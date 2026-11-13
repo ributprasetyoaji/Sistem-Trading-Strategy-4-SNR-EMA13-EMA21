@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+data/
+data_test_s2/
+*.log

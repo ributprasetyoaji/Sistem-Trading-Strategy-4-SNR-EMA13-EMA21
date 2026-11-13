@@ -1,0 +1,1 @@
+# Sistem-Trading-Strategy-3

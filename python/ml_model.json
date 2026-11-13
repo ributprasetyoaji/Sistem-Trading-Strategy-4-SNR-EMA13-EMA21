@@ -1,0 +1,58 @@
+{
+ "feat_version": 1,
+ "features": [
+  "sdir",
+  "gap_ema",
+  "adx_n",
+  "room",
+  "ext",
+  "mom3",
+  "brkout",
+  "hour_sin",
+  "hour_cos"
+ ],
+ "w": [
+  0.018672,
+  -0.078164,
+  -0.06176,
+  0.001155,
+  0.393666,
+  0.13916,
+  -0.151239,
+  0.091703,
+  -0.035579
+ ],
+ "b": -0.293738,
+ "meta": {
+  "n_train": 638800,
+  "n_val": 159700,
+  "acc_train": 0.5029,
+  "acc_val": 0.5088,
+  "pairs": [
+   "AUDUSD",
+   "BTCUSD",
+   "ETHUSD",
+   "EURJPY",
+   "EURUSD",
+   "GBPJPY",
+   "GBPUSD",
+   "GER40",
+   "LTCUSD",
+   "NAS100",
+   "NZDUSD",
+   "SOLUSD",
+   "US30",
+   "US500",
+   "USDCAD",
+   "USDCHF",
+   "USDJPY",
+   "USOIL",
+   "XAGUSD",
+   "XAUUSD",
+   "XPTUSD",
+   "XRPUSD"
+  ],
+  "step": 2,
+  "trained_utc": "2026-10-06 17:24 UTC"
+ }
+}
