@@ -51,7 +51,7 @@ button:hover{filter:brightness(1.15)}
 </style></head><body>
 <div class="box">
 <svg viewBox="0 0 32 24" width="42" height="30"><defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd75e"/><stop offset="1" stop-color="#d99900"/></linearGradient></defs><path d="M2 19 L2 8 L9.5 13.5 L16 2.5 L22.5 13.5 L30 8 L30 19 Z" fill="url(#cg)"/><rect x="2" y="19.5" width="28" height="3" rx="1" fill="#d99900"/></svg>
-<h1>RBT FX</h1><small>COMMAND CENTER</small>
+<h1>RBT FX</h1><small>COMMAND CENTER &middot; UI-2</small>
 <p>MASUKKAN PASSWORD DASHBOARD</p>
 <input id="pw" type="password" placeholder="*****" autofocus>
 <button onclick="go()">MASUK</button>
@@ -431,7 +431,7 @@ grid-template-areas:"scan" "chart" "conf" "log" "pos"}
 <main>
 <div class="topbar">
   <div class="logo"><svg class="crown" viewBox="0 0 32 24" width="38" height="28" aria-hidden="true"><defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd75e"/><stop offset="1" stop-color="#d99900"/></linearGradient></defs><path d="M2 19 L2 8 L9.5 13.5 L16 2.5 L22.5 13.5 L30 8 L30 19 Z" fill="url(#cg)" stroke="#ffe08a" stroke-width="1"/><rect x="2" y="19.5" width="28" height="3" rx="1" fill="#d99900"/></svg><span class="brand glitch">RBT FX</span><span class="cur">▊</span>
-    <small>TRADING ALGO SYSTEM <b id="uiver" style="color:#5d9678;font-weight:700"></b></small></div>
+    <small>TRADING ALGO SYSTEM &middot; UI-2 <b id="uiver" style="color:#5d9678;font-weight:700"></b></small></div>
   <div class="chips">
     <div class="chip grn"><span class="ci">⬢</span><span class="ct"><small>PYTHON ENGINE</small><b id="c-engine">-ONLINE</b></span></div>
     <div id="hb-alert" style="display:none;background:#7a1f1f;color:#ffd9d9;border:1px solid #ff6b6b;border-radius:10px;padding:8px 12px;margin:8px 0;font:600 13px system-ui">

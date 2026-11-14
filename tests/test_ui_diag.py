@@ -11,6 +11,11 @@ def _page():
 def test_stamp_versi_ui_di_header():
     assert 'id="uiver"' in _page()
     assert "UI-2 v" in _page()
+    assert "TRADING ALGO SYSTEM &middot; UI-2" in _page()   # statis, terlihat tanpa JS
+
+
+def test_stamp_statis_di_halaman_login():
+    assert "COMMAND CENTER &middot; UI-2" in _page()
 
 
 def test_auto_reload_saat_versi_engine_ganti():
