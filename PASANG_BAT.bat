@@ -19,20 +19,24 @@ echo ================================================================
 echo.
 
 
+
 rem ====== MULAI_STRATEGY_1.bat ======
 if exist "MULAI_STRATEGY_1.bat" del "MULAI_STRATEGY_1.bat" >nul 2>nul
 >>"MULAI_STRATEGY_1.bat" echo @echo off
 >>"MULAI_STRATEGY_1.bat" echo setlocal
 >>"MULAI_STRATEGY_1.bat" echo title RBT FX - STRATEGY 1
 >>"MULAI_STRATEGY_1.bat" echo rem ================================================================
->>"MULAI_STRATEGY_1.bat" echo rem  MULAI STRATEGY 1 - FINAL v6 (anti-rusak versi lama)
->>"MULAI_STRATEGY_1.bat" echo rem  Letak file bebas: di dalam folder strategy, C:\RBT, Desktop,
->>"MULAI_STRATEGY_1.bat" echo rem  Downloads - folder dicari otomatis, nama folder fleksibel.
->>"MULAI_STRATEGY_1.bat" echo rem  Bisa mendeteksi MULAI_SEMUA.bat versi lama (penyebab GAGAL)
->>"MULAI_STRATEGY_1.bat" echo rem  dan menyalakan engine + dashboard LANGSUNG melewatinya.
+>>"MULAI_STRATEGY_1.bat" echo rem  MULAI STRATEGY 1 - FINAL v7
+>>"MULAI_STRATEGY_1.bat" echo rem  Cari otomatis di: samping file ini, C:\RBT, Desktop,
+>>"MULAI_STRATEGY_1.bat" echo rem  OneDrive Desktop, Documents, Downloads (nama folder bebas).
+>>"MULAI_STRATEGY_1.bat" echo rem  Kalau tidak ketemu: cukup SERET folder strategy ke jendela ini
+>>"MULAI_STRATEGY_1.bat" echo rem  - lokasi DIINGAT selamanya - berikutnya otomatis lagi.
 >>"MULAI_STRATEGY_1.bat" echo rem ================================================================
 >>"MULAI_STRATEGY_1.bat" echo set "DIR="
 >>"MULAI_STRATEGY_1.bat" echo set "DIRF="
+>>"MULAI_STRATEGY_1.bat" echo if exist "%%~dp0S1_LOKASI.txt" set /p DIR=<"%%~dp0S1_LOKASI.txt"
+>>"MULAI_STRATEGY_1.bat" echo if defined DIR if exist "%%DIR%%\MULAI_SEMUA.bat" goto mulai
+>>"MULAI_STRATEGY_1.bat" echo set "DIR="
 >>"MULAI_STRATEGY_1.bat" echo if exist "%%~dp0MULAI_SEMUA.bat" set "DIR=%%~dp0"
 >>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%~dp0*Strategy-1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%~dp0*Strategy_1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
@@ -45,28 +49,70 @@ if exist "MULAI_STRATEGY_1.bat" del "MULAI_STRATEGY_1.bat" >nul 2>nul
 >>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy-1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy_1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy 1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy-1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy_1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy 1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy-1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy_1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy 1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy-1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy_1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy 1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_1.bat" echo if defined DIR goto mulai
->>"MULAI_STRATEGY_1.bat" echo rem cadangan: folder ketemu tapi MULAI_SEMUA.bat belum ada - engine langsung
 >>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%~dp0*Strategy-1*") do if not defined DIRF set "DIRF=%%%%D"
 >>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("C:\RBT\*Strategy-1*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("C:\RBT\*Strategy_1*") do if not defined DIRF set "DIRF=%%%%D"
 >>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy-1*") do if not defined DIRF set "DIRF=%%%%D"
+>>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy-1*") do if not defined DIRF set "DIRF=%%%%D"
+>>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy-1*") do if not defined DIRF set "DIRF=%%%%D"
 >>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy-1*") do if not defined DIRF set "DIRF=%%%%D"
 >>"MULAI_STRATEGY_1.bat" echo if defined DIRF goto engine
->>"MULAI_STRATEGY_1.bat" echo echo [X] Folder STRATEGY 1 tidak ketemu di lokasi manapun:
->>"MULAI_STRATEGY_1.bat" echo echo     di samping file ini, C:\RBT, Desktop, Downloads.
->>"MULAI_STRATEGY_1.bat" echo echo Pastikan folder Sistem-Trading-Strategy-1 ada di salah satu tempat itu.
+>>"MULAI_STRATEGY_1.bat" echo echo [X] Folder STRATEGY 1 tidak ketemu otomatis.
+>>"MULAI_STRATEGY_1.bat" echo echo.
+>>"MULAI_STRATEGY_1.bat" echo echo ---- INFO UNTUK DIAGNOSIS (kalau mampir foto layar ini) ----
+>>"MULAI_STRATEGY_1.bat" echo echo Profil Windows: %%USERPROFILE%%
+>>"MULAI_STRATEGY_1.bat" echo dir /b "C:\RBT" 2>nul | findstr /I "strategy"
+>>"MULAI_STRATEGY_1.bat" echo dir /b "%%USERPROFILE%%\Desktop" 2>nul | findstr /I "strategy"
+>>"MULAI_STRATEGY_1.bat" echo dir /b "%%USERPROFILE%%\Downloads" 2>nul | findstr /I "strategy"
+>>"MULAI_STRATEGY_1.bat" echo dir /b "%%~dp0" | findstr /I "strategy"
+>>"MULAI_STRATEGY_1.bat" echo echo ---- AKHIR INFO ----
+>>"MULAI_STRATEGY_1.bat" echo echo.
+>>"MULAI_STRATEGY_1.bat" echo echo ====== CARA PASTI (10 detik) ======
+>>"MULAI_STRATEGY_1.bat" echo echo 1. Buka File Explorer (ikon folder kuning di taskbar)
+>>"MULAI_STRATEGY_1.bat" echo echo 2. Cari folder Sistem-Trading-Strategy-1
+>>"MULAI_STRATEGY_1.bat" echo echo 3. SERET folder itu pakai mouse ke JENDELA HITAM INI
+>>"MULAI_STRATEGY_1.bat" echo echo 4. Lepaskan di dalam jendela ini, lalu tekan Enter
+>>"MULAI_STRATEGY_1.bat" echo echo.
+>>"MULAI_STRATEGY_1.bat" echo set /p "LOK=Seret folder ke sini lalu tekan Enter: "
+>>"MULAI_STRATEGY_1.bat" echo set "LOK=%%LOK:"=%%"
+>>"MULAI_STRATEGY_1.bat" echo if not defined LOK goto gagal_input
+>>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%LOK%%\*Strategy-1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_1.bat" echo if exist "%%LOK%%\Sistem-Trading-Strategy-1\MULAI_SEMUA.bat" set "DIR=%%LOK%%\Sistem-Trading-Strategy-1"
+>>"MULAI_STRATEGY_1.bat" echo if exist "%%LOK%%\MULAI_SEMUA.bat" set "DIR=%%LOK%%"
+>>"MULAI_STRATEGY_1.bat" echo if not defined DIR goto input_salah
+>>"MULAI_STRATEGY_1.bat" echo >"%%~dp0S1_LOKASI.txt" echo %%LOK%%
+>>"MULAI_STRATEGY_1.bat" echo echo [OK] Lokasi disimpan: %%DIR%%
+>>"MULAI_STRATEGY_1.bat" echo goto mulai
+>>"MULAI_STRATEGY_1.bat" echo.
+>>"MULAI_STRATEGY_1.bat" echo :input_salah
+>>"MULAI_STRATEGY_1.bat" echo echo [X] Di folder yang diseret tidak ada MULAI_SEMUA.bat.
+>>"MULAI_STRATEGY_1.bat" echo echo Kemungkinan yang diseret folder induk atau folder salah.
+>>"MULAI_STRATEGY_1.bat" echo echo Seret folder yang DI DALAMNYA terlihat MULAI_SEMUA.bat.
+>>"MULAI_STRATEGY_1.bat" echo echo.
+>>"MULAI_STRATEGY_1.bat" echo pause
+>>"MULAI_STRATEGY_1.bat" echo exit /b 1
+>>"MULAI_STRATEGY_1.bat" echo.
+>>"MULAI_STRATEGY_1.bat" echo :gagal_input
+>>"MULAI_STRATEGY_1.bat" echo echo Tidak ada input. Klik 2x file ini lagi untuk mencoba.
 >>"MULAI_STRATEGY_1.bat" echo echo.
 >>"MULAI_STRATEGY_1.bat" echo pause
 >>"MULAI_STRATEGY_1.bat" echo exit /b 1
 >>"MULAI_STRATEGY_1.bat" echo.
 >>"MULAI_STRATEGY_1.bat" echo :mulai
 >>"MULAI_STRATEGY_1.bat" echo cd /d "%%DIR%%"
->>"MULAI_STRATEGY_1.bat" echo rem ==== DETEKSI BAT LAMA: MULAI_SEMUA.bat tanpa TOKEN.txt = versi lama ====
 >>"MULAI_STRATEGY_1.bat" echo findstr /C:"TOKEN.txt" "MULAI_SEMUA.bat" >nul 2>nul
 >>"MULAI_STRATEGY_1.bat" echo if errorlevel 1 goto oldbat
 >>"MULAI_STRATEGY_1.bat" echo echo Menyalakan STRATEGY 1 di %%DIR%% ...
@@ -74,10 +120,15 @@ if exist "MULAI_STRATEGY_1.bat" del "MULAI_STRATEGY_1.bat" >nul 2>nul
 >>"MULAI_STRATEGY_1.bat" echo goto selesai
 >>"MULAI_STRATEGY_1.bat" echo.
 >>"MULAI_STRATEGY_1.bat" echo :oldbat
->>"MULAI_STRATEGY_1.bat" echo echo MULAI_SEMUA.bat versi LAMA terdeteksi - jalur update lamanya selalu GAGAL
->>"MULAI_STRATEGY_1.bat" echo echo (persis layar [0/3] GAGAL di foto). Engine + dashboard dinyalakan
->>"MULAI_STRATEGY_1.bat" echo echo LANGSUNG tanpa lewat jalur itu - Strategy 1 tetap trading.
+>>"MULAI_STRATEGY_1.bat" echo echo MULAI_SEMUA.bat versi LAMA terdeteksi - jalur update lamanya selalu GAGAL.
+>>"MULAI_STRATEGY_1.bat" echo echo Engine plus dashboard dinyalakan LANGSUNG melewatinya.
 >>"MULAI_STRATEGY_1.bat" echo echo.
+>>"MULAI_STRATEGY_1.bat" echo goto startdirect
+>>"MULAI_STRATEGY_1.bat" echo.
+>>"MULAI_STRATEGY_1.bat" echo :engine
+>>"MULAI_STRATEGY_1.bat" echo cd /d "%%DIRF%%"
+>>"MULAI_STRATEGY_1.bat" echo echo MULAI_SEMUA.bat belum ada di folder itu - engine dinyalakan langsung.
+>>"MULAI_STRATEGY_1.bat" echo :startdirect
 >>"MULAI_STRATEGY_1.bat" echo set "PY="
 >>"MULAI_STRATEGY_1.bat" echo python --version >nul 2>nul
 >>"MULAI_STRATEGY_1.bat" echo if not errorlevel 1 set "PY=python"
@@ -85,7 +136,8 @@ if exist "MULAI_STRATEGY_1.bat" del "MULAI_STRATEGY_1.bat" >nul 2>nul
 >>"MULAI_STRATEGY_1.bat" echo py -3 --version >nul 2>nul
 >>"MULAI_STRATEGY_1.bat" echo if not errorlevel 1 set "PY=py -3"
 >>"MULAI_STRATEGY_1.bat" echo if defined PY goto pyok
->>"MULAI_STRATEGY_1.bat" echo echo [X] Python tidak ketemu. Buka folder %%DIR%% lalu klik 2x MULAI_SEMUA.bat.
+>>"MULAI_STRATEGY_1.bat" echo echo [X] Python tidak ketemu di VPS ini.
+>>"MULAI_STRATEGY_1.bat" echo echo Buka folder %%CD%% lalu klik 2x MULAI_SEMUA.bat di dalamnya.
 >>"MULAI_STRATEGY_1.bat" echo echo.
 >>"MULAI_STRATEGY_1.bat" echo pause
 >>"MULAI_STRATEGY_1.bat" echo exit /b 1
@@ -99,37 +151,8 @@ if exist "MULAI_STRATEGY_1.bat" del "MULAI_STRATEGY_1.bat" >nul 2>nul
 >>"MULAI_STRATEGY_1.bat" echo set "PYW=%%PY%%"
 >>"MULAI_STRATEGY_1.bat" echo for %%%%P in (%%PY%%) do if exist "%%%%~dpPpythonw.exe" set "PYW=%%%%~dpPpythonw.exe"
 >>"MULAI_STRATEGY_1.bat" echo start "RBT FX DASHBOARD" %%PYW%% "%%DASH%%" --port 8080
->>"MULAI_STRATEGY_1.bat" echo echo Dashboard dinyalakan. Engine mulai - log hidup di jendela ini.
+>>"MULAI_STRATEGY_1.bat" echo echo Dashboard dinyalakan. Engine berjalan DI JENDELA INI - log hidup di bawah.
 >>"MULAI_STRATEGY_1.bat" echo echo JANGAN tutup jendela ini selama trading.
->>"MULAI_STRATEGY_1.bat" echo echo.
->>"MULAI_STRATEGY_1.bat" echo %%PY%% -u python\command_center.py
->>"MULAI_STRATEGY_1.bat" echo goto selesai
->>"MULAI_STRATEGY_1.bat" echo.
->>"MULAI_STRATEGY_1.bat" echo :engine
->>"MULAI_STRATEGY_1.bat" echo cd /d "%%DIRF%%"
->>"MULAI_STRATEGY_1.bat" echo echo MULAI_SEMUA.bat belum ada - menyalakan engine + dashboard langsung di %%DIRF%%
->>"MULAI_STRATEGY_1.bat" echo set "PY="
->>"MULAI_STRATEGY_1.bat" echo python --version >nul 2>nul
->>"MULAI_STRATEGY_1.bat" echo if not errorlevel 1 set "PY=python"
->>"MULAI_STRATEGY_1.bat" echo if defined PY goto pyok2
->>"MULAI_STRATEGY_1.bat" echo py -3 --version >nul 2>nul
->>"MULAI_STRATEGY_1.bat" echo if not errorlevel 1 set "PY=py -3"
->>"MULAI_STRATEGY_1.bat" echo if defined PY goto pyok2
->>"MULAI_STRATEGY_1.bat" echo echo [X] Python tidak ketemu.
->>"MULAI_STRATEGY_1.bat" echo echo.
->>"MULAI_STRATEGY_1.bat" echo pause
->>"MULAI_STRATEGY_1.bat" echo exit /b 1
->>"MULAI_STRATEGY_1.bat" echo.
->>"MULAI_STRATEGY_1.bat" echo :pyok2
->>"MULAI_STRATEGY_1.bat" echo set "DASH=python\cc_tkdashboard.py"
->>"MULAI_STRATEGY_1.bat" echo %%PY%% -c "import PySide6" >nul 2>nul
->>"MULAI_STRATEGY_1.bat" echo if errorlevel 1 goto dashgo2
->>"MULAI_STRATEGY_1.bat" echo set "DASH=python\cc_qtdashboard.py"
->>"MULAI_STRATEGY_1.bat" echo :dashgo2
->>"MULAI_STRATEGY_1.bat" echo set "PYW=%%PY%%"
->>"MULAI_STRATEGY_1.bat" echo for %%%%P in (%%PY%%) do if exist "%%%%~dpPpythonw.exe" set "PYW=%%%%~dpPpythonw.exe"
->>"MULAI_STRATEGY_1.bat" echo start "RBT FX DASHBOARD" %%PYW%% "%%DASH%%" --port 8080
->>"MULAI_STRATEGY_1.bat" echo echo Dashboard dinyalakan. Engine mulai - log hidup di jendela ini.
 >>"MULAI_STRATEGY_1.bat" echo echo.
 >>"MULAI_STRATEGY_1.bat" echo %%PY%% -u python\command_center.py
 >>"MULAI_STRATEGY_1.bat" echo goto selesai
@@ -137,8 +160,6 @@ if exist "MULAI_STRATEGY_1.bat" del "MULAI_STRATEGY_1.bat" >nul 2>nul
 >>"MULAI_STRATEGY_1.bat" echo :selesai
 >>"MULAI_STRATEGY_1.bat" echo echo.
 >>"MULAI_STRATEGY_1.bat" echo echo STRATEGY 1 berhenti. Klik 2x file ini lagi untuk menyalakan.
->>"MULAI_STRATEGY_1.bat" echo echo Saran: jalankan PERBAIKI_TOKEN.bat sekali di folder ini agar
->>"MULAI_STRATEGY_1.bat" echo echo jalur update normal kembali berfungsi.
 >>"MULAI_STRATEGY_1.bat" echo echo.
 >>"MULAI_STRATEGY_1.bat" echo pause
 >>"MULAI_STRATEGY_1.bat" echo exit /b 0
@@ -151,16 +172,18 @@ if exist "MULAI_STRATEGY_2.bat" del "MULAI_STRATEGY_2.bat" >nul 2>nul
 >>"MULAI_STRATEGY_2.bat" echo setlocal
 >>"MULAI_STRATEGY_2.bat" echo title RBT FX - STRATEGY 2
 >>"MULAI_STRATEGY_2.bat" echo rem ================================================================
->>"MULAI_STRATEGY_2.bat" echo rem  MULAI STRATEGY 2 - FILE FINAL UTUH (mandiri)
->>"MULAI_STRATEGY_2.bat" echo rem  Letak file bebas: di dalam folder strategy, C:\RBT, Desktop,
->>"MULAI_STRATEGY_2.bat" echo rem  Downloads - folder strategy dicari otomatis di semua tempat,
->>"MULAI_STRATEGY_2.bat" echo rem  nama folder fleksibel (Strategy-1, Strategy_1, Strategy 1, dll).
+>>"MULAI_STRATEGY_2.bat" echo rem  MULAI STRATEGY 2 - FINAL v7
+>>"MULAI_STRATEGY_2.bat" echo rem  Cari otomatis di: samping file ini, C:\RBT, Desktop,
+>>"MULAI_STRATEGY_2.bat" echo rem  OneDrive Desktop, Documents, Downloads (nama folder bebas).
+>>"MULAI_STRATEGY_2.bat" echo rem  Kalau tidak ketemu: cukup SERET folder strategy ke jendela ini
+>>"MULAI_STRATEGY_2.bat" echo rem  - lokasi DIINGAT selamanya - berikutnya otomatis lagi.
 >>"MULAI_STRATEGY_2.bat" echo rem ================================================================
 >>"MULAI_STRATEGY_2.bat" echo set "DIR="
 >>"MULAI_STRATEGY_2.bat" echo set "DIRF="
->>"MULAI_STRATEGY_2.bat" echo rem [1/3] file ini ada DI DALAM folder strategy?
+>>"MULAI_STRATEGY_2.bat" echo if exist "%%~dp0S2_LOKASI.txt" set /p DIR=<"%%~dp0S2_LOKASI.txt"
+>>"MULAI_STRATEGY_2.bat" echo if defined DIR if exist "%%DIR%%\MULAI_SEMUA.bat" goto mulai
+>>"MULAI_STRATEGY_2.bat" echo set "DIR="
 >>"MULAI_STRATEGY_2.bat" echo if exist "%%~dp0MULAI_SEMUA.bat" set "DIR=%%~dp0"
->>"MULAI_STRATEGY_2.bat" echo rem [2/3] cari folder strategy di 4 lokasi, nama folder fleksibel
 >>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%~dp0*Strategy-2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%~dp0*Strategy_2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%~dp0*Strategy 2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
@@ -172,21 +195,64 @@ if exist "MULAI_STRATEGY_2.bat" del "MULAI_STRATEGY_2.bat" >nul 2>nul
 >>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy-2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy_2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy 2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy-2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy_2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy 2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy-2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy_2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy 2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy-2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy_2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy 2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_2.bat" echo if defined DIR goto mulai
->>"MULAI_STRATEGY_2.bat" echo rem [3/3] cadangan: folder strategy ketemu tapi MULAI_SEMUA.bat belum ada - engine langsung
 >>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%~dp0*Strategy-2*") do if not defined DIRF set "DIRF=%%%%D"
 >>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("C:\RBT\*Strategy-2*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("C:\RBT\*Strategy_2*") do if not defined DIRF set "DIRF=%%%%D"
 >>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy-2*") do if not defined DIRF set "DIRF=%%%%D"
+>>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy-2*") do if not defined DIRF set "DIRF=%%%%D"
+>>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy-2*") do if not defined DIRF set "DIRF=%%%%D"
 >>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy-2*") do if not defined DIRF set "DIRF=%%%%D"
 >>"MULAI_STRATEGY_2.bat" echo if defined DIRF goto engine
->>"MULAI_STRATEGY_2.bat" echo echo [X] Folder STRATEGY 2 tidak ketemu di lokasi manapun:
->>"MULAI_STRATEGY_2.bat" echo echo     di samping file ini, C:\RBT, Desktop, Downloads.
->>"MULAI_STRATEGY_2.bat" echo echo Pastikan folder Sistem-Trading-Strategy-2 ada di salah satu tempat itu.
+>>"MULAI_STRATEGY_2.bat" echo echo [X] Folder STRATEGY 2 tidak ketemu otomatis.
+>>"MULAI_STRATEGY_2.bat" echo echo.
+>>"MULAI_STRATEGY_2.bat" echo echo ---- INFO UNTUK DIAGNOSIS (kalau mampir foto layar ini) ----
+>>"MULAI_STRATEGY_2.bat" echo echo Profil Windows: %%USERPROFILE%%
+>>"MULAI_STRATEGY_2.bat" echo dir /b "C:\RBT" 2>nul | findstr /I "strategy"
+>>"MULAI_STRATEGY_2.bat" echo dir /b "%%USERPROFILE%%\Desktop" 2>nul | findstr /I "strategy"
+>>"MULAI_STRATEGY_2.bat" echo dir /b "%%USERPROFILE%%\Downloads" 2>nul | findstr /I "strategy"
+>>"MULAI_STRATEGY_2.bat" echo dir /b "%%~dp0" | findstr /I "strategy"
+>>"MULAI_STRATEGY_2.bat" echo echo ---- AKHIR INFO ----
+>>"MULAI_STRATEGY_2.bat" echo echo.
+>>"MULAI_STRATEGY_2.bat" echo echo ====== CARA PASTI (10 detik) ======
+>>"MULAI_STRATEGY_2.bat" echo echo 1. Buka File Explorer (ikon folder kuning di taskbar)
+>>"MULAI_STRATEGY_2.bat" echo echo 2. Cari folder Sistem-Trading-Strategy-2
+>>"MULAI_STRATEGY_2.bat" echo echo 3. SERET folder itu pakai mouse ke JENDELA HITAM INI
+>>"MULAI_STRATEGY_2.bat" echo echo 4. Lepaskan di dalam jendela ini, lalu tekan Enter
+>>"MULAI_STRATEGY_2.bat" echo echo.
+>>"MULAI_STRATEGY_2.bat" echo set /p "LOK=Seret folder ke sini lalu tekan Enter: "
+>>"MULAI_STRATEGY_2.bat" echo set "LOK=%%LOK:"=%%"
+>>"MULAI_STRATEGY_2.bat" echo if not defined LOK goto gagal_input
+>>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%LOK%%\*Strategy-2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_2.bat" echo if exist "%%LOK%%\Sistem-Trading-Strategy-2\MULAI_SEMUA.bat" set "DIR=%%LOK%%\Sistem-Trading-Strategy-2"
+>>"MULAI_STRATEGY_2.bat" echo if exist "%%LOK%%\MULAI_SEMUA.bat" set "DIR=%%LOK%%"
+>>"MULAI_STRATEGY_2.bat" echo if not defined DIR goto input_salah
+>>"MULAI_STRATEGY_2.bat" echo >"%%~dp0S2_LOKASI.txt" echo %%LOK%%
+>>"MULAI_STRATEGY_2.bat" echo echo [OK] Lokasi disimpan: %%DIR%%
+>>"MULAI_STRATEGY_2.bat" echo goto mulai
+>>"MULAI_STRATEGY_2.bat" echo.
+>>"MULAI_STRATEGY_2.bat" echo :input_salah
+>>"MULAI_STRATEGY_2.bat" echo echo [X] Di folder yang diseret tidak ada MULAI_SEMUA.bat.
+>>"MULAI_STRATEGY_2.bat" echo echo Kemungkinan yang diseret folder induk atau folder salah.
+>>"MULAI_STRATEGY_2.bat" echo echo Seret folder yang DI DALAMNYA terlihat MULAI_SEMUA.bat.
+>>"MULAI_STRATEGY_2.bat" echo echo.
+>>"MULAI_STRATEGY_2.bat" echo pause
+>>"MULAI_STRATEGY_2.bat" echo exit /b 1
+>>"MULAI_STRATEGY_2.bat" echo.
+>>"MULAI_STRATEGY_2.bat" echo :gagal_input
+>>"MULAI_STRATEGY_2.bat" echo echo Tidak ada input. Klik 2x file ini lagi untuk mencoba.
 >>"MULAI_STRATEGY_2.bat" echo echo.
 >>"MULAI_STRATEGY_2.bat" echo pause
 >>"MULAI_STRATEGY_2.bat" echo exit /b 1
@@ -195,31 +261,44 @@ if exist "MULAI_STRATEGY_2.bat" del "MULAI_STRATEGY_2.bat" >nul 2>nul
 >>"MULAI_STRATEGY_2.bat" echo cd /d "%%DIR%%"
 >>"MULAI_STRATEGY_2.bat" echo echo Menyalakan STRATEGY 2 di %%DIR%% ...
 >>"MULAI_STRATEGY_2.bat" echo call "MULAI_SEMUA.bat"
->>"MULAI_STRATEGY_2.bat" echo echo.
->>"MULAI_STRATEGY_2.bat" echo echo STRATEGY 2 berhenti. Klik 2x file ini lagi untuk menyalakan.
->>"MULAI_STRATEGY_2.bat" echo pause
->>"MULAI_STRATEGY_2.bat" echo exit /b 0
+>>"MULAI_STRATEGY_2.bat" echo goto selesai
 >>"MULAI_STRATEGY_2.bat" echo.
 >>"MULAI_STRATEGY_2.bat" echo :engine
 >>"MULAI_STRATEGY_2.bat" echo cd /d "%%DIRF%%"
->>"MULAI_STRATEGY_2.bat" echo echo MULAI_SEMUA.bat belum ada - menyalakan engine langsung di %%DIRF%%
+>>"MULAI_STRATEGY_2.bat" echo echo MULAI_SEMUA.bat belum ada di folder itu - engine dinyalakan langsung.
+>>"MULAI_STRATEGY_2.bat" echo :startdirect
 >>"MULAI_STRATEGY_2.bat" echo set "PY="
 >>"MULAI_STRATEGY_2.bat" echo python --version >nul 2>nul
 >>"MULAI_STRATEGY_2.bat" echo if not errorlevel 1 set "PY=python"
->>"MULAI_STRATEGY_2.bat" echo if defined PY goto runeng
+>>"MULAI_STRATEGY_2.bat" echo if defined PY goto pyok
 >>"MULAI_STRATEGY_2.bat" echo py -3 --version >nul 2>nul
 >>"MULAI_STRATEGY_2.bat" echo if not errorlevel 1 set "PY=py -3"
->>"MULAI_STRATEGY_2.bat" echo if defined PY goto runeng
->>"MULAI_STRATEGY_2.bat" echo echo [X] Python tidak ketemu. Cara yang betul:
->>"MULAI_STRATEGY_2.bat" echo echo     buka folder %%DIRF%% lalu klik 2x MULAI_SEMUA.bat di dalamnya.
+>>"MULAI_STRATEGY_2.bat" echo if defined PY goto pyok
+>>"MULAI_STRATEGY_2.bat" echo echo [X] Python tidak ketemu di VPS ini.
+>>"MULAI_STRATEGY_2.bat" echo echo Buka folder %%CD%% lalu klik 2x MULAI_SEMUA.bat di dalamnya.
 >>"MULAI_STRATEGY_2.bat" echo echo.
 >>"MULAI_STRATEGY_2.bat" echo pause
 >>"MULAI_STRATEGY_2.bat" echo exit /b 1
 >>"MULAI_STRATEGY_2.bat" echo.
->>"MULAI_STRATEGY_2.bat" echo :runeng
->>"MULAI_STRATEGY_2.bat" echo "%%PY%%" -u python\command_center.py
+>>"MULAI_STRATEGY_2.bat" echo :pyok
+>>"MULAI_STRATEGY_2.bat" echo set "DASH=python\cc_tkdashboard.py"
+>>"MULAI_STRATEGY_2.bat" echo %%PY%% -c "import PySide6" >nul 2>nul
+>>"MULAI_STRATEGY_2.bat" echo if errorlevel 1 goto dashgo
+>>"MULAI_STRATEGY_2.bat" echo set "DASH=python\cc_qtdashboard.py"
+>>"MULAI_STRATEGY_2.bat" echo :dashgo
+>>"MULAI_STRATEGY_2.bat" echo set "PYW=%%PY%%"
+>>"MULAI_STRATEGY_2.bat" echo for %%%%P in (%%PY%%) do if exist "%%%%~dpPpythonw.exe" set "PYW=%%%%~dpPpythonw.exe"
+>>"MULAI_STRATEGY_2.bat" echo start "RBT FX DASHBOARD" %%PYW%% "%%DASH%%" --port 8082
+>>"MULAI_STRATEGY_2.bat" echo echo Dashboard dinyalakan. Engine berjalan DI JENDELA INI - log hidup di bawah.
+>>"MULAI_STRATEGY_2.bat" echo echo JANGAN tutup jendela ini selama trading.
+>>"MULAI_STRATEGY_2.bat" echo echo.
+>>"MULAI_STRATEGY_2.bat" echo %%PY%% -u python\command_center.py
+>>"MULAI_STRATEGY_2.bat" echo goto selesai
+>>"MULAI_STRATEGY_2.bat" echo.
+>>"MULAI_STRATEGY_2.bat" echo :selesai
 >>"MULAI_STRATEGY_2.bat" echo echo.
 >>"MULAI_STRATEGY_2.bat" echo echo STRATEGY 2 berhenti. Klik 2x file ini lagi untuk menyalakan.
+>>"MULAI_STRATEGY_2.bat" echo echo.
 >>"MULAI_STRATEGY_2.bat" echo pause
 >>"MULAI_STRATEGY_2.bat" echo exit /b 0
 >>"MULAI_STRATEGY_2.bat" echo.
@@ -231,16 +310,18 @@ if exist "MULAI_STRATEGY_3.bat" del "MULAI_STRATEGY_3.bat" >nul 2>nul
 >>"MULAI_STRATEGY_3.bat" echo setlocal
 >>"MULAI_STRATEGY_3.bat" echo title RBT FX - STRATEGY 3
 >>"MULAI_STRATEGY_3.bat" echo rem ================================================================
->>"MULAI_STRATEGY_3.bat" echo rem  MULAI STRATEGY 3 - FILE FINAL UTUH (mandiri)
->>"MULAI_STRATEGY_3.bat" echo rem  Letak file bebas: di dalam folder strategy, C:\RBT, Desktop,
->>"MULAI_STRATEGY_3.bat" echo rem  Downloads - folder strategy dicari otomatis di semua tempat,
->>"MULAI_STRATEGY_3.bat" echo rem  nama folder fleksibel (Strategy-1, Strategy_1, Strategy 1, dll).
+>>"MULAI_STRATEGY_3.bat" echo rem  MULAI STRATEGY 3 - FINAL v7
+>>"MULAI_STRATEGY_3.bat" echo rem  Cari otomatis di: samping file ini, C:\RBT, Desktop,
+>>"MULAI_STRATEGY_3.bat" echo rem  OneDrive Desktop, Documents, Downloads (nama folder bebas).
+>>"MULAI_STRATEGY_3.bat" echo rem  Kalau tidak ketemu: cukup SERET folder strategy ke jendela ini
+>>"MULAI_STRATEGY_3.bat" echo rem  - lokasi DIINGAT selamanya - berikutnya otomatis lagi.
 >>"MULAI_STRATEGY_3.bat" echo rem ================================================================
 >>"MULAI_STRATEGY_3.bat" echo set "DIR="
 >>"MULAI_STRATEGY_3.bat" echo set "DIRF="
->>"MULAI_STRATEGY_3.bat" echo rem [1/3] file ini ada DI DALAM folder strategy?
+>>"MULAI_STRATEGY_3.bat" echo if exist "%%~dp0S3_LOKASI.txt" set /p DIR=<"%%~dp0S3_LOKASI.txt"
+>>"MULAI_STRATEGY_3.bat" echo if defined DIR if exist "%%DIR%%\MULAI_SEMUA.bat" goto mulai
+>>"MULAI_STRATEGY_3.bat" echo set "DIR="
 >>"MULAI_STRATEGY_3.bat" echo if exist "%%~dp0MULAI_SEMUA.bat" set "DIR=%%~dp0"
->>"MULAI_STRATEGY_3.bat" echo rem [2/3] cari folder strategy di 4 lokasi, nama folder fleksibel
 >>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%~dp0*Strategy-3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%~dp0*Strategy_3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%~dp0*Strategy 3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
@@ -252,21 +333,64 @@ if exist "MULAI_STRATEGY_3.bat" del "MULAI_STRATEGY_3.bat" >nul 2>nul
 >>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy-3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy_3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy 3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy-3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy_3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy 3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy-3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy_3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy 3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy-3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy_3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy 3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_3.bat" echo if defined DIR goto mulai
->>"MULAI_STRATEGY_3.bat" echo rem [3/3] cadangan: folder strategy ketemu tapi MULAI_SEMUA.bat belum ada - engine langsung
 >>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%~dp0*Strategy-3*") do if not defined DIRF set "DIRF=%%%%D"
 >>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("C:\RBT\*Strategy-3*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("C:\RBT\*Strategy_3*") do if not defined DIRF set "DIRF=%%%%D"
 >>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy-3*") do if not defined DIRF set "DIRF=%%%%D"
+>>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy-3*") do if not defined DIRF set "DIRF=%%%%D"
+>>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy-3*") do if not defined DIRF set "DIRF=%%%%D"
 >>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy-3*") do if not defined DIRF set "DIRF=%%%%D"
 >>"MULAI_STRATEGY_3.bat" echo if defined DIRF goto engine
->>"MULAI_STRATEGY_3.bat" echo echo [X] Folder STRATEGY 3 tidak ketemu di lokasi manapun:
->>"MULAI_STRATEGY_3.bat" echo echo     di samping file ini, C:\RBT, Desktop, Downloads.
->>"MULAI_STRATEGY_3.bat" echo echo Pastikan folder Sistem-Trading-Strategy-3 ada di salah satu tempat itu.
+>>"MULAI_STRATEGY_3.bat" echo echo [X] Folder STRATEGY 3 tidak ketemu otomatis.
+>>"MULAI_STRATEGY_3.bat" echo echo.
+>>"MULAI_STRATEGY_3.bat" echo echo ---- INFO UNTUK DIAGNOSIS (kalau mampir foto layar ini) ----
+>>"MULAI_STRATEGY_3.bat" echo echo Profil Windows: %%USERPROFILE%%
+>>"MULAI_STRATEGY_3.bat" echo dir /b "C:\RBT" 2>nul | findstr /I "strategy"
+>>"MULAI_STRATEGY_3.bat" echo dir /b "%%USERPROFILE%%\Desktop" 2>nul | findstr /I "strategy"
+>>"MULAI_STRATEGY_3.bat" echo dir /b "%%USERPROFILE%%\Downloads" 2>nul | findstr /I "strategy"
+>>"MULAI_STRATEGY_3.bat" echo dir /b "%%~dp0" | findstr /I "strategy"
+>>"MULAI_STRATEGY_3.bat" echo echo ---- AKHIR INFO ----
+>>"MULAI_STRATEGY_3.bat" echo echo.
+>>"MULAI_STRATEGY_3.bat" echo echo ====== CARA PASTI (10 detik) ======
+>>"MULAI_STRATEGY_3.bat" echo echo 1. Buka File Explorer (ikon folder kuning di taskbar)
+>>"MULAI_STRATEGY_3.bat" echo echo 2. Cari folder Sistem-Trading-Strategy-3
+>>"MULAI_STRATEGY_3.bat" echo echo 3. SERET folder itu pakai mouse ke JENDELA HITAM INI
+>>"MULAI_STRATEGY_3.bat" echo echo 4. Lepaskan di dalam jendela ini, lalu tekan Enter
+>>"MULAI_STRATEGY_3.bat" echo echo.
+>>"MULAI_STRATEGY_3.bat" echo set /p "LOK=Seret folder ke sini lalu tekan Enter: "
+>>"MULAI_STRATEGY_3.bat" echo set "LOK=%%LOK:"=%%"
+>>"MULAI_STRATEGY_3.bat" echo if not defined LOK goto gagal_input
+>>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%LOK%%\*Strategy-3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_3.bat" echo if exist "%%LOK%%\Sistem-Trading-Strategy-3\MULAI_SEMUA.bat" set "DIR=%%LOK%%\Sistem-Trading-Strategy-3"
+>>"MULAI_STRATEGY_3.bat" echo if exist "%%LOK%%\MULAI_SEMUA.bat" set "DIR=%%LOK%%"
+>>"MULAI_STRATEGY_3.bat" echo if not defined DIR goto input_salah
+>>"MULAI_STRATEGY_3.bat" echo >"%%~dp0S3_LOKASI.txt" echo %%LOK%%
+>>"MULAI_STRATEGY_3.bat" echo echo [OK] Lokasi disimpan: %%DIR%%
+>>"MULAI_STRATEGY_3.bat" echo goto mulai
+>>"MULAI_STRATEGY_3.bat" echo.
+>>"MULAI_STRATEGY_3.bat" echo :input_salah
+>>"MULAI_STRATEGY_3.bat" echo echo [X] Di folder yang diseret tidak ada MULAI_SEMUA.bat.
+>>"MULAI_STRATEGY_3.bat" echo echo Kemungkinan yang diseret folder induk atau folder salah.
+>>"MULAI_STRATEGY_3.bat" echo echo Seret folder yang DI DALAMNYA terlihat MULAI_SEMUA.bat.
+>>"MULAI_STRATEGY_3.bat" echo echo.
+>>"MULAI_STRATEGY_3.bat" echo pause
+>>"MULAI_STRATEGY_3.bat" echo exit /b 1
+>>"MULAI_STRATEGY_3.bat" echo.
+>>"MULAI_STRATEGY_3.bat" echo :gagal_input
+>>"MULAI_STRATEGY_3.bat" echo echo Tidak ada input. Klik 2x file ini lagi untuk mencoba.
 >>"MULAI_STRATEGY_3.bat" echo echo.
 >>"MULAI_STRATEGY_3.bat" echo pause
 >>"MULAI_STRATEGY_3.bat" echo exit /b 1
@@ -275,31 +399,44 @@ if exist "MULAI_STRATEGY_3.bat" del "MULAI_STRATEGY_3.bat" >nul 2>nul
 >>"MULAI_STRATEGY_3.bat" echo cd /d "%%DIR%%"
 >>"MULAI_STRATEGY_3.bat" echo echo Menyalakan STRATEGY 3 di %%DIR%% ...
 >>"MULAI_STRATEGY_3.bat" echo call "MULAI_SEMUA.bat"
->>"MULAI_STRATEGY_3.bat" echo echo.
->>"MULAI_STRATEGY_3.bat" echo echo STRATEGY 3 berhenti. Klik 2x file ini lagi untuk menyalakan.
->>"MULAI_STRATEGY_3.bat" echo pause
->>"MULAI_STRATEGY_3.bat" echo exit /b 0
+>>"MULAI_STRATEGY_3.bat" echo goto selesai
 >>"MULAI_STRATEGY_3.bat" echo.
 >>"MULAI_STRATEGY_3.bat" echo :engine
 >>"MULAI_STRATEGY_3.bat" echo cd /d "%%DIRF%%"
->>"MULAI_STRATEGY_3.bat" echo echo MULAI_SEMUA.bat belum ada - menyalakan engine langsung di %%DIRF%%
+>>"MULAI_STRATEGY_3.bat" echo echo MULAI_SEMUA.bat belum ada di folder itu - engine dinyalakan langsung.
+>>"MULAI_STRATEGY_3.bat" echo :startdirect
 >>"MULAI_STRATEGY_3.bat" echo set "PY="
 >>"MULAI_STRATEGY_3.bat" echo python --version >nul 2>nul
 >>"MULAI_STRATEGY_3.bat" echo if not errorlevel 1 set "PY=python"
->>"MULAI_STRATEGY_3.bat" echo if defined PY goto runeng
+>>"MULAI_STRATEGY_3.bat" echo if defined PY goto pyok
 >>"MULAI_STRATEGY_3.bat" echo py -3 --version >nul 2>nul
 >>"MULAI_STRATEGY_3.bat" echo if not errorlevel 1 set "PY=py -3"
->>"MULAI_STRATEGY_3.bat" echo if defined PY goto runeng
->>"MULAI_STRATEGY_3.bat" echo echo [X] Python tidak ketemu. Cara yang betul:
->>"MULAI_STRATEGY_3.bat" echo echo     buka folder %%DIRF%% lalu klik 2x MULAI_SEMUA.bat di dalamnya.
+>>"MULAI_STRATEGY_3.bat" echo if defined PY goto pyok
+>>"MULAI_STRATEGY_3.bat" echo echo [X] Python tidak ketemu di VPS ini.
+>>"MULAI_STRATEGY_3.bat" echo echo Buka folder %%CD%% lalu klik 2x MULAI_SEMUA.bat di dalamnya.
 >>"MULAI_STRATEGY_3.bat" echo echo.
 >>"MULAI_STRATEGY_3.bat" echo pause
 >>"MULAI_STRATEGY_3.bat" echo exit /b 1
 >>"MULAI_STRATEGY_3.bat" echo.
->>"MULAI_STRATEGY_3.bat" echo :runeng
->>"MULAI_STRATEGY_3.bat" echo "%%PY%%" -u python\command_center.py
+>>"MULAI_STRATEGY_3.bat" echo :pyok
+>>"MULAI_STRATEGY_3.bat" echo set "DASH=python\cc_tkdashboard.py"
+>>"MULAI_STRATEGY_3.bat" echo %%PY%% -c "import PySide6" >nul 2>nul
+>>"MULAI_STRATEGY_3.bat" echo if errorlevel 1 goto dashgo
+>>"MULAI_STRATEGY_3.bat" echo set "DASH=python\cc_qtdashboard.py"
+>>"MULAI_STRATEGY_3.bat" echo :dashgo
+>>"MULAI_STRATEGY_3.bat" echo set "PYW=%%PY%%"
+>>"MULAI_STRATEGY_3.bat" echo for %%%%P in (%%PY%%) do if exist "%%%%~dpPpythonw.exe" set "PYW=%%%%~dpPpythonw.exe"
+>>"MULAI_STRATEGY_3.bat" echo start "RBT FX DASHBOARD" %%PYW%% "%%DASH%%" --port 8082
+>>"MULAI_STRATEGY_3.bat" echo echo Dashboard dinyalakan. Engine berjalan DI JENDELA INI - log hidup di bawah.
+>>"MULAI_STRATEGY_3.bat" echo echo JANGAN tutup jendela ini selama trading.
+>>"MULAI_STRATEGY_3.bat" echo echo.
+>>"MULAI_STRATEGY_3.bat" echo %%PY%% -u python\command_center.py
+>>"MULAI_STRATEGY_3.bat" echo goto selesai
+>>"MULAI_STRATEGY_3.bat" echo.
+>>"MULAI_STRATEGY_3.bat" echo :selesai
 >>"MULAI_STRATEGY_3.bat" echo echo.
 >>"MULAI_STRATEGY_3.bat" echo echo STRATEGY 3 berhenti. Klik 2x file ini lagi untuk menyalakan.
+>>"MULAI_STRATEGY_3.bat" echo echo.
 >>"MULAI_STRATEGY_3.bat" echo pause
 >>"MULAI_STRATEGY_3.bat" echo exit /b 0
 >>"MULAI_STRATEGY_3.bat" echo.
@@ -311,16 +448,18 @@ if exist "MULAI_STRATEGY_4.bat" del "MULAI_STRATEGY_4.bat" >nul 2>nul
 >>"MULAI_STRATEGY_4.bat" echo setlocal
 >>"MULAI_STRATEGY_4.bat" echo title RBT FX - STRATEGY 4
 >>"MULAI_STRATEGY_4.bat" echo rem ================================================================
->>"MULAI_STRATEGY_4.bat" echo rem  MULAI STRATEGY 4 - FILE FINAL UTUH (mandiri)
->>"MULAI_STRATEGY_4.bat" echo rem  Letak file bebas: di dalam folder strategy, C:\RBT, Desktop,
->>"MULAI_STRATEGY_4.bat" echo rem  Downloads - folder strategy dicari otomatis di semua tempat,
->>"MULAI_STRATEGY_4.bat" echo rem  nama folder fleksibel (Strategy-1, Strategy_1, Strategy 1, dll).
+>>"MULAI_STRATEGY_4.bat" echo rem  MULAI STRATEGY 4 - FINAL v7
+>>"MULAI_STRATEGY_4.bat" echo rem  Cari otomatis di: samping file ini, C:\RBT, Desktop,
+>>"MULAI_STRATEGY_4.bat" echo rem  OneDrive Desktop, Documents, Downloads (nama folder bebas).
+>>"MULAI_STRATEGY_4.bat" echo rem  Kalau tidak ketemu: cukup SERET folder strategy ke jendela ini
+>>"MULAI_STRATEGY_4.bat" echo rem  - lokasi DIINGAT selamanya - berikutnya otomatis lagi.
 >>"MULAI_STRATEGY_4.bat" echo rem ================================================================
 >>"MULAI_STRATEGY_4.bat" echo set "DIR="
 >>"MULAI_STRATEGY_4.bat" echo set "DIRF="
->>"MULAI_STRATEGY_4.bat" echo rem [1/3] file ini ada DI DALAM folder strategy?
+>>"MULAI_STRATEGY_4.bat" echo if exist "%%~dp0S4_LOKASI.txt" set /p DIR=<"%%~dp0S4_LOKASI.txt"
+>>"MULAI_STRATEGY_4.bat" echo if defined DIR if exist "%%DIR%%\MULAI_SEMUA.bat" goto mulai
+>>"MULAI_STRATEGY_4.bat" echo set "DIR="
 >>"MULAI_STRATEGY_4.bat" echo if exist "%%~dp0MULAI_SEMUA.bat" set "DIR=%%~dp0"
->>"MULAI_STRATEGY_4.bat" echo rem [2/3] cari folder strategy di 4 lokasi, nama folder fleksibel
 >>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%~dp0*Strategy-4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%~dp0*Strategy_4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%~dp0*Strategy 4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
@@ -332,21 +471,64 @@ if exist "MULAI_STRATEGY_4.bat" del "MULAI_STRATEGY_4.bat" >nul 2>nul
 >>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy-4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy_4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy 4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy-4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy_4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy 4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy-4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy_4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy 4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy-4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy_4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy 4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
 >>"MULAI_STRATEGY_4.bat" echo if defined DIR goto mulai
->>"MULAI_STRATEGY_4.bat" echo rem [3/3] cadangan: folder strategy ketemu tapi MULAI_SEMUA.bat belum ada - engine langsung
 >>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%~dp0*Strategy-4*") do if not defined DIRF set "DIRF=%%%%D"
 >>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("C:\RBT\*Strategy-4*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("C:\RBT\*Strategy_4*") do if not defined DIRF set "DIRF=%%%%D"
 >>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy-4*") do if not defined DIRF set "DIRF=%%%%D"
+>>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy-4*") do if not defined DIRF set "DIRF=%%%%D"
+>>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy-4*") do if not defined DIRF set "DIRF=%%%%D"
 >>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy-4*") do if not defined DIRF set "DIRF=%%%%D"
 >>"MULAI_STRATEGY_4.bat" echo if defined DIRF goto engine
->>"MULAI_STRATEGY_4.bat" echo echo [X] Folder STRATEGY 4 tidak ketemu di lokasi manapun:
->>"MULAI_STRATEGY_4.bat" echo echo     di samping file ini, C:\RBT, Desktop, Downloads.
->>"MULAI_STRATEGY_4.bat" echo echo Pastikan folder Sistem-Trading-Strategy-4 ada di salah satu tempat itu.
+>>"MULAI_STRATEGY_4.bat" echo echo [X] Folder STRATEGY 4 tidak ketemu otomatis.
+>>"MULAI_STRATEGY_4.bat" echo echo.
+>>"MULAI_STRATEGY_4.bat" echo echo ---- INFO UNTUK DIAGNOSIS (kalau mampir foto layar ini) ----
+>>"MULAI_STRATEGY_4.bat" echo echo Profil Windows: %%USERPROFILE%%
+>>"MULAI_STRATEGY_4.bat" echo dir /b "C:\RBT" 2>nul | findstr /I "strategy"
+>>"MULAI_STRATEGY_4.bat" echo dir /b "%%USERPROFILE%%\Desktop" 2>nul | findstr /I "strategy"
+>>"MULAI_STRATEGY_4.bat" echo dir /b "%%USERPROFILE%%\Downloads" 2>nul | findstr /I "strategy"
+>>"MULAI_STRATEGY_4.bat" echo dir /b "%%~dp0" | findstr /I "strategy"
+>>"MULAI_STRATEGY_4.bat" echo echo ---- AKHIR INFO ----
+>>"MULAI_STRATEGY_4.bat" echo echo.
+>>"MULAI_STRATEGY_4.bat" echo echo ====== CARA PASTI (10 detik) ======
+>>"MULAI_STRATEGY_4.bat" echo echo 1. Buka File Explorer (ikon folder kuning di taskbar)
+>>"MULAI_STRATEGY_4.bat" echo echo 2. Cari folder Sistem-Trading-Strategy-4
+>>"MULAI_STRATEGY_4.bat" echo echo 3. SERET folder itu pakai mouse ke JENDELA HITAM INI
+>>"MULAI_STRATEGY_4.bat" echo echo 4. Lepaskan di dalam jendela ini, lalu tekan Enter
+>>"MULAI_STRATEGY_4.bat" echo echo.
+>>"MULAI_STRATEGY_4.bat" echo set /p "LOK=Seret folder ke sini lalu tekan Enter: "
+>>"MULAI_STRATEGY_4.bat" echo set "LOK=%%LOK:"=%%"
+>>"MULAI_STRATEGY_4.bat" echo if not defined LOK goto gagal_input
+>>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%LOK%%\*Strategy-4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
+>>"MULAI_STRATEGY_4.bat" echo if exist "%%LOK%%\Sistem-Trading-Strategy-4\MULAI_SEMUA.bat" set "DIR=%%LOK%%\Sistem-Trading-Strategy-4"
+>>"MULAI_STRATEGY_4.bat" echo if exist "%%LOK%%\MULAI_SEMUA.bat" set "DIR=%%LOK%%"
+>>"MULAI_STRATEGY_4.bat" echo if not defined DIR goto input_salah
+>>"MULAI_STRATEGY_4.bat" echo >"%%~dp0S4_LOKASI.txt" echo %%LOK%%
+>>"MULAI_STRATEGY_4.bat" echo echo [OK] Lokasi disimpan: %%DIR%%
+>>"MULAI_STRATEGY_4.bat" echo goto mulai
+>>"MULAI_STRATEGY_4.bat" echo.
+>>"MULAI_STRATEGY_4.bat" echo :input_salah
+>>"MULAI_STRATEGY_4.bat" echo echo [X] Di folder yang diseret tidak ada MULAI_SEMUA.bat.
+>>"MULAI_STRATEGY_4.bat" echo echo Kemungkinan yang diseret folder induk atau folder salah.
+>>"MULAI_STRATEGY_4.bat" echo echo Seret folder yang DI DALAMNYA terlihat MULAI_SEMUA.bat.
+>>"MULAI_STRATEGY_4.bat" echo echo.
+>>"MULAI_STRATEGY_4.bat" echo pause
+>>"MULAI_STRATEGY_4.bat" echo exit /b 1
+>>"MULAI_STRATEGY_4.bat" echo.
+>>"MULAI_STRATEGY_4.bat" echo :gagal_input
+>>"MULAI_STRATEGY_4.bat" echo echo Tidak ada input. Klik 2x file ini lagi untuk mencoba.
 >>"MULAI_STRATEGY_4.bat" echo echo.
 >>"MULAI_STRATEGY_4.bat" echo pause
 >>"MULAI_STRATEGY_4.bat" echo exit /b 1
@@ -355,31 +537,44 @@ if exist "MULAI_STRATEGY_4.bat" del "MULAI_STRATEGY_4.bat" >nul 2>nul
 >>"MULAI_STRATEGY_4.bat" echo cd /d "%%DIR%%"
 >>"MULAI_STRATEGY_4.bat" echo echo Menyalakan STRATEGY 4 di %%DIR%% ...
 >>"MULAI_STRATEGY_4.bat" echo call "MULAI_SEMUA.bat"
->>"MULAI_STRATEGY_4.bat" echo echo.
->>"MULAI_STRATEGY_4.bat" echo echo STRATEGY 4 berhenti. Klik 2x file ini lagi untuk menyalakan.
->>"MULAI_STRATEGY_4.bat" echo pause
->>"MULAI_STRATEGY_4.bat" echo exit /b 0
+>>"MULAI_STRATEGY_4.bat" echo goto selesai
 >>"MULAI_STRATEGY_4.bat" echo.
 >>"MULAI_STRATEGY_4.bat" echo :engine
 >>"MULAI_STRATEGY_4.bat" echo cd /d "%%DIRF%%"
->>"MULAI_STRATEGY_4.bat" echo echo MULAI_SEMUA.bat belum ada - menyalakan engine langsung di %%DIRF%%
+>>"MULAI_STRATEGY_4.bat" echo echo MULAI_SEMUA.bat belum ada di folder itu - engine dinyalakan langsung.
+>>"MULAI_STRATEGY_4.bat" echo :startdirect
 >>"MULAI_STRATEGY_4.bat" echo set "PY="
 >>"MULAI_STRATEGY_4.bat" echo python --version >nul 2>nul
 >>"MULAI_STRATEGY_4.bat" echo if not errorlevel 1 set "PY=python"
->>"MULAI_STRATEGY_4.bat" echo if defined PY goto runeng
+>>"MULAI_STRATEGY_4.bat" echo if defined PY goto pyok
 >>"MULAI_STRATEGY_4.bat" echo py -3 --version >nul 2>nul
 >>"MULAI_STRATEGY_4.bat" echo if not errorlevel 1 set "PY=py -3"
->>"MULAI_STRATEGY_4.bat" echo if defined PY goto runeng
->>"MULAI_STRATEGY_4.bat" echo echo [X] Python tidak ketemu. Cara yang betul:
->>"MULAI_STRATEGY_4.bat" echo echo     buka folder %%DIRF%% lalu klik 2x MULAI_SEMUA.bat di dalamnya.
+>>"MULAI_STRATEGY_4.bat" echo if defined PY goto pyok
+>>"MULAI_STRATEGY_4.bat" echo echo [X] Python tidak ketemu di VPS ini.
+>>"MULAI_STRATEGY_4.bat" echo echo Buka folder %%CD%% lalu klik 2x MULAI_SEMUA.bat di dalamnya.
 >>"MULAI_STRATEGY_4.bat" echo echo.
 >>"MULAI_STRATEGY_4.bat" echo pause
 >>"MULAI_STRATEGY_4.bat" echo exit /b 1
 >>"MULAI_STRATEGY_4.bat" echo.
->>"MULAI_STRATEGY_4.bat" echo :runeng
->>"MULAI_STRATEGY_4.bat" echo "%%PY%%" -u python\command_center.py
+>>"MULAI_STRATEGY_4.bat" echo :pyok
+>>"MULAI_STRATEGY_4.bat" echo set "DASH=python\cc_tkdashboard.py"
+>>"MULAI_STRATEGY_4.bat" echo %%PY%% -c "import PySide6" >nul 2>nul
+>>"MULAI_STRATEGY_4.bat" echo if errorlevel 1 goto dashgo
+>>"MULAI_STRATEGY_4.bat" echo set "DASH=python\cc_qtdashboard.py"
+>>"MULAI_STRATEGY_4.bat" echo :dashgo
+>>"MULAI_STRATEGY_4.bat" echo set "PYW=%%PY%%"
+>>"MULAI_STRATEGY_4.bat" echo for %%%%P in (%%PY%%) do if exist "%%%%~dpPpythonw.exe" set "PYW=%%%%~dpPpythonw.exe"
+>>"MULAI_STRATEGY_4.bat" echo start "RBT FX DASHBOARD" %%PYW%% "%%DASH%%" --port 8082
+>>"MULAI_STRATEGY_4.bat" echo echo Dashboard dinyalakan. Engine berjalan DI JENDELA INI - log hidup di bawah.
+>>"MULAI_STRATEGY_4.bat" echo echo JANGAN tutup jendela ini selama trading.
+>>"MULAI_STRATEGY_4.bat" echo echo.
+>>"MULAI_STRATEGY_4.bat" echo %%PY%% -u python\command_center.py
+>>"MULAI_STRATEGY_4.bat" echo goto selesai
+>>"MULAI_STRATEGY_4.bat" echo.
+>>"MULAI_STRATEGY_4.bat" echo :selesai
 >>"MULAI_STRATEGY_4.bat" echo echo.
 >>"MULAI_STRATEGY_4.bat" echo echo STRATEGY 4 berhenti. Klik 2x file ini lagi untuk menyalakan.
+>>"MULAI_STRATEGY_4.bat" echo echo.
 >>"MULAI_STRATEGY_4.bat" echo pause
 >>"MULAI_STRATEGY_4.bat" echo exit /b 0
 >>"MULAI_STRATEGY_4.bat" echo.
