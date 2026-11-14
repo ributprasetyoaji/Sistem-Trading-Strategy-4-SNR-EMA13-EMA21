@@ -7,7 +7,7 @@ rem  - PROGRAM ada di dalam file ini (self-extract, tanpa curl)
 rem  - Python belum ada? UNDUH + INSTALL OTOMATIS dari repo Anda
 rem    (installer resmi python.org yang sudah disimpan di repo)
 rem  - pandas belum ada? UNDUH 12 paket dari repo Anda, install
-rem    OFFLINE. PySide6 otomatis (gagal = pakai tkinter bawaan).
+rem    OFFLINE. Dashboard = browser web (tanpa jendela GUI tambahan).
 rem  - Semua unduhan pakai certutil/PowerShell/bitsadmin - BUKAN curl
 rem  - Tidak ada token, tidak ada pertanyaan, sampai dashboard nyala
 rem ================================================================
@@ -16,7 +16,7 @@ cd /d "%~dp0"
 rem ---- [1] PASANG PROGRAM dari payload di dalam file ini ----
 set "APP=C:\RBT\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21"
 mkdir "%APP%\python" >nul 2>nul
-echo [1/4] Memasang program ke %APP% ...
+echo [1/3] Memasang program ke %APP% ...
 >>"_rp01.b64" echo IiIiQWJzb3JwdGlvbiBlbmdpbmUg4oCUIHN0cmljdGx5IHF1YW50aXRhdGl2ZSAoc3BlYyBzZWN0aW9ucyA3LTgpLgoKU0VMTCBBQlNPUlBUSU9OIChMT05HIGNhbmRpZGF0ZSk6CiAgaGlnaCBhZ2dyZXNzaXZlIHNlbGwgdm9sdW1lCiAgKyBzbWFsbCBkb3dud2FyZCBwcmljZSBkaXNwbGFjZW1lbnQKICArIG5vIHNpZ25pZmljYW50IGNvbnRpbnVhdGlvbiBsb3dlcgogICsgZGVjbGluaW5nIHNlbGxlciBlZmZpY2llbmN5IChsYXRlciBzZWxsIGJ1cnN0cyBtb3ZlIHByaWNlIGxlc3MgcGVyIHZvbHVtZSkKCkJVWSBBQlNPUlBUSU9OIChTSE9SVCBjYW5kaWRhdGUpOiBtaXJyb3IuCgpOb3RoaW5nIHN1YmplY3RpdmUgaXMgY29kZWQ6IG9ubHkgdm9sdW1lIG11bHRpcGxlcywgQVRSLW5vcm1hbGl6ZWQKZGlzcGxhY2VtZW50IGFuZCBidXJzdCBlZmZpY2llbmN5IHJhdGlvcy4KIiIiCmZyb20gX19mdXR1cmVfXyBpbXBvcnQgYW5ub3RhdGlvbnMKCmZyb20gZGF0YWNsYXNzZXMgaW1wb3J0IGRhdGFjbGFzcwoKZnJvbSB0cmFkZV9hZ2dyZWdhdG9yIGltcG9ydCBXaW5kb3dTdGF0cywgQnVyc3QKCgpAZGF0YWNsYXNzCmNsYXNzIEFic29ycHRpb25FdmVudDoKICAgIGRpcmVjdGlvbjogc3RyICAgICAgICAjICJMT05HIiAoc2VsbCBhYnNvcnB0aW9uKSB8ICJTSE9SVCIgKGJ1eSBhYnNvcnB0aW9uKQogICAgc3RyZW5ndGg6IGZsb2F0ICAgICAgICMgMC4uMTAwCiAgICB2b2xfbXVsdDogZmxvYXQgICAgICAgIyBzaWRlIHZv
 >>"_rp01.b64" echo bHVtZSAvIChiYXNlbGluZSAqIHdpbmRvdykKICAgIGRpc3BfYXRyOiBmbG9hdCAgICAgICAjIHxuZXQgZGlzcGxhY2VtZW50fCAvIEFUUgogICAgY29udF9hdHI6IGZsb2F0ICAgICAgICMgdG90YWwgZXh0ZW5zaW9uIC8gQVRSCiAgICBlZmZfZGVjYXk6IGZsb2F0ICAgICAgIyBsYXN0IGJ1cnN0IGVmZmljaWVuY3kgLyBmaXJzdCBidXJzdCBlZmZpY2llbmN5CiAgICBuX2J1cnN0czogaW50CiAgICBleHRyZW1lOiBmbG9hdCAgICAgICAgIyB3aW5kb3cgbG93IChMT05HKSBvciB3aW5kb3cgaGlnaCAoU0hPUlQpIC0+IGludmFsaWRhdGlvbiBhbmNob3IKICAgIHdpbmRvd19kZWx0YTogZmxvYXQKCgpjbGFzcyBBYnNvcnB0aW9uRW5naW5lOgogICAgZGVmIF9faW5pdF9fKHNlbGYsIGNmZyk6CiAgICAgICAgc2VsZi5jZmcgPSBjZmcKCiAgICBkZWYgZXZhbHVhdGUoc2VsZiwgc3RhdHM6IFdpbmRvd1N0YXRzIHwgTm9uZSwgYnVyc3RzOiBsaXN0W0J1cnN0XSwKICAgICAgICAgICAgICAgICBhdHI6IGZsb2F0LCBiYXNlbGluZV9wZXJfc2VjOiBmbG9hdCkgLT4gQWJzb3JwdGlvbkV2ZW50IHwgTm9uZToKICAgICAgICBjZmcgPSBzZWxmLmNmZwogICAgICAgIGlmIHN0YXRzIGlzIE5vbmUgb3IgYXRyIDw9IDAgb3IgYmFzZWxpbmVfcGVyX3NlYyA8PSAwOgogICAgICAgICAgICByZXR1cm4gTm9uZQogICAgICAgIHdpbmRvdyA9IHN0YXRzLndpbmRvd19zZWMKICAgICAgICBpZiB3aW5kb3cgPCBtYXgoMy4wLCBjZmcuYWJz
 >>"_rp01.b64" echo b3JwdGlvbl93aW5kb3dfc2VjICogMC41KToKICAgICAgICAgICAgcmV0dXJuIE5vbmUKCiAgICAgICAgc3BsaXQgPSBtYXgoMC4xLCBtaW4oMC45LCBjZmcuYWJzX3NpZGVfYmFzZWxpbmVfc3BsaXQpKQogICAgICAgIGZvciBzaWRlLCBkaXJlY3Rpb24gaW4gKCgic2VsbCIsICJMT05HIiksICgiYnV5IiwgIlNIT1JUIikpOgogICAgICAgICAgICBzaWRlX3ZvbCA9IHN0YXRzLnNlbGwgaWYgc2lkZSA9PSAic2VsbCIgZWxzZSBzdGF0cy5idXkKICAgICAgICAgICAgc2lkZV9iYXNlID0gYmFzZWxpbmVfcGVyX3NlYyAqIHNwbGl0ICAgIyBhZ2dyZXNzaW9uIHZzIG5vcm1hbCBTQU1FLXNpZGUgZmxvdwogICAgICAgICAgICB2b2xfbXVsdCA9IHNpZGVfdm9sIC8gKHNpZGVfYmFzZSAqIHdpbmRvdykKICAgICAgICAgICAgaWYgdm9sX211bHQgPCBjZmcuYWJzX21pbl92b2xfbXVsdGlwbGU6CiAgICAgICAgICAgICAgICBjb250aW51ZQoKICAgICAgICAgICAgaWYgc2lkZSA9PSAic2VsbCI6CiAgICAgICAgICAgICAgICBuZXQgPSBzdGF0cy5vcGVuIC0gc3RhdHMuY2xvc2UgICAgICAgICAgIyA+MCA9IHByaWNlIGZlbGwKICAgICAgICAgICAgICAgIHRvdGFsID0gc3RhdHMub3BlbiAtIHN0YXRzLmxvdyAgICAgICAgICAjIGZ1bGwgZG93bndhcmQgZXh0ZW5zaW9uCiAgICAgICAgICAgICAgICBleHRyZW1lID0gc3RhdHMubG93CiAgICAgICAgICAgIGVsc2U6CiAgICAgICAgICAgICAgICBuZXQgPSBzdGF0cy5jbG9zZSAt
@@ -1061,7 +1061,7 @@ if not exist "%APP%\python\command_center.py" goto payload_gagal
 echo [OK] Program lengkap terpasang.
 
 rem ---- [2] PYTHON OTOMATIS (installer dari repo Anda sendiri) ----
-echo [2/4] Cek Python dan dependency (auto-install kalau perlu) ...
+echo [2/3] Cek Python dan dependency (auto-install kalau perlu) ...
 set "PY="
 python --version >nul 2>nul
 if not errorlevel 1 set "PY=python"
@@ -1148,25 +1148,13 @@ if errorlevel 1 goto dep_gagal
 :dep_core_ok
 echo     Dependency core (pandas/numpy/requests/websockets) OK.
 
-rem ---- [2c] PySide6 (gagal = pakai tkinter bawaan) + MetaTrader5 ----
-%PY% -c "import PySide6" >nul 2>nul
-if not errorlevel 1 goto dep_ui_ok
-echo     PySide6 belum ada - mengunduh dan memasang (diam-diam) ...
-%PY% -m pip install -q --disable-pip-version-check PySide6
-%PY% -c "import PySide6" >nul 2>nul
-if not errorlevel 1 goto dep_ui_ok
-%PY% -m pip install --disable-pip-version-check PySide6
-%PY% -c "import PySide6" >nul 2>nul
-if not errorlevel 1 goto dep_ui_ok
-echo [!] PySide6 gagal dipasang - pakai dashboard tkinter bawaan Python.
-:dep_ui_ok
 %PY% -c "import MetaTrader5" >nul 2>nul
 if not errorlevel 1 goto dep_mt5_ok
 %PY% -m pip install -q --disable-pip-version-check MetaTrader5
 :dep_mt5_ok
 
 rem ---- [3] Update opsional dari GitHub (gagal = pakai program lokal) ----
-echo [3/4] Cek update GitHub (dilewati kalau tidak bisa) ...
+echo (update opsional GitHub) (dilewati kalau tidak bisa) ...
 set "UZIP=%TEMP%\_rbt_aio.zip"
 set "UDIR=%TEMP%\_rbt_aio"
 set "UURL=https://codeload.github.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/zip/refs/heads/main"
@@ -1183,32 +1171,20 @@ if defined USRC robocopy "%USRC%\python" "%APP%\python" /E /XF cc_state.json cc_
 if exist "%UZIP%" del "%UZIP%" >nul 2>nul
 if exist "%UDIR%" rmdir /s /q "%UDIR%" >nul 2>nul
 
-rem ---- [4] Matikan engine/dashboard lama (port 8082) ----
-echo [4/4] Menyalakan STRATEGY 4 ...
+rem ---- [4] Bersihkan proses lama lalu nyalakan ENGINE ----
+echo [3/3] Menyalakan STRATEGY 4 ...
 for /f "tokens=5" %%p in ('netstat -aon ^| findstr ":8082" ^| findstr "LISTENING"') do taskkill /F /PID %%p >nul 2>&1
 powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 8082 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }" >nul 2>&1
+wmic process where "CommandLine like '%%command_center.py%%'" delete >nul 2>&1
 wmic process where "CommandLine like '%%cc_qtdashboard%%' or CommandLine like '%%cc_tkdashboard%%'" delete >nul 2>&1
-set "DASH=python\cc_tkdashboard.py"
-%PY% -c "import PySide6; from PySide6 import QtWidgets" >nul 2>nul
-if errorlevel 1 goto dash_tk
-set "DASH=python\cc_qtdashboard.py"
-goto dash_ok
-:dash_tk
-%PY% -c "import tkinter" >nul 2>nul
-if not errorlevel 1 goto dash_tk_ok
-echo [!] PySide6 dan tkinter tidak tersedia - pakai dashboard WEB saja.
-goto dash_ok
-:dash_tk_ok
-echo     PySide6 tidak ada - memakai dashboard Tk bawaan Python.
-:dash_ok
-rem ---- pythonw (dashboard tanpa console ekstra); kalau tidak ada, python ----
+rem ---- engine DETACHED (pythonw): console boleh ditutup, engine tetap hidup ----
 set "PYW="
 for /f "delims=" %%W in ('where pythonw 2^>nul') do if not defined PYW set "PYW=%%W"
 if not defined PYW set "PYW=%PY%"
 cd /d "%APP%"
-start "RBT FX DASHBOARD" %PYW% "%DASH%" --port 8082
+start "RBT FX ENGINE" %PYW% -u python\command_center.py
 
-rem ---- tunggu web dashboard engine hidup di port 8082 (3 cobaan) ----
+rem ---- tunggu web dashboard hidup di port 8082 (3 cobaan) ----
 %PY% -c "import socket,sys;s=socket.socket();s.settimeout(2);sys.exit(0 if s.connect_ex(('127.0.0.1',8082))==0 else 1)" >nul 2>nul
 if not errorlevel 1 goto web_ok
 timeout /t 3 /nobreak >nul 2>nul
@@ -1217,26 +1193,25 @@ if not errorlevel 1 goto web_ok
 timeout /t 3 /nobreak >nul 2>nul
 %PY% -c "import socket,sys;s=socket.socket();s.settimeout(2);sys.exit(0 if s.connect_ex(('127.0.0.1',8082))==0 else 1)" >nul 2>nul
 if not errorlevel 1 goto web_ok
-echo [!] Port 8082 belum merespons - engine web mungkin masih start.
+echo [!] Port 8082 belum merespons - tunggu 10 dtk lalu buka browser manual.
 goto web_info
 :web_ok
-echo [OK] Dashboard web AKTIF di http://localhost:8082
+echo [OK] STRATEGY 4 JALAN - dashboard AKTIF di http://localhost:8082
 :web_info
 echo ---------------------------------------------------------------
-echo  CARA BUKA DASHBOARD:
-echo  1. Di VPS: browser terbuka OTOMATIS (8 dtk) ke http://localhost:8082
-echo     Kalau tidak terbuka, buka browser di VPS, ketik alamat itu.
-echo  2. Dari PC rumah: http://IP-PUBLIK-VPS:8082
-echo     (192.168.99.99 = IP internal, tidak bisa dipakai dari luar)
+echo  DASHBOARD:
+echo  - Browser terbuka OTOMATIS (8 dtk) ke http://localhost:8082
+echo  - Kalau tidak: buka browser di VPS, ketik alamat itu
+echo  - Dari PC rumah: http://IP-PUBLIK-VPS:8082 (bukan 192.168.x.x)
+echo  - Engine berjalan DI LATAR BELAKANG - jendela ini BOLEH ditutup
+echo  - Mau matikan engine: buka Task Manager, akhiri pythonw.exe
 echo ---------------------------------------------------------------
-rem ---- tampilkan IP publik VPS (info akses dari rumah) ----
 %PY% -c "import requests;print('     IP publik VPS ini: http://'+requests.get('https://api.ipify.org',timeout=8).text+':8082')" >nul 2>nul
-rem ---- buka browser otomatis 8 dtk setelah engine start ----
 %PY% -c "import threading,webbrowser;threading.Timer(8.0,lambda:webbrowser.open('http://localhost:8082')).start()" >nul 2>nul
-echo Dashboard dinyalakan. Engine berjalan DI JENDELA INI.
-echo JANGAN tutup jendela ini selama trading.
-%PY% -u python\command_center.py
-goto selesai
+echo.
+echo SELESAI - STRATEGY 4 berjalan. Boleh tutup jendela ini.
+timeout /t 10 /nobreak >nul 2>nul
+exit /b 0
 
 :payload_gagal
 echo [X] Gagal memasang program dari payload - download ulang file ini.
@@ -1258,13 +1233,3 @@ echo     Offline (repo Anda) dan online sama-sama gagal.
 echo     Cek internet VPS lalu klik 2x file ini lagi.
 pause
 exit /b 1
-
-:selesai
-echo.
-echo STRATEGY 4 berhenti. Klik 2x file ini lagi untuk menyalakan.
-pause
-exit /b 0
-echo.
-echo STRATEGY 4 berhenti. Klik 2x file ini lagi untuk menyalakan.
-pause
-exit /b 0
