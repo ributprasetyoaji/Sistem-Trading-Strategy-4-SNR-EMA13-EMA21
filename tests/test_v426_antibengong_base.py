@@ -86,46 +86,36 @@ def test_broker_reconnect_anti_spam_dan_sim_dilewati():
     assert st2.broker.n == 0             # sim tidak di-reconnect
 
 
-# ------------------- 3) heartbeat + engine_stale + alert TG -----------
+# --------------- 3) heartbeat + engine_stale + alert log WARN ----------
 def test_watchdog_heartbeat_beku_alert_sekali(monkeypatch, tmp_path):
     monkeypatch.chdir(tmp_path)
     os.makedirs("data", exist_ok=True)
     with open("data/cc_heartbeat.json", "w") as f:
         json.dump({"ts": time.time() - 900.0}, f)   # beku 15 menit
-    sent = []
-    old_tg = CC._tg
-    CC._tg = types.SimpleNamespace(
-        forward=lambda tag, msg: sent.append((tag, msg)))
-    try:
-        st = types.SimpleNamespace(_stale_alert_ts=0.0,
-                                   emit_log=lambda t, m: None)
-        age, stale = CC.CommandCenter._watchdog_check(st)
-        assert stale and age > 600
-        assert len(sent) == 1
-        CC.CommandCenter._watchdog_check(st)
-        assert len(sent) == 1                 # anti-spam 10 menit
-        with open("data/cc_heartbeat.json", "w") as f:
-            json.dump({"ts": time.time()}, f)
-        age2, stale2 = CC.CommandCenter._watchdog_check(st)
-        assert not stale2
-    finally:
-        CC._tg = old_tg
+    logs = []   # Telegram sudah DIHAPUS -> alert kini via log WARN saja
+    st = types.SimpleNamespace(
+        _stale_alert_ts=0.0,
+        emit_log=lambda tag, msg: logs.append((tag, msg)))
+    age, stale = CC.CommandCenter._watchdog_check(st)
+    assert stale and age > 600
+    assert len(logs) == 1 and logs[0][0] == "WARN"
+    CC.CommandCenter._watchdog_check(st)
+    assert len(logs) == 1                 # anti-spam 10 menit
+    with open("data/cc_heartbeat.json", "w") as f:
+        json.dump({"ts": time.time()}, f)
+    age2, stale2 = CC.CommandCenter._watchdog_check(st)
+    assert not stale2
 
 
 def test_watchdog_baru_start_tidak_alert(monkeypatch, tmp_path):
     monkeypatch.chdir(tmp_path)              # tidak ada file heartbeat
-    sent = []
-    old_tg = CC._tg
-    CC._tg = types.SimpleNamespace(
-        forward=lambda tag, msg: sent.append((tag, msg)))
-    try:
-        st = types.SimpleNamespace(_stale_alert_ts=0.0,
-                                   emit_log=lambda t, m: None)
-        age, stale = CC.CommandCenter._watchdog_check(st)
-        assert age == -1.0 and not stale
-        assert sent == []
-    finally:
-        CC._tg = old_tg
+    logs = []
+    st = types.SimpleNamespace(
+        _stale_alert_ts=0.0,
+        emit_log=lambda tag, msg: logs.append((tag, msg)))
+    age, stale = CC.CommandCenter._watchdog_check(st)
+    assert age == -1.0 and not stale
+    assert logs == []
 
 
 # ------------------------------- 2) IPC lock broker -------------------

@@ -20,10 +20,6 @@ try:
     import cc_selfupdate
 except Exception:
     cc_selfupdate = None
-try:  # v4.02: Telegram setup dr dashboard
-    import cc_telegram
-except Exception:
-    cc_telegram = None
 from urllib.parse import urlparse, parse_qs
 
 PAGE_LOGIN = r"""<!DOCTYPE html>
@@ -449,8 +445,6 @@ grid-template-areas:"scan" "chart" "conf" "log" "pos"}
   </div>
   <span class="tclock num" id="c-time">--:--:--</span>
   <button id="halt" title="TRADING AKTIF — klik untuk HALT (hentikan order baru)">⚡ ON</button>
-  <button id="tg" title="Notifikasi Telegram: isi BOT_TOKEN &amp; CHAT_ID lalu KONEK">✈ SUBMIT TG</button>
-  <span id="tgb" class="tgb off">TG…</span>
 </div>
 <div class="tape"><div class="tapein" id="tape"><span class="tseg">CONNECTING TO ENGINE...</span></div></div>
 <div class="cards" id="cards"></div>
@@ -757,10 +751,6 @@ if(s.mode==='LIVE'){$('c-mt5').textContent='CONNECTED';mw.className='chip grn';}
 else{$('c-mt5').textContent='SIMULASI';mw.className='chip amber';}
 $('c-acc').textContent=s.mode+' #'+s.account.login;
 $('c-time').textContent=(s.ts_wib||s.ts).substr(11)+' WIB';
-var _T=s.tg_state||{};var _tb=$('tgb');
-if(_T.err){_tb.textContent='TG GAGAL';_tb.className='tgb bad';_tb.title=_T.err;}
-else if(_T.on){_tb.textContent='TG AKTIF'+(_T.bot?' '+_T.bot:'');_tb.className='tgb on';_tb.title='Telegram terhubung';}
-else{_tb.textContent='TG OFF';_tb.className='tgb off';_tb.title='Telegram belum dikonfigurasi';}
 const rw=$('c-risk'),dw=$('c-dailyw');
 if(s.risk.trade_on){rw.className='chip grn';$('c-risk').textContent='ACTIVE';}
 else if(s.risk.pause_until>0){rw.className='chip amber';$('c-risk').textContent='PAUSED';}
@@ -898,52 +888,8 @@ document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
  t.classList.add('act');TAB=t.dataset.c;tick();});
 tick();setInterval(tick,2000);
 
-var tgp=document.getElementById('tgpanel');
-function tgInfo(){fetch('api/telegram').then(function(r){return r.json();}).then(function(j){
- var g=j.tg||{};var f=g.files||{};
- var st=g.on?('AKTIF'+(g.bot?' '+g.bot:'')):(g.err?('GAGAL: '+g.err):'OFF');
- document.getElementById('tg-info').innerHTML='Status: <b>'+st+'</b><br>File token: <b>'+(f.token?'TERSIMPAN':'TIDAK ADA')+'</b> | File chat: <b>'+(f.chat?'TERSIMPAN':'TIDAK ADA')+'</b>';
-}).catch(function(e){document.getElementById('tg-info').textContent='status: '+e;});}
-$('tg').onclick=function(){tgp.style.display=(tgp.style.display==='none')?'block':'none';tgInfo();};
-document.getElementById('tg-token').addEventListener('keyup',function(e){if(e.key==='Enter')document.getElementById('tg-go').click();});
-document.getElementById('tg-chat').addEventListener('keyup',function(e){if(e.key==='Enter')document.getElementById('tg-go').click();});
-$('tg-go').onclick=function(){
- var b=document.getElementById('tg-go');b.disabled=true;b.textContent='MENGHUBUNGKAN...';
- var st=document.getElementById('tg-status');st.style.color='#8a8fa8';st.textContent='Menghubungi Telegram...';
- fetch('api/telegram',{method:'POST',headers:{'Content-Type':'application/json'},
-  body:JSON.stringify({token:document.getElementById('tg-token').value.trim(),
-                       chat:document.getElementById('tg-chat').value.trim()})})
- .then(function(r){return r.json();}).then(function(j){
-  if(j.ok){st.style.color='#39d98a';st.textContent='\\u2714 '+j.message+' -- cek Telegram Anda';}
-  else{st.style.color='#ff2d55';st.textContent='\\u2716 '+(j.error||'gagal');}
-  b.disabled=false;b.textContent='KONEK & TES';})
- .catch(function(e){st.style.color='#ff2d55';st.textContent='\\u2716 '+e;
-  b.disabled=false;b.textContent='KONEK & TES';});
-};
-$('tg-diag').onclick=function(){
- var st=document.getElementById('tg-status');st.style.color='#8a8fa8';st.textContent='Mendiagnosis (token & chat)...';
- fetch('api/telegram',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'diag'})})
- .then(function(r){return r.json();}).then(function(j){
-  var t='';(j.steps||[]).forEach(function(x){t+=(x.ok?'\\u2714 ':'\\u2716 ')+x.step+'\\n    '+(x.ok?'OK -- ':'GAGAL -- ')+x.msg+'\\n';});
-  if(j.message)t+='\\n'+j.message;
-  st.style.color=j.ok?'#39d98a':'#ff2d55';st.textContent=t||('error: '+(j.error||'?'));})
- .catch(function(e){st.style.color='#ff2d55';st.textContent='\\u2716 '+e;});
-};
-
 </script>
 
-<div id="tgpanel" style="display:none;position:fixed;top:52px;right:10px;z-index:99;background:#0b0e14;border:1px solid #2a2f3a;border-radius:10px;padding:12px;width:280px;box-shadow:0 10px 34px rgba(0,0,0,.55)">
-  <div style="font-size:11px;font-weight:800;letter-spacing:.14em;color:#8a8fa8;margin-bottom:2px">SUBMIT MANUAL -- TELEGRAM</div>
-  <div id="tg-info" style="font-size:10px;color:#8a8fa8;margin-bottom:8px;white-space:pre-line">memuat status...</div>
-  <div style="font-size:10px;color:#5d9678;margin-bottom:8px">Notifikasi entry, close, rekap harian &amp; news</div>
-  <div style="font-size:10px;color:#8a8fa8;margin:6px 0 3px">BOT_TOKEN <span style="color:#5d9678">(@BotFather)</span></div>
-  <input id="tg-token" type="password" placeholder="1234567890:AAE..." style="width:100%;box-sizing:border-box;background:#10131a;border:1px solid #2a2f3a;border-radius:6px;color:#f0f1fa;font-size:12px;padding:7px">
-  <div style="font-size:10px;color:#8a8fa8;margin:8px 0 3px">CHAT_ID <span style="color:#5d9678">(@userinfobot)</span></div>
-  <input id="tg-chat" type="text" placeholder="mis. 123456789" style="width:100%;box-sizing:border-box;background:#10131a;border:1px solid #2a2f3a;border-radius:6px;color:#f0f1fa;font-size:12px;padding:7px">
-  <button id="tg-go" style="width:100%;margin-top:10px;background:rgba(0,255,156,.1);color:#00ff9c;border:1px solid rgba(0,255,156,.5);border-radius:6px;font-weight:800;font-size:11px;letter-spacing:.12em;padding:8px;cursor:pointer">KONEK &amp; TES</button>
-  <button id="tg-diag" style="width:100%;margin-top:6px;background:rgba(43,108,176,.12);color:#7fc3ff;border:1px solid rgba(127,195,255,.45);border-radius:6px;font-weight:800;font-size:11px;letter-spacing:.12em;padding:8px;cursor:pointer">TES DIAGNOSA</button>
-  <div id="tg-status" style="font-size:11px;color:#8a8fa8;margin-top:8px;min-height:14px"></div>
-</div>
 </body></html>
 """
 
@@ -1000,17 +946,6 @@ def make_handler(cc, password=""):
                     self._send(401, PAGE_LOGIN)
                     return
                 self._send(200, PAGE)
-            elif self.path == "/api/telegram":
-                # v4.07: status TG utk panel SUBMIT (files tersimpan?)
-                if not self._authed():
-                    self._send(401, '{"error":"auth"}', "application/json")
-                    return
-                _tgst = dict(cc_telegram.state()) if cc_telegram else {}
-                _tgst["files"] = (cc_telegram.files_present()
-                                  if cc_telegram else {})
-                self._send(200, json.dumps({"ok": True, "tg": _tgst}),
-                           "application/json")
-                return
             elif self.path == "/api/status":
                 if not self._authed():
                     self._send(401, '{"error":"auth"}', "application/json")
@@ -1045,96 +980,6 @@ def make_handler(cc, password=""):
                         pass          # klien putus -> benin
                 else:
                     self._send(401, '{"ok":false}', "application/json")
-                return
-            if self.path == "/api/telegram":
-                # v4.02: pasang kredensial Telegram dari dashboard --
-                # tes kirim dulu; sukses -> simpan + aktifkan + jawab
-                # CONNECTING SUKSES; gagal -> setting lama tak diubah.
-                if not self._authed():
-                    self._send(401, '{"error":"auth"}', "application/json")
-                    return
-                if cc_telegram is None:
-                    self._send(500, json.dumps({"ok": False, "error":
-                                "modul cc_telegram tidak ada"}),
-                               "application/json")
-                    return
-                tok = cid = ""
-                _act = ""
-                try:
-                    _n = int(self.headers.get("Content-Length", 0) or 0)
-                    _b = json.loads(self.rfile.read(_n).decode(
-                        "utf-8", "ignore") or "{}")
-                    # v4.08: kutip & spasi hasil copy-paste
-                    #   dibersihkan otomatis (kesalahan umum user)
-                    tok = str(_b.get("token", "") or "").strip()\
-                        .strip('"').strip("'").strip()
-                    cid = str(_b.get("chat", "") or "").strip()\
-                        .strip('"').strip("'").strip()
-                    _act = str(_b.get("action", "") or "").strip()
-                except Exception:
-                    tok = cid = ""
-                    _act = ""
-                if _act == "diag":
-                    # diag Telegram -- token & chat dari POST body atau
-                    # dari kredensial tersimpan; hasil per langkah
-                    _rt = getattr(cc_telegram, "ROOT", ".")
-                    try:
-                        _st2 = tok or open(os.path.join(
-                            _rt, "telegram_token.txt"),
-                            encoding="utf-8").read().strip()
-                    except Exception:
-                        _st2 = ""
-                    try:
-                        _sc2 = cid or open(os.path.join(
-                            _rt, "telegram_chat.txt"),
-                            encoding="utf-8").read().strip()
-                    except Exception:
-                        _sc2 = ""
-                    if not _st2 or not _sc2:
-                        self._send(400, json.dumps({"ok": False,
-                                    "error": "belum ada kredensial -- "
-                                    "isi BOT_TOKEN & CHAT_ID dulu"}),
-                                   "application/json")
-                        return
-                    _d = cc_telegram.diag(_st2, _sc2)
-                    self._send(200, json.dumps(_d), "application/json")
-                    return
-                if not tok or not cid:
-                    self._send(400, json.dumps({"ok": False, "error":
-                                "BOT_TOKEN & CHAT_ID wajib diisi"}),
-                               "application/json")
-                    return
-                _ok, _det = cc_telegram.test_send(
-                    tok, cid, cc_telegram.msg_connected())
-                if not _ok:
-                    # v4.04: tampilkan ALASAN asli Telegram
-                    # (token salah / bot belum START / chat id salah)
-                    self._send(502, json.dumps({"ok": False, "error":
-                                "GAGAL: %s -- setting lama tidak diubah"
-                                % (_det or "kirim tes gagal, cek "
-                                   "internet VPS")}),
-                               "application/json")
-                    return
-                _root = getattr(cc_telegram, "ROOT", ".")
-                try:
-                    with open(os.path.join(_root, "telegram_token.txt"),
-                              "w", encoding="utf-8") as f:
-                        f.write(tok)
-                    with open(os.path.join(_root, "telegram_chat.txt"),
-                              "w", encoding="utf-8") as f:
-                        f.write(cid)
-                except Exception as e:
-                    self._send(500, json.dumps({"ok": False, "error":
-                                "terkirim tapi gagal simpan file: %s" % e}),
-                               "application/json")
-                    return
-                try:
-                    cc_telegram.rebind(tok, cid)
-                except Exception:
-                    pass
-                self._send(200, json.dumps({"ok": True,
-                            "message": "CONNECTING SUKSES"}),
-                           "application/json")
                 return
             if self.path == "/api/update":
                 if not self._authed():

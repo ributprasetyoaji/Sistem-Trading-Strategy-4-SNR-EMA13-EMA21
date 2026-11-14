@@ -44,10 +44,6 @@ import cc_scanner                                     # noqa: E402
 import cc_strategy3 as cc_strategy2                   # noqa: E402  (S3 TEMPLATE)
 import market_guard                                   # noqa: E402
 import github_hist                                    # noqa: E402
-try:  # v4.01: notifikasi Telegram (KHUSUS Strategy 3)
-    import cc_telegram as _tg                         # noqa: E402
-except Exception:
-    _tg = None
 
 
 def _disk_free_mb(path="."):
@@ -177,12 +173,6 @@ class CommandCenter:
             if len(self.log_lines) > 220:
                 self.log_lines = self.log_lines[-200:]
         # v4.01: ERROR & PROTECT (halt harian, disk kritis, dll) -> TG
-        if tag in ("ERROR", "PROTECT") and _tg is not None:
-            try:
-                _tg.forward(tag, msg)
-            except Exception:
-                pass
-
     def _adapt_log(self, m):
         """Adapter: modul lama memanggil log("[TAG] pesan") satu argumen."""
         try:
@@ -476,13 +466,6 @@ class CommandCenter:
         self.emit_log("BROKER", "reconnect %s" %
                       ("SUKSES" if ok else
                        "GAGAL (terminal MT5 jalan?)"))
-        if _tg is not None:
-            try:
-                _tg.forward("WARN", "S3: sesi MT5 putus -- reconnect %s "
-                            "(%s)" % ("SUKSES" if ok else "GAGAL", why))
-            except Exception:
-                pass
-
     def _cloud_autosync_tick(self, now):
         """v4.30 (permintaan user): PASTIKAN data di-backup 2X SEHARI ke
         GitHub -- cek berkala (default tiap 10 mnt, di thread) semua
@@ -1056,12 +1039,6 @@ class CommandCenter:
             self._write_signal(want, sig, res.get("score", 0), lot, ask,
                                sl_price, 0.0, "SKIP", g_why)
             self.emit_log("WARN", "%s %s -> SKIP (%s)" % (want, sig, g_why))
-            if _tg is not None:   # v4.18: sinyal SKIP dilaporkan (dedupe)
-                try:
-                    _tg.signal(want, sig, "SKIP", g_why, ask, sl_price,
-                               0.0, 0.0)
-                except Exception:
-                    pass
             return
 
         # -- TP minimal (USD): jarak = SL_dist x (tp/sl).  SL 0.8 ATR dgn
@@ -1180,41 +1157,6 @@ class CommandCenter:
                              sm_usd, tp_txt,
                              float(res.get("score", 0)),
                              (res.get("mtf") or {}).get("final", "-")))
-            if _tg is not None:      # v4.01 + v4.18 template lengkap
-                try:
-                    _tp_px = tp_price if tp_price else \
-                        ((entry_px + tp_tpd) if sig == "BUY"
-                         else (entry_px - tp_tpd))
-                    _tp2_px = 0.0
-                    if self._tp2_rr > 0 and sl_dist_px > 0:
-                        _tp2_px = (entry_px + sl_dist_px * self._tp2_rr
-                                   if sig == "BUY"
-                                   else entry_px - sl_dist_px * self._tp2_rr)
-                    _rk_m, _rk_p = None, 0.0
-                    try:   # risiko dalam SATUAN AKUN (tick value broker)
-                        _tsz = float(info.get("trade_tick_size", 0.0)
-                                     or 0.0) or \
-                            float(info.get("point", 0.0) or 0.0)
-                        _tv = float(info.get("trade_tick_value", 0.0) or 0.0)
-                        _vu = (_tv / _tsz) if (_tsz > 0 and _tv > 0) else 0.0
-                        if _vu > 0:
-                            _rk_m = sl_dist_px * lot * _vu
-                            _bal = float((self.broker.account()
-                                          if self.broker else {})
-                                         .get("balance") or 0.0)
-                            _rk_p = (_rk_m / _bal * 100.0) if _bal > 0 \
-                                else float(self.cfg.get(
-                                    "risk_per_trade_percent", 0.0) or 0.0)
-                    except Exception:
-                        _rk_m, _rk_p = None, 0.0
-                    _tg.entry(want, sig, lot, entry_px, sl_price, _tp_px,
-                              tp_txt, "skor %.0f | %s"
-                              % (float(res.get("score", 0)),
-                                 str(res.get("why", ""))[:80]),
-                              tp2=_tp2_px, risk_money=_rk_m,
-                              risk_pct=_rk_p)
-                except Exception:
-                    pass
             self.emit_log("BROKER", "MT5 order diterima (Ticket: %s)" % r.ticket)
             try:   # s.41 audit: lot & estimasi risiko uang ke journal
                 _tsz = float(info.get("trade_tick_size", 0.0) or 0.0) or \
@@ -1238,13 +1180,6 @@ class CommandCenter:
             res["status"] = "BLOCKED"
             res["block_why"] = "BROKER: %s" % r.comment
             self.emit_log("WARN", "Order %s gagal: %s" % (want, r.comment))
-            if _tg is not None:   # v4.18: DITOLAK broker -> template penuh
-                try:
-                    _tg.signal(want, sig, "DITOLAK",
-                               "order broker: %s" % r.comment, ask,
-                               sl_price, 0.0, 0.0)
-                except Exception:
-                    pass
             self._write_signal(want, sig, res.get("score", 0), lot, ask,
                                sl_price, 0.0, "FAIL", r.comment)
             # v3.65 AUDIT: order ditolak broker -> pending hangus + pair
@@ -1269,13 +1204,6 @@ class CommandCenter:
             res["status"] = "BLOCKED"
             res["block_why"] = why
             self.emit_log("PROTECT", "%s %s" % (want, why))
-            if _tg is not None:   # v4.18: guard sesi juga dilaporkan
-                try:
-                    _tg.signal(want, res.get("side", "-"), "SKIP", why,
-                               res.get("price"), res.get("sl_price"),
-                               res.get("tp_price"), 0.0)
-                except Exception:
-                    pass
         return blk
 
     def _want_of(self, sym):
@@ -1766,15 +1694,6 @@ class CommandCenter:
             self.emit_log("WARN", "ENGINE BENGONG: loop utama tidak "
                           "aktif %.0f menit (heartbeat beku) -- cek "
                           "terminal MT5/VPS" % (hb_age / 60.0))
-            if _tg is not None:
-                try:
-                    _tg.forward("WARN", "S3 ENGINE BENGONG: loop utama "
-                                "tidak aktif %.0f menit (heartbeat "
-                                "beku) -- cek terminal MT5/VPS, "
-                                "restart MULAI_SEMUA.bat bila perlu"
-                                % (hb_age / 60.0))
-                except Exception:
-                    pass
         return hb_age, stale
 
     def get_status(self) -> dict:
@@ -1856,22 +1775,7 @@ class CommandCenter:
         day_start_live = (round(balance - realized_ccy - bal_ops, 2)
                           if balance > 0 else
                           float(daily.get("day_start") or 0.0))
-        # v4.01 TELEGRAM (S3): online sekali, DD harian, rekap 00:00 WIB,
         # heartbeat berkala, alert market news -- semua anti-blokir.
-        try:
-            if _tg is not None:
-                # v4.01b: ambil data mandiri (pos/acc lokal status belum
-                # terdefinisi di titik ini -> NameError tertelan diam)
-                _tg.tick(CC_VERSION, equity, balance, realized_ccy,
-                         floating,
-                         len(self.broker.positions())
-                         if self.broker else 0,
-                         ((self.broker.account()
-                           if self.broker else {}) or {}),
-                         self.cfg.get("symbols", []))
-        except Exception:
-            pass
-
         scanner = []
         for want in self.cfg.get("symbols", []):
             res = self.scan.get(want)
@@ -1967,6 +1871,7 @@ class CommandCenter:
             sessions[k] = {"open": bool(op), "hour": "%02d:00" % t.tm_hour}
         return {
             "ts": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "ts_epoch": time.time(),
             # v4.00: jam utk dashboard = WIB (UTC+7)
             # eksplisit -- tidak tergantung setting jam VPS.
             # PENTING: "ts" lama sengaja tidak diubah (dipakai
@@ -1974,8 +1879,6 @@ class CommandCenter:
             "ts_wib": time.strftime("%Y-%m-%d %H:%M:%S",
                                     time.gmtime(time.time() + 7 * 3600)),
             "version": CC_VERSION,
-            "tg_on": (_tg.enabled() if _tg else False),
-            "tg_state": (_tg.state() if _tg else None),
             "terminal": (getattr(b, "kind", "MT5")
                      if (b and not b.is_sim) else "SIM"),
         "mode": "SIMULASI" if (b and b.is_sim) else "LIVE",
@@ -2054,13 +1957,6 @@ class CommandCenter:
                           "(jendela ini tetap jalan)..." % float(delay))
         except Exception:
             pass
-        if _tg is not None:      # v4.01
-            try:
-                _tg.restart("self-update/refresh diterima, memuat ulang "
-                            "engine (jendela tetap jalan)")
-            except Exception:
-                pass
-
         def _go():
             try:
                 time.sleep(max(0.2, float(delay)))
@@ -2191,16 +2087,6 @@ class CommandCenter:
                                           % (t["symbol"], t["pl"],
                                              "WIN" if t["pl"] > 0 else "LOSS",
                                              self.risk.consec_losses))
-                            if _tg is not None:   # v4.01: hasil close -> TG
-                                try:
-                                    _tg.close(t["symbol"],
-                                              float(t["pl"]),
-                                              float(t.get("lot", 0.0)
-                                                    or 0.0),
-                                              ("fase %s" % _tr3.phase)
-                                              if _tr3 is not None else "")
-                                except Exception:
-                                    pass
                 except Exception:
                     pass
                 # trailing BE + v3.21: MTRAIL profit-bersih (start 2 USD ->
@@ -2427,11 +2313,6 @@ class CommandCenter:
 def main():
     cfg = CCConfig()
     cc = CommandCenter(cfg)
-    if _tg is not None:      # v4.01: nyalakan Telegram (OFF bila tanpa
-        try:                 #   token/chat -- engine tetap jalan normal)
-            _tg.init(cfg, cc.emit_log)
-        except Exception:
-            pass
     signal.signal(signal.SIGINT, cc.stop)
     signal.signal(signal.SIGTERM, cc.stop)
 
@@ -2457,12 +2338,6 @@ def main():
     try:
         cc.run()
     finally:
-        if _tg is not None:      # v4.01: kabari Telegram engine berhenti
-            try:
-                _tg.engine_offline("engine dihentikan "
-                                   "(jendela ditutup / Ctrl+C)")
-            except Exception:
-                pass
         srv.shutdown()
         if cc.broker:
             cc.broker.shutdown()

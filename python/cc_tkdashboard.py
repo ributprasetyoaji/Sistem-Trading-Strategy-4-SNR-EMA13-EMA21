@@ -297,22 +297,6 @@ class EngineClient(object):
 
 # ---------------------------------------------------------------- jendela ---
 class Dash(object):
-    def telegram_setup(self, port, token, chat):
-        """v4.02: POST /api/telegram (tes koneksi + simpan kredensial)."""
-        data = json.dumps({"token": token, "chat": chat}).encode("utf-8")
-        req = urllib.request.Request(
-            "http://127.0.0.1:%d/api/telegram" % port, data=data,
-            method="POST", headers={"Content-Type": "application/json"})
-        if self.cookie:
-            req.add_header("Cookie", self.cookie)
-        try:
-            with self._opener.open(req, timeout=45) as r:
-                j = json.loads(r.read().decode("utf-8", "ignore"))
-                return bool(j.get("ok")), str(j.get("message")
-                                              or j.get("error") or "?")
-        except Exception as e:
-            return False, str(e)
-
     def __init__(self, ports=None, shot=None):
         self.ports = list(ports or PORTS)
         self.shot = shot
@@ -429,17 +413,6 @@ class Dash(object):
                                   activebackground="#12341f",
                                   activeforeground="#00ff9c", command=self._halt)
         self.btn_halt.pack(side="right", padx=4)
-        # v4.11: tombol Telegram setup (dikembalikan permintaan user)
-        self.btn_tg = tk.Button(top, text="✈ TG", bg="#0e2a16",
-                                fg="#39d98a", activebackground="#12341f",
-                                activeforeground="#39d98a", relief="flat",
-                                font=("Segoe UI", 9, "bold"),
-                                command=self._tg_setup)
-        self.btn_tg.pack(side="right", padx=4)
-        # v4.05: badge status Telegram (persistent)
-        self.lb_tg = tk.Label(top, text="", bg=PAN, fg=DIM,
-                              font=("Consolas", 9, "bold"))
-        self.lb_tg.pack(side="right", padx=6)
         self._upd_armed = 0.0
 
         # ================= TAPE =================
@@ -551,11 +524,14 @@ class Dash(object):
         self.lb_cfsym = tk.Label(bar, text="( - )", bg=PAN, fg=TX,
                                  font=("Consolas", 9, "bold"))
         self.lb_cfsym.pack(side="right", padx=6)
+        self.lb_age = tk.Label(bar, text="", bg=PAN, fg=DIM,
+                               font=("Consolas", 9, "bold"))
+        self.lb_age.pack(side="right", padx=6)
         crow = tk.Frame(p, bg=PAN)
         crow.pack(fill="x", padx=6, pady=(0, 2))
         self.cv_gauge = tk.Canvas(crow, bg=PAN, width=150, height=150,
                                   highlightthickness=0)
-        self.cv_gauge.pack(side="left", padx=(0, 8))
+        self.cv_gauge.pack(side="left", padx=(6, 8))
         cinfo = tk.Frame(crow, bg=PAN)
         cinfo.pack(side="left", fill="both", expand=True)
         vrow = tk.Frame(cinfo, bg=PAN)
@@ -833,44 +809,6 @@ class Dash(object):
     def _halt(self):
         threading.Thread(target=self._halt_bg, daemon=True).start()
 
-    def _tg_setup(self):
-        """v4.11: input BOT_TOKEN & CHAT_ID -> tes + simpan via engine."""
-        tok = simpledialog.askstring(
-            "Telegram BOT_TOKEN", "Tempel token bot dari @BotFather:",
-            show="*", parent=self.root)
-        if not tok or not str(tok).strip():
-            return
-        cid = simpledialog.askstring(
-            "Telegram CHAT_ID", "Chat ID Anda (dari @userinfobot):",
-            parent=self.root)
-        if not cid or not str(cid).strip():
-            return
-        self.btn_tg.configure(text="...", state="disabled")
-        threading.Thread(target=self._tg_bg,
-                         args=(str(tok).strip(), str(cid).strip()),
-                         daemon=True).start()
-
-    def _tg_bg(self, tok, cid):
-        ok, msg = self.client.telegram_setup(
-            self.active_port or self.ports[0], tok, cid)
-
-        def _done():
-            try:
-                self.btn_tg.configure(text="SUBMIT TG", state="normal")
-            except Exception:
-                pass
-            try:
-                if ok:
-                    messagebox.showinfo("Telegram", msg, parent=self.root)
-                else:
-                    messagebox.showerror("Telegram", msg, parent=self.root)
-            except Exception:
-                pass
-        try:
-            self.root.after(0, _done)
-        except Exception:
-            pass
-
     def _halt_bg(self):
         self.client.halt(self.active_port or self.ports[0])
         self._kick()
@@ -997,14 +935,12 @@ class Dash(object):
                                       or s.get("ts")
                                       or "--:--:--")[11:])
                                 + " WIB")
-        # v4.05: badge status Telegram (persistent)
-        _tgs = s.get("tg_state") or {}
-        _tgt = ("TG GAGAL" if _tgs.get("err") else
-                ("TG AKTIF %s" % _tgs.get("bot", "")
-                 if _tgs.get("on") else "TG OFF"))
-        _tgc = (GRN if _tgs.get("on") else
-                (RED if _tgs.get("err") else DIM))
-        self.lb_tg.configure(text=_tgt, fg=_tgc)
+        _te = s.get("ts_epoch")
+        if _te:
+            _age = max(0, int(time.time() - float(_te)))
+            _ac = GRN if _age <= 15 else (AMBER if _age <= 60 else RED)
+            _at = "DATA BARU" if _age <= 15 else ("DATA %ds" % _age if _age <= 60 else "DATA LAMA %ds" % _age)
+            self.lb_age.configure(text=_at, fg=_ac)
 
         self.ch["PYTHON ENGINE"].configure(
             text="\u25cf ONLINE v%s" % s.get("version", "-"), fg=GRN)
@@ -1311,7 +1247,7 @@ class Dash(object):
         # v3.87: bola dunia BERPUTAR (GlobeTk, timer sendiri) ditempel
         # di TENGAH ring -- widget child di atas canvas gauge
         if not getattr(self, "_gg", None):
-            self._gg = GlobeTk(cv, size=100, bg=PAN, acc=ACC, dim=DIM2,
+            self._gg = GlobeTk(cv, size=108, bg=PAN, acc=ACC, dim=DIM2,
                                fade=1.0, disk=True)
         cv.create_window((cxg, cyg), window=self._gg)
 

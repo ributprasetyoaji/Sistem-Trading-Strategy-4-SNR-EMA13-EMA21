@@ -276,17 +276,6 @@ DEFAULTS = {
                                       #   tetap masuk)
     "max_risk_overrun_x": 3.0,        #   pengaman: risiko efektif lot min
                                       #   maks 3x target risiko, lebih -> SKIP
-    # ---- NOTIFIKASI TELEGRAM (v4.01, KHUSUS STRATEGY 3) ----
-    "tg_enabled": True,               # master switch notifikasi Telegram
-    "tg_token": "",                   # token bot @BotFather -- atau isi
-                                      #   telegram_token.txt / env RBT_TG_TOKEN
-    "tg_chat": "",                    # chat id (@userinfobot) -- atau
-                                      #   telegram_chat.txt / env RBT_TG_CHAT
-    "tg_news_enabled": True,          # alert market news high-impact
-                                      #   (ForexFactory mingguan, cache 6 jam)
-    "tg_news_lead_min": 120,          # ingatkan X menit sebelum rilis
-    "tg_status_hours": 4.0,           # heartbeat status tiap N jam (0=off);
-                                      #   rekap harian OTOMATIS 00:00 WIB
     "trade_enabled": True,            # kill-switch global (bisa juga dari dashboard)
     # ---- PELINDUNG ANTI SL-BERUNTUN (v3.06) ----
     "day_tz_offset": 7.0,             # v3.69: KUNCI WIB (UTC+7), permintaan

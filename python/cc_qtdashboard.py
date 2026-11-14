@@ -290,22 +290,6 @@ class Sig(QObject):
 class Crown(QWidget):
     """Mahkota emas bergradasi dengan glow."""
 
-    def telegram_setup(self, port, token, chat):
-        """v4.02: POST /api/telegram (tes koneksi + simpan kredensial)."""
-        data = json.dumps({"token": token, "chat": chat}).encode("utf-8")
-        req = urllib.request.Request(
-            "http://127.0.0.1:%d/api/telegram" % port, data=data,
-            method="POST", headers={"Content-Type": "application/json"})
-        if self.cookie:
-            req.add_header("Cookie", self.cookie)
-        try:
-            with self._opener.open(req, timeout=45) as r:
-                j = json.loads(r.read().decode("utf-8", "ignore"))
-                return bool(j.get("ok")), str(j.get("message")
-                                              or j.get("error") or "?")
-        except Exception as e:
-            return False, str(e)
-
     def __init__(self):
         super().__init__()
         self.setFixedSize(58, 34)
@@ -890,9 +874,9 @@ class Gauge(QWidget):
         self.setFixedSize(150, 150)
         # v3.87 (user): GLOBE BERPUTAR (GlobeCyber) FULL di dalam ring;
         # cakram solid -> garis ring/ticks tak memotong bola
-        self.gglobe = GlobeCyber(self, size=100, opacity=1.0, disk=True)
+        self.gglobe = GlobeCyber(self, size=108, opacity=1.0, disk=True)
         self.gglobe.setAttribute(Qt.WA_TransparentForMouseEvents, True)
-        self.gglobe.move((150 - 100) // 2, (150 - 100) // 2)
+        self.gglobe.move((150 - 108) // 2, (150 - 108) // 2)
         self.gglobe.raise_()
 
     def paintEvent(self, _e):
@@ -1308,6 +1292,7 @@ class Dash(QWidget):
 
     def _build(self):
         self.resize(1306, 724)
+        self.setMinimumSize(1024, 620)
         root = QVBoxLayout(self)
         root.setContentsMargins(8, 8, 8, 8)
         root.setSpacing(2)
@@ -1346,16 +1331,6 @@ class Dash(QWidget):
         self.btn_halt.setProperty("hstate", "on")
         self.btn_halt.clicked.connect(self._halt)
         hl.addWidget(self.btn_halt)
-        # v4.11: tombol Telegram setup (dikembalikan permintaan user)
-        self.btn_tg = QPushButton("SUBMIT TG")
-        self.btn_tg.setObjectName("haltbtn")
-        self.btn_tg.clicked.connect(self._tg_setup)
-        hl.addWidget(self.btn_tg)
-        # v4.05: badge status Telegram (persistent)
-        self.lb_tg = QLabel("")
-        self.lb_tg.setStyleSheet("color:#8a8fa8;font-size:8pt;"
-                                 "font-weight:bold;padding:0 4px;")
-        hl.addWidget(self.lb_tg)
         self._upd_armed = 0.0
         self.lb_clock = QLabel("--:--:--")
         self.lb_clock.setFont(mono(12, True))
@@ -1514,6 +1489,9 @@ class Dash(QWidget):
         self.lb_cfsym.setStyleSheet("color:%s;font-size:9pt;font-weight:bold;"
                                     "background:transparent;" % GOLD)
         bar.layout().addWidget(self.lb_cfsym)
+        self.lb_age = QLabel("")
+        self.lb_age.setStyleSheet("color:#8a8fa8;font-size:8pt;font-weight:bold;padding:0 6px;")
+        bar.layout().addWidget(self.lb_age)
         crow2 = QHBoxLayout()
         crow2.setContentsMargins(8, 0, 8, 0)
         crow2.setSpacing(10)
@@ -1714,31 +1692,6 @@ class Dash(QWidget):
     def _halt(self):
         threading.Thread(target=self._halt_bg, daemon=True).start()
 
-    def _tg_setup(self):
-        """v4.11: input BOT_TOKEN & CHAT_ID -> tes + simpan via engine."""
-        from PySide6.QtWidgets import (QInputDialog, QMessageBox,
-                                       QLineEdit)
-        tok, ok1 = QInputDialog.getText(
-            self, "Telegram BOT_TOKEN",
-            "Tempel token bot dari @BotFather:", QLineEdit.Password)
-        if not ok1 or not str(tok).strip():
-            return
-        cid, ok2 = QInputDialog.getText(
-            self, "Telegram CHAT_ID",
-            "Chat ID Anda (dari @userinfobot):")
-        if not ok2 or not str(cid).strip():
-            return
-        self.btn_tg.setText("...")
-        self.btn_tg.setEnabled(False)
-        threading.Thread(target=self._tg_bg,
-                         args=(str(tok).strip(), str(cid).strip()),
-                         daemon=True).start()
-
-    def _tg_bg(self, tok, cid):
-        ok, msg = self.client.telegram_setup(
-            self.active_port or self.ports[0], tok, cid)
-        self._tg_result = (bool(ok), msg)
-
     def _try_pw(self):
         if self.client.login(self.active_port or self.ports[0],
                              self.ent_pw.text()):
@@ -1860,36 +1813,13 @@ class Dash(QWidget):
         self.lb_clock.setText(((s.get("ts_wib")
                                 or s.get("ts")
                                 or "--:--:--")[11:]) + " WIB")
-        # v4.05: badge status Telegram (persistent)
-        _tgs = s.get("tg_state") or {}
-        _tgt = ("TG GAGAL" if _tgs.get("err") else
-                ("TG AKTIF %s" % _tgs.get("bot", "")
-                 if _tgs.get("on") else "TG OFF"))
-        _tgc = ("#2ee6a8" if _tgs.get("on") else
-                ("#ff2d55" if _tgs.get("err") else "#8a8fa8"))
-        if self.lb_tg.text() != _tgt:
-            self.lb_tg.setText(_tgt)
-        self.lb_tg.setStyleSheet(
-            "color:%s;font-size:8pt;font-weight:bold;padding:0 4px;"
-            % _tgc)
-        self.lb_tg.setToolTip(str(_tgs.get("err")
-                                  or "status Telegram"))
-        _tgr = getattr(self, "_tg_result", None)
-        if _tgr:
-            self._tg_result = None
-            try:
-                from PySide6.QtWidgets import QMessageBox
-                if _tgr[0]:
-                    QMessageBox.information(self, "Telegram", _tgr[1])
-                else:
-                    QMessageBox.warning(self, "Telegram", _tgr[1])
-            except Exception:
-                pass
-            try:
-                self.btn_tg.setText("SUBMIT TG")
-                self.btn_tg.setEnabled(True)
-            except Exception:
-                pass
+        _te = s.get("ts_epoch")
+        if _te:
+            _age = max(0, int(time.time() - float(_te)))
+            _ac = "#2ee6a8" if _age <= 15 else ("#f5a623" if _age <= 60 else "#ff2d55")
+            _at = "DATA BARU" if _age <= 15 else ("DATA %ds" % _age if _age <= 60 else "DATA LAMA %ds" % _age)
+            self.lb_age.setText(_at)
+            self.lb_age.setStyleSheet("color:%s;font-size:8pt;font-weight:bold;padding:0 6px;" % _ac)
 
 
         chipstyle = ("color:%s;font-size:9pt;font-weight:bold;"
