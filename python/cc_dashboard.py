@@ -551,7 +551,7 @@ const CAT={XAUUSD:'GOLD',XAGUSD:'GOLD',GOLD:'GOLD',SILVER:'GOLD',
  BTCUSD:'CRYPTO',ETHUSD:'CRYPTO',BTCUSDM:'CRYPTO',ETHUSDM:'CRYPTO',
  NAS100:'INDEX',USTEC:'INDEX',USTECM:'INDEX',US30:'INDEX',GER40:'INDEX',US100:'INDEX',
  USOIL:'COMMODITY',WTI:'COMMODITY',UKOIL:'COMMODITY',XTIUSD:'COMMODITY'};
-const catOf=s=>CAT[String(s).toUpperCase()]||'FOREX';
+const catOf=s=>{s=String(s).toUpperCase();if(CAT[s])return CAT[s];if(/^(XAU|XAG|GOLD|SILVER|XPT)/.test(s))return 'GOLD';if(/^(BTC|ETH|SOL|XRP|LTC|DOGE|ADA|XLM|BCH|DOT|LINK)/.test(s))return 'CRYPTO';if(/(NAS|USTEC|US100|US30|US500|GER|DAX|UK100|FTSE|JP225|NIKKEI|HK50|AUS200|SPX)/.test(s))return 'INDEX';if(/(OIL|WTI|BRENT|XBR)/.test(s))return 'COMMODITY';return 'FOREX';};
 /* boot sequence */
 (function(){const lines=['> INIT RBT FX SYSTEM v3.42','> PYTHON ENGINE ............ [OK]',
 '> MULTI-PAIR SCANNER ....... [OK]','> RISK MANAGER ............. [OK]',

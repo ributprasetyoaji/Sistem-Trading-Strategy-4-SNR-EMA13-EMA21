@@ -82,6 +82,18 @@ def _merge_symbols(wants, force):
     return out
 
 
+def _no_data_row(want):
+    """S4 (user): baris scanner utk pair yang BELUM ada data (nama
+    broker tidak match / terminal belum siap) - WAJIB tetap tampil
+    di dashboard (gold/silver tidak boleh 'hilang' dari panel)."""
+    return {"symbol": want, "price": 0.0, "digits": 2, "spread": 0,
+            "regime": "-", "signal": "-", "score": 0.0, "trend_pct": 0.0,
+            "status": "NO-DATA", "sniper_why": "menunggu data pair ini",
+            "block_why": "", "sl": 0.0, "tp": 0.0, "sl_points": 0,
+            "components": {}, "components_buy": {}, "components_sell": {},
+            "ohlc": []}
+
+
 class CommandCenter:
     def __init__(self, cfg: CCConfig, log=print):
         self.cfg = cfg
@@ -1789,6 +1801,8 @@ class CommandCenter:
 
             res = self.scan.get(want)
             if not res:
+                # TIDAK di-skip: pair wajib TAMPIL walau belum ada data
+                scanner.append(_no_data_row(want))
                 continue
             info = res.get("info") or {}
             has_pos = any(p["symbol"] == self.resolved.get(want, want) for p in pos)
