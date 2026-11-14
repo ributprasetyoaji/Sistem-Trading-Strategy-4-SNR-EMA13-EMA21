@@ -165,6 +165,8 @@ def test_hook_di_loop_utama():
                encoding="utf-8").read()
     assert "self._cloud_autosync_tick(time.time())" in src
     i_hook = src.index("self._cloud_autosync_tick(time.time())")
-    i_sleep = src.index('time.sleep(max(0.5, self.cfg.get('
-                        '"scan_interval_sec"')
+    import re as _re
+    _m = _re.search(r"time\.sleep\(max\(0\.5,\s*self\.cfg\.get\("
+                    r"\s*\"scan_interval_sec\"", src)
+    i_sleep = _m.start() if _m else -1
     assert i_hook < i_sleep, (i_hook, i_sleep)

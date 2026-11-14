@@ -138,6 +138,25 @@ def _load_pair_lot():
     return {}
 
 
+def _spark_from_bars(bars, n=60):
+    """v4.41: candle utk chart dari bars mentah (format sama dgn
+    spark_ohlc strategy: [(t,o,h,l,c),...]) -- chart TETAP HIDUP walau
+    pair OFF / menunggu analisa (tampilan saja, bukan sinyal)."""
+    try:
+        t = [int(v) for v in (bars.get("time") or [])]
+        o = [float(v) for v in (bars.get("open") or [])]
+        h = [float(v) for v in (bars.get("high") or [])]
+        l = [float(v) for v in (bars.get("low") or [])]
+        c = [float(v) for v in (bars.get("close") or [])]
+        k = min(len(t), len(o), len(h), len(l), len(c))
+        if k < 2:
+            return []
+        return [(t[i], o[i], h[i], l[i], c[i])
+                for i in range(max(0, k - int(n)), k)]
+    except Exception:
+        return []
+
+
 def _off_row(want, data=None):
     """v4.34 (user): baris scanner utk pair yang di-OFF-kan lewat switch
     kolom SW -- tidak dianalisa, tidak di-tradingkan, tetap tampil."""
@@ -151,6 +170,8 @@ def _off_row(want, data=None):
         r["spread"] = int(info.get("spread", 0) or 0)
     except Exception:
         pass
+    # v4.41: chart tetap hidup utk pair OFF (candle live, tanpa sinyal)
+    r["ohlc"] = _spark_from_bars((data or {}).get("m5") or {})
     return r
 
 
@@ -727,6 +748,9 @@ class CommandCenter:
             self.pair_sw[want] = True
         else:
             self.pair_sw.pop(want, None)
+        # v4.41: minta loop scan jalan SEKARANG -- pair ON langsung
+        # dianalisa (dulu nunggu tick berikut -- chart kesan "off")
+        self._scan_kick = True
         try:
             os.makedirs("data", exist_ok=True)
             _tmp = _pair_sw_path() + ".tmp"
@@ -777,6 +801,12 @@ class CommandCenter:
         for want, sym in list(self.resolved.items()):
             try:
                 data = self._fetch_data(want, sym)
+                if not data and (getattr(self, "pair_sw", {}) or {})\
+                        .get(want, False):
+                    # v4.41: pair ON -- 1x retry cepat (MT5 kadang
+                    # gagal sesaat; dulu langsung dianggap no-data ->
+                    # chart kosong & user toggle berulang)
+                    data = self._fetch_data(want, sym)
                 if not data:
                     # v4.19: JANGAN SENYAP -- data None = terminal MT5
                     # putus/simbol hilang; inilah 'momentum 0% semua
@@ -2026,8 +2056,15 @@ class CommandCenter:
             })
         scanner.sort(key=lambda r: -r["score"])
 
-        top = next((r for r in scanner if r["status"] in ("READY", "TRADING", "SNIPER_WAIT", "HOLD")),
-                   scanner[0] if scanner else None)
+        top = next((r for r in scanner
+                    if r["status"] in ("READY", "TRADING",
+                                       "SNIPER_WAIT", "HOLD")), None)
+        # v4.41: jangan jatuh ke baris TANPA candle (OFF/NO-DATA) --
+        # pilih baris ber-candle supaya panel & chart tak kosong
+        if top is None:
+            top = next((r for r in scanner if r.get("ohlc")), None)
+        if top is None:
+            top = scanner[0] if scanner else None
         confluence = None
         if top:
             comps = [{"name": n, "key": k,
@@ -2458,7 +2495,12 @@ class CommandCenter:
                 self._cloud_autosync_tick(time.time())
             except Exception:
                 pass
-            time.sleep(max(0.5, self.cfg.get("scan_interval_sec", 5.0)))
+            # v4.41: kick dari set_pair_switch -> scan langsung (max 1x)
+            if bool(getattr(self, "_scan_kick", False)):
+                self._scan_kick = False
+            else:
+                time.sleep(max(0.5,
+                               self.cfg.get("scan_interval_sec", 5.0)))
 
     def _top(self):
         if not self.scan:

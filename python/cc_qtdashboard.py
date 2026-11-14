@@ -2352,6 +2352,13 @@ class Dash(QWidget):
                     break
         if top is None and rows:
             top = rows[0]
+        # v4.41: baris terpilih sesaat TANPA candle (NO-DATA / fetch MT5
+        # gagal) -> pakai baris ber-candle lain; chart TIDAK pernah kosong
+        if top is not None and not (top.get("ohlc") or []):
+            for r in rows:
+                if r.get("ohlc"):
+                    top = r
+                    break
         if not top:
             return
         self.cf_top = top
