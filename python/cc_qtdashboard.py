@@ -84,6 +84,13 @@ _RX_CRY = re.compile(r"^(BTC|ETH|SOL|XRP|LTC|DOGE|ADA|XLM|BCH|DOT|LINK)")
 _RX_IDX = re.compile(r"(NAS|USTEC|US100|US30|US500|GER|DAX|UK100|FTSE|JP225|NIKKEI|HK50|AUS200|SPX)")
 _RX_COM = re.compile(r"(OIL|WTI|BRENT|XBR)")
 _TAB_CAT = {"GOLD/SILVER": "GOLD"}   # v4.32: label tombol tab -> kategori cat_of
+# v4.36 (user): tombol SW ber-BORDER -- ON hijau, OFF merah
+_SW_ON = ("QPushButton{background:#0d3b22;color:#3ddc84;"
+          "border:1px solid #22c55e;border-radius:4px;"
+          "font-size:7pt;font-weight:800;padding:1px 6px;}")
+_SW_OFF = ("QPushButton{background:#3b0d14;color:#ff6b7a;"
+           "border:1px solid #ff4d5e;border-radius:4px;"
+           "font-size:7pt;font-weight:800;padding:1px 6px;}")
 
 def cat_of(sym):
     s0 = (sym or "").upper()
@@ -1714,26 +1721,32 @@ class Dash(QWidget):
         return super().eventFilter(obj, ev)
 
     def _on_select(self, row, _col):
-        if _col == 9:   # v4.34: kolom SW -> toggle ON/OFF pair
+        if _col == 9:   # v4.36: klik area kolom SW -> toggle
             it1 = self.tv.item(row, 1)
             if it1 is None:
                 return
             sym = it1.text()
-            cur = self._sw_map.get(sym, False)
-            self._sw_map[sym] = not cur
-            it2 = self.tv.item(row, 9)
-            if it2 is not None:
-                it2.setText("ON" if not cur else "OFF")
-                it2.setForeground(QColor(GRN if not cur else "#565b7a"))
-            self.sel_sym = sym
-            threading.Thread(target=self._sw_bg, args=(sym, not cur),
-                             daemon=True).start()
+            self._toggle_sw(sym, not self._sw_map.get(sym, False))
             return
         it = self.tv.item(row, 1)
         if it:
             self.sel_sym = it.text()
             if self.snap:
                 self._apply(self.snap)
+
+    def _toggle_sw(self, sym, on, btn=None):
+        """v4.36: toggle switch pair -- feedback instan (border hijau/
+        merah), lalu kirim ke engine (snapshot berikut menyegarkan)."""
+        self._sw_map[sym] = bool(on)
+        self.sel_sym = sym
+        if btn is not None:
+            try:
+                btn.setText("ON" if on else "OFF")
+                btn.setStyleSheet(_SW_ON if on else _SW_OFF)
+            except Exception:
+                pass
+        threading.Thread(target=self._sw_bg, args=(sym, bool(on)),
+                         daemon=True).start()
 
     def _sw_bg(self, sym, on):
         for p in self.ports:
@@ -2005,13 +2018,22 @@ class Dash(QWidget):
             r0 = self.tv.rowCount()
             self.tv.insertRow(r0)
             for c0, v0 in enumerate(vals):
+                if c0 == 9:
+                    # v4.36 (user): tombol SW dgn BORDER -- ON hijau,
+                    # OFF merah; klik tombol = toggle langsung
+                    btn = QPushButton(str(v0))
+                    btn.setStyleSheet(_SW_ON if r.get("sw") else _SW_OFF)
+                    btn.setCursor(Qt.PointingHandCursor)
+                    btn.clicked.connect(
+                        lambda _c=False, s=r.get("symbol"),
+                        cur=bool(r.get("sw")), w=btn:
+                        self._toggle_sw(s, not cur, w))
+                    self.tv.setCellWidget(r0, 9, btn)
+                    continue
                 it = QTableWidgetItem(str(v0))
-                it.setFont(mono(8, c0 in (1, 9)))
+                it.setFont(mono(8, c0 == 1))
                 it.setForeground(QColor(st_col.get(stag, TX))
                                  if c0 in (5, 8) else QColor(TX))
-                if c0 == 9:
-                    it.setForeground(QColor(GRN if r.get("sw")
-                                           else "#565b7a"))
                 self.tv.setItem(r0, c0, it)
             keep.append(r.get("symbol"))
         if self.sel_sym and self.sel_sym in keep:

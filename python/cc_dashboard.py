@@ -309,6 +309,7 @@ box-shadow:0 0 8px rgba(0,255,156,.55)}
 border-radius:4px;border:1px solid #243057;background:#0a0f1e;color:#8a92b8;
 cursor:pointer;font-family:var(--mon)}
 .swbtn.on{color:#04120b;background:var(--grn);border-color:var(--grn)}
+.swbtn.off{color:#ff5c6c;background:rgba(255,92,108,.08);border-color:#ff5c6c}
 .sbar.hot i:after{content:'';position:absolute;inset:0;transform:translateX(-100%);
 background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);
 animation:shimmer 1.5s linear infinite}
@@ -816,7 +817,7 @@ return '<tr data-sym="'+r.symbol+'" class="'+(SEL===r.symbol?'sel':'')+'">'+
  '<td><div class="tbar"><div class="tr"><i style="width:'+tb+'%"></i></div>'+
  '<span class="sq" style="background:'+(tb>=55?'var(--grn)':'var(--red)')+'"></span></div></td>'+
  '<td>'+statusHTML(r)+'</td>'+
- '<td><button class="swbtn'+(r.sw?' on':'')+'" data-sw="'+r.symbol+
+ '<td><button class="swbtn'+(r.sw?' on':' off')+'" data-sw="'+r.symbol+
  '">'+(r.sw?'ON':'OFF')+'</button></td></tr>';}).join('')||
  '<tr><td colspan="10" style="text-align:center;color:var(--dim2)">[ tidak ada pair di kategori ini ]</td></tr>';
 document.querySelectorAll('#scan tr').forEach(tr=>tr.onclick=()=>{

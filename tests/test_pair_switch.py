@@ -147,9 +147,12 @@ def test_ui_qt_tk_web_kolom_sw():
     py = os.path.join(os.path.dirname(__file__), "..", "python")
     qt = open(os.path.join(py, "cc_qtdashboard.py"), encoding="utf-8").read()
     assert '("SW", 40)' in qt
-    assert "if _col == 9:" in qt                 # klik kolom SW -> toggle
+    assert "if _col == 9:" in qt                 # klik area kolom SW
     assert "def pair_switch" in qt
-    assert 'it2.setText("ON" if not cur else "OFF")' in qt
+    assert "def _toggle_sw" in qt                # v4.36
+    assert "setCellWidget(r0, 9" in qt           # tombol SW di sel
+    assert "#22c55e" in qt                       # border ON hijau
+    assert "#ff4d5e" in qt                       # border OFF merah
     tk = open(os.path.join(py, "cc_tkdashboard.py"), encoding="utf-8").read()
     assert '("sw", "SW", 40)' in tk
     assert "def _tv_click" in tk
@@ -157,5 +160,7 @@ def test_ui_qt_tk_web_kolom_sw():
     web = open(os.path.join(py, "cc_dashboard.py"), encoding="utf-8").read()
     assert web.count("api/pair_switch") >= 2
     assert "swbtn" in web and "data-sw" in web
+    assert ".swbtn.off" in web                   # border merah web
+    assert "(r.sw?' on':' off')" in web
     assert 'colspan="10"' in web
     assert "JSON.stringify({symbol:sym,on:on})" in web
