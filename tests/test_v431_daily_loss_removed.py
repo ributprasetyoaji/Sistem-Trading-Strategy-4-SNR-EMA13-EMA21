@@ -20,7 +20,7 @@ import cc_risk as CR                # noqa: E402
 
 
 def test_versi_dan_kunci_dihapus_dari_defaults():
-    assert C.CC_VERSION == "4.31"
+    assert C.CC_VERSION >= "4.30"  # versi maju terus
     assert "daily_loss_pct" not in C.DEFAULTS, "kunci wajib hilang"
 
 

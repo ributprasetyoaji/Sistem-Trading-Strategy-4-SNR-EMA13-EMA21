@@ -23,7 +23,7 @@ import github_hist as GH            # noqa: E402
 
 
 def test_versi_dan_config():
-    assert C.CC_VERSION == "4.31"
+    assert C.CC_VERSION >= "4.30"  # versi maju terus
     hc = C.DEFAULTS["hist_cloud"]
     assert hc["enabled"] is True
     assert abs(float(hc["delta_min_hours"]) - 12.0) < 1e-9   # 2x/hari

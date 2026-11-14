@@ -10,6 +10,7 @@ Pustaka standar Python saja - tanpa install.
 """
 import json
 import queue
+import re
 import sys
 import threading
 import time
@@ -60,6 +61,12 @@ CAT_INDEX = {"NAS100","US30","SPX500","GER40","JP225","NAS100M","US500",
              "UK100","AUS200","UT100","USTEC"}
 CAT_COMM = {"USOIL","XTIUSD","XBRUSD","USOILM","UKOIL","NGAS","XPTUSD","XPDUSD"}
 
+_RX_GOLD = re.compile(r"^(XAU|XAG|GOLD|SILVER|XPT)")
+_RX_CRY = re.compile(r"^(BTC|ETH|SOL|XRP|LTC|DOGE|ADA|XLM|BCH|DOT|LINK)")
+_RX_IDX = re.compile(r"(NAS|USTEC|US100|US30|US500|GER|DAX|UK100|FTSE|JP225|NIKKEI|HK50|AUS200|SPX)")
+_RX_COM = re.compile(r"(OIL|WTI|BRENT|XBR)")
+_TAB_CAT = {"GOLD/SILVER": "GOLD"}   # v4.32: label tombol tab -> kategori cat_of
+
 
 def cat_of(sym):
     s = (sym or "").upper()
@@ -68,7 +75,12 @@ def cat_of(sym):
     if s in CAT_CRYPTO: return "CRYPTO"
     if s in CAT_INDEX: return "INDEX"
     if s in CAT_COMM: return "COMMODITY"
-    return "OTHER"
+    # v4.32: nama broker apapun tetap tergrup benar (GOLD.a, XAUUSD.r, ...)
+    if _RX_GOLD.match(s): return "GOLD"
+    if _RX_CRY.match(s): return "CRYPTO"
+    if _RX_IDX.search(s): return "INDEX"
+    if _RX_COM.search(s): return "COMMODITY"
+    return "FOREX"
 
 
 def fmt(v, d=2):
@@ -1021,7 +1033,8 @@ class Dash(object):
         self.tv.delete(*self.tv.get_children())
         i = 0
         for r in rows:
-            if self.tab != "ALL" and cat_of(r.get("symbol")) != self.tab:
+            _tabc = _TAB_CAT.get(self.tab, self.tab)
+            if self.tab != "ALL" and cat_of(r.get("symbol")) != _tabc:
                 continue
             i += 1
             sig = r.get("signal", "-") if float(r.get("score", 0) or 0) >= 70 \

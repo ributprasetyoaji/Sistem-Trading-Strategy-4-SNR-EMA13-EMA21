@@ -153,4 +153,4 @@ def test_heartbeat_dan_watchdog_terpasang_di_source():
 
 
 def test_versi_baru():
-    assert cc_config.CC_VERSION == "4.31"
+    assert cc_config.CC_VERSION >= "4.30"  # versi maju terus

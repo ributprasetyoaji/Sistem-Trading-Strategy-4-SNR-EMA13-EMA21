@@ -8,6 +8,7 @@ Sumber data: http://127.0.0.1:<port>/api/status (8081/8080 otomatis).
 Dependensi: PySide6-Essentials (fallback Tk: cc_tkdashboard.py).
 """
 import json
+import re
 import sys
 import threading
 import time
@@ -78,6 +79,11 @@ CAT_INDEX = {"NAS100", "US30", "SPX500", "GER40", "JP225", "NAS100M", "US500",
 CAT_COMM = {"USOIL", "XTIUSD", "XBRUSD", "USOILM", "UKOIL", "NGAS", "XPTUSD",
             "XPDUSD"}
 
+_RX_GOLD = re.compile(r"^(XAU|XAG|GOLD|SILVER|XPT)")
+_RX_CRY = re.compile(r"^(BTC|ETH|SOL|XRP|LTC|DOGE|ADA|XLM|BCH|DOT|LINK)")
+_RX_IDX = re.compile(r"(NAS|USTEC|US100|US30|US500|GER|DAX|UK100|FTSE|JP225|NIKKEI|HK50|AUS200|SPX)")
+_RX_COM = re.compile(r"(OIL|WTI|BRENT|XBR)")
+_TAB_CAT = {"GOLD/SILVER": "GOLD"}   # v4.32: label tombol tab -> kategori cat_of
 
 def cat_of(sym):
     s0 = (sym or "").upper()
@@ -86,7 +92,12 @@ def cat_of(sym):
     if s0 in CAT_CRYPTO: return "CRYPTO"
     if s0 in CAT_INDEX: return "INDEX"
     if s0 in CAT_COMM: return "COMMODITY"
-    return "OTHER"
+    # v4.32: nama broker apapun tetap tergrup benar (GOLD.a, XAUUSD.r, ...)
+    if _RX_GOLD.match(s0): return "GOLD"
+    if _RX_CRY.match(s0): return "CRYPTO"
+    if _RX_IDX.search(s0): return "INDEX"
+    if _RX_COM.search(s0): return "COMMODITY"
+    return "FOREX"
 
 
 def fmt(v, d=2):
@@ -1929,7 +1940,8 @@ class Dash(QWidget):
         self.tv.setRowCount(0)
         i = 0
         for r in rows:
-            if self.tab != "ALL" and cat_of(r.get("symbol")) != self.tab:
+            _tabc = _TAB_CAT.get(self.tab, self.tab)
+            if self.tab != "ALL" and cat_of(r.get("symbol")) != _tabc:
                 continue
             i += 1
             sig = r.get("signal", "-") if float(r.get("score", 0) or 0) >= 70 \

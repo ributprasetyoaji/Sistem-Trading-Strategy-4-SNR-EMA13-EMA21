@@ -13,6 +13,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import socket
 import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -919,6 +920,22 @@ def json_default(o):
     return str(o)
 
 
+# v4.32: mirror python dari catOf() frontend -- utk /api/selfcheck
+_SC_GOLD = re.compile(r"^(XAU|XAG|GOLD|SILVER|XPT)")
+_SC_CRY = re.compile(r"^(BTC|ETH|SOL|XRP|LTC|DOGE|ADA|XLM|BCH|DOT|LINK)")
+_SC_IDX = re.compile(r"(NAS|USTEC|US100|US30|US500|GER|DAX|UK100|FTSE|JP225|NIKKEI|HK50|AUS200|SPX)")
+_SC_COM = re.compile(r"(OIL|WTI|BRENT|XBR)")
+
+
+def _selfcheck_cat(s):
+    s0 = str(s or "").upper()
+    if _SC_GOLD.match(s0): return "GOLD"
+    if _SC_CRY.match(s0): return "CRYPTO"
+    if _SC_IDX.search(s0): return "INDEX"
+    if _SC_COM.search(s0): return "COMMODITY"
+    return "FOREX"
+
+
 def make_handler(cc, password=""):
     _token = hashlib.sha256(("rbt-fx:" + password).encode()).hexdigest()[:32] \
         if password else ""
@@ -964,6 +981,35 @@ def make_handler(cc, password=""):
                     st = {"error": str(e)}
                 self._send(200, json.dumps(st, default=json_default),
                            "application/json")
+            elif self.path == "/api/selfcheck":
+                # v4.32: bukti ground-truth tanpa JS (bisa difoto):
+                # jumlah pair per kategori + daftar simbol mentah
+                if not self._authed():
+                    self._send(401, '{"error":"auth"}', "application/json")
+                    return
+                try:
+                    st = cc.get_status()
+                    rows = st.get("scanner") or []
+                    cat = {}
+                    for r in rows:
+                        c = _selfcheck_cat(r.get("symbol"))
+                        cat[c] = cat.get(c, 0) + 1
+                    out = {"ok": True, "ui": "UI-2",
+                           "version": st.get("version"),
+                           "scanner": len(rows), "cat": cat,
+                           "symbols": [r.get("symbol") for r in rows],
+                           "gold_rows": [{"symbol": r.get("symbol"),
+                                          "status": r.get("status"),
+                                          "score": r.get("score")}
+                                         for r in rows
+                                         if _selfcheck_cat(r.get("symbol"))
+                                         == "GOLD"]}
+                    self._send(200, json.dumps(out, default=json_default),
+                               "application/json")
+                except Exception as e:
+                    self._send(200, json.dumps({"ok": False,
+                                                "error": str(e)}),
+                               "application/json")
             else:
                 self._send(404, "not found", "text/plain")
 
