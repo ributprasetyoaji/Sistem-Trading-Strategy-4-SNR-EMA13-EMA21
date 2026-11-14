@@ -174,21 +174,21 @@ animation:tape 36s linear infinite;will-change:transform}
 .tpit .tpx{color:var(--tx)}
 .tpit .tup{color:var(--grn)}.tpit .tdn{color:var(--red)}
 /* ---------- cards ---------- */
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;margin-top:9px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:6px;margin-top:6px}
 .card{position:relative;overflow:hidden;
 background:linear-gradient(180deg,rgba(9,25,16,.94),rgba(4,12,8,.9));
-border:1px solid #17472e;border-radius:8px;padding:8px 11px;
+border:1px solid #17472e;border-radius:7px;padding:5px 9px;
 box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 0 14px rgba(0,0,0,.35)}
 .card:before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
 background:linear-gradient(90deg,transparent,rgba(255,200,87,.8),transparent)}
-.card .ct{display:flex;align-items:center;gap:6px;font-size:9px;
-letter-spacing:.18em;color:#79b497;margin-bottom:4px;font-weight:700}
-.card .ct .ci{font-size:11px;text-shadow:0 0 9px currentColor}
-.card .v{font-size:16.5px;font-weight:800;letter-spacing:.02em;color:#eefff6;
+.card .ct{display:flex;align-items:center;gap:5px;font-size:8px;
+letter-spacing:.14em;color:#79b497;margin-bottom:2px;font-weight:700}
+.card .ct .ci{font-size:9.5px;text-shadow:0 0 9px currentColor}
+.card .v{font-size:13.5px;font-weight:800;letter-spacing:.02em;color:#eefff6;
 text-shadow:0 1px 0 rgba(0,0,0,.65)}
-.card .v small{font-size:9.5px;color:#7fb89a;font-weight:700;
+.card .v small{font-size:8.5px;color:#7fb89a;font-weight:700;
 letter-spacing:.1em;margin-left:1px}
-.card .s{font-size:9px;color:#63a17e;margin-top:3px;letter-spacing:.05em}
+.card .s{font-size:8px;color:#63a17e;margin-top:1px;letter-spacing:.05em}
 /* v3.27: fill warna per kartu biar gampang dibedakan */
 .card.a-bal{background:linear-gradient(165deg,rgba(255,200,87,.17),rgba(10,12,8,.93) 62%);border-color:rgba(255,200,87,.40)}
 .card.a-bal:before{background:linear-gradient(90deg,transparent,rgba(255,200,87,.95),transparent)}
@@ -219,8 +219,8 @@ letter-spacing:.1em;margin-left:1px}
 @keyframes fldn{0%{filter:brightness(2.4) drop-shadow(0 0 8px var(--red))}100%{filter:none}}
 /* ---------- layout ---------- */
 .cols{flex:1;min-height:0;display:grid;gap:10px;margin-top:10px;overflow-y:auto;
-grid-template-columns:minmax(0,1fr) 400px;
-grid-template-rows:minmax(150px,1.4fr) auto minmax(72px,1fr);
+grid-template-columns:minmax(0,1fr) 460px;
+grid-template-rows:minmax(170px,1.9fr) auto minmax(72px,1fr);
 grid-template-areas:"scan chart" "conf log" "pos log"}
 .cols>.pan{display:flex;flex-direction:column;min-height:0;overflow:hidden}
 #sec-scan{grid-area:scan}#sec-conf{grid-area:conf}#sec-pos{grid-area:pos}
