@@ -3,3 +3,16 @@ __pycache__/
 data/
 data_test_s2/
 *.log
+cc_state.json
+cc_day.json
+cc_status.json
+cc_heartbeat.json
+*_state.json
+*_journal.jsonl
+s3_hist_*.json
+CC_SIGNAL.csv
+telegram_token.txt
+telegram_chat.txt
+MT5_PATH.txt
+TOKEN.txt
+*.b64

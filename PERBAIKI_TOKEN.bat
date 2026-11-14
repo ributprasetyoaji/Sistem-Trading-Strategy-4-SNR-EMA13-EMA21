@@ -128,7 +128,7 @@ if defined USRC goto u_copy
 for /d %%D in (_rbt_upd\*) do if not defined USRC if exist "%%D\python\command_center.py" set "USRC=%%D"
 :u_copy
 if not defined USRC goto u_fail
-robocopy "%USRC%" "." /E /XF cc_state.json cc_day.json cc_status.json CC_SIGNAL.csv s2_state.json s1_state.json MT5_PATH.txt TOKEN.txt /XD logs replay __pycache__ .git redist /NFL /NDL /NJH /NJS /NP >nul
+robocopy "%USRC%" "." /E /XF cc_state.json cc_day.json cc_status.json CC_SIGNAL.csv s2_state.json s1_state.json MT5_PATH.txt TOKEN.txt  s3_state.json s3_journal.jsonl s3_hist_*.json cc_heartbeat.json telegram_chat.txt telegram_token.txt/XD logs replay __pycache__ .git redist /NFL /NDL /NJH /NJS /NP >nul
 if errorlevel 8 goto u_fail
 if exist "_rbt_upd" rmdir /s /q "_rbt_upd" >nul 2>nul
 if exist "_rbt_upd.zip" del "_rbt_upd.zip" >nul 2>nul
