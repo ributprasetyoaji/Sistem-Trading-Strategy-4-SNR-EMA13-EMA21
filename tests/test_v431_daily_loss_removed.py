@@ -84,4 +84,4 @@ def test_sumber_kode_keras_dan_display_nol():
                             "command_center.py"),
                encoding="utf-8").read()
     assert '"daily_loss_limit": 0.0}' in eng         # api/status nol
-    assert "TEMPLATE KOSONG" in eng                  # log startup S4
+    assert "SNR BODY + EMA STACK aktif" in eng       # log startup v4.44

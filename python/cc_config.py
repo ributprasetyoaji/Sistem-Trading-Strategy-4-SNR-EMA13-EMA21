@@ -8,7 +8,7 @@ from __future__ import annotations
 import json
 import os
 
-CC_VERSION = "4.43"
+CC_VERSION = "4.44"
 
 DEFAULTS = {
     # ---- HISTORY CLOUD (v3.88, permintaan user): backup/restore cache
@@ -156,8 +156,8 @@ DEFAULTS = {
     "tp1_rr": 1.0,                   # v4.27 (user) TP1 = 1R (dulu 1.5R
                                       #   v4.22) -> tutup 75% posisi,
                                       #   SL langsung +1R
-    "tp1_close_pct": 75.0,           # v4.12 persen ditutup di TP1 (75%)
-    "tp2_rr": 4.0,                   # v4.12 sisa posisi jalan ke TP2 =
+    "tp1_close_pct": 100.0,          # v4.44 (user S4): TP penuh 1R -- dulu 75%
+    "tp2_rr": 1.0,                   # v4.44 (user S4): TP penuh 1R (RR 1:1) -- dulu 4.0
                                       #   4R; 0 = tanpa TP2 (ride trail)
     "tp2_trail_step_r": 0.2,         # v4.28 (user): setelah TP1 SL
                                       #   trailing tiap 0.2R (ratchet)
@@ -206,9 +206,18 @@ DEFAULTS = {
     "money_trail_enabled": False,     # OFF di S2 (SL dikelola ATR trail)
     "basket_tp_enabled": False,       # OFF di S2 (tidak ada TP profit di EA)
     "smart_exit_enabled": False,      # OFF di S2
-    "s3": {  # ===== PARAMETER STRATEGY 4 DIKOSONGKAN (user isi baru) =====
-             # taruh parameter angka strategi baru di sini, contoh:
-             #   "ema_fast": 13, "ema_slow": 21, "snr_strength": 3
+    "s3": {  # ===== STRATEGY 4 -- PARAMETER DARI USER (v4.44) =====
+             "ema_fast": 13, "ema_slow": 21,
+             "bb_period": 25, "bb_dev": 2.1,   # Bollinger Band 25, dev 2.100
+             "adx_period": 14, "adx_min": 20.0,
+             "m5_ema_fast": 13, "m5_ema_slow": 21,
+             "swing_strength": 3,              # pivot badan candle (close)
+             "tp_rr": 1.0,                     # RR 1:1
+             "be_r": 0.6, "be_lock_r": 0.2,    # 0.6R -> SL ke +0.2R
+             "s4_exit": True,                  # trailing + close-reversal
+             "daily_loss_usd": 30.0,
+             "daily_loss_idr": 540000.0,
+             "cooldown_min": 10,
              },
     "tp_r": 1.0,                      # (tidak dipakai S2; TP=0 dari ATR spec)
     "tp_body_pos": 0.4,               # v3.16: posisi TP di BATANG lilin SNR

@@ -12,17 +12,20 @@ DATA = {"info": {"bid": 2500.5, "ask": 2500.6, "point": 0.01},
         "m1": {}, "h1": {}}
 
 
-def test_evaluate_selalu_wait_tanpa_exec():
-    r = S.evaluate("BTCUSD", DATA, {}, None)
+def test_evaluate_wait_pada_data_netral():
+    r = S.evaluate("BTCUSD", DATA, S.s2_cfg({}), None)
     assert r["status"] == "WAIT"
     assert r["exec"] is None
-    assert r["score"] == 0.0
-    assert "template" in r["why"].lower()
 
 
-def test_s2_cfg_kosong():
-    assert S.s2_cfg({}) == {}
-    assert S.s2_cfg({"s3": {"ema_fast": 13}}) == {}   # abaikan config lama
+def test_s2_cfg_parameter_user():
+    k = S.s2_cfg({})
+    assert k["ema_fast"] == 13 and k["ema_slow"] == 21
+    assert k["bb_period"] == 25 and k["bb_dev"] == 2.1
+    assert k["adx_period"] == 14 and k["adx_min"] == 20.0
+    assert k["tp_rr"] == 1.0 and k["be_r"] == 0.6 and k["be_lock_r"] == 0.2
+    k2 = S.s2_cfg({"s3": {"adx_min": 25.0}})
+    assert k2["adx_min"] == 25.0                    # config menang
 
 
 def test_validate_execution_memblokir_semua():
@@ -32,7 +35,7 @@ def test_validate_execution_memblokir_semua():
 
 
 def test_tidak_ada_satu_pun_logika_filter_s3():
-    for gone in ("adx_gate", "adx_wilder", "ml_gate", "ml_features",
+    for gone in ("adx_gate", "ml_gate", "ml_features",
                  "msf_gate", "detect_zones", "zone_quality",
                  "nearest_opposing", "structure_state", "h1_regime",
                  "m5_momentum", "m1_trigger", "ema_reversal_block",
@@ -44,6 +47,8 @@ def test_tidak_ada_satu_pun_logika_filter_s3():
 
 def test_alat_netral_dan_infra_tersedia():
     for need in ("evaluate", "_result", "s2_cfg", "validate_execution",
+                 "adx_wilder", "s4_bias", "s4_m5_ok", "s4_structure",
+                 "s4_reversal", "body_pivots", "sma_at",
                  "ema_at", "ema_series", "atr_at", "swings", "merge_bars",
                  "Strategy2State", "ATRTrail", "tp_ladder_decision",
                  "journal", "journal_exit", "hist_paged", "hist_years",
@@ -52,15 +57,22 @@ def test_alat_netral_dan_infra_tersedia():
         assert hasattr(S, need), f"{need} hilang!"
 
 
-def test_config_parameter_s3_kosong():
-    assert DEFAULTS.get("s3") == {}
+def test_config_parameter_s3_dari_user():
+    s3 = DEFAULTS.get("s3") or {}
+    assert s3.get("ema_fast") == 13 and s3.get("bb_period") == 25
+    assert s3.get("daily_loss_usd") == 30.0
+    assert s3.get("daily_loss_idr") == 540000.0
+    assert DEFAULTS.get("tp2_rr") == 1.0            # RR 1:1 penuh
+    assert DEFAULTS.get("tp1_close_pct") == 100.0
 
 
 def test_engine_selalu_evaluasi_template_dan_log_kosong():
     src = open(os.path.join(os.path.dirname(__file__), "..", "python",
                             "command_center.py"), encoding="utf-8").read()
-    assert "self.s2_on = True" in src          # selalu evaluasi (WAIT)
-    assert "TEMPLATE KOSONG" in src            # log startup jelas
+    assert "self.s2_on = True" in src          # selalu evaluasi
+    assert "SNR BODY + EMA STACK aktif" in src # log startup v4.44
+    assert "MAX DAILY LOSS" in src             # gate daily loss
+    assert "s4_exit" in src                    # cabang trailing S4
 
 
 def test_state_infra_tetap_jalan(tmp_path):

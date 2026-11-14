@@ -632,41 +632,334 @@ def _result(symbol, data, status="WAIT", why=""):
             "spark_ohlc": spark}
 
 
-# ============================ PARAMETER (KOSONG) =================================
+# ============== STRATEGY 4 -- SNR BODY + EMA STACK + BB (v4.44) ==============
+# ISI DARI USER (v4.44):
+#   Indikator : EMA13, EMA21, Bollinger Band(25, 2.1) -- garis MIDDLE
+#               untuk bias (visual: middle biru tipis putus-putus,
+#               upper/lower putih -- warna hanya tampilan chart), ADX 14.
+#   Bias M15  : BUY-only jika EMA13 > EMA21 > BBmiddle;
+#               SELL-only jika BBmiddle > EMA21 > EMA13.
+#   Struktur  : HH/HL (buy) & LL/LH (sell) diukur dari BADAN candle
+#               (close), BUKAN wick.
+#   Filter    : ADX(14) > 20; M5 kontra -> skip; max daily loss
+#               30 USD / Rp 540.000 (mengikuti mata uang akun).
+#   Entry     : uptrend HH lalu pullback HL, saat harga naik MENYENTUH
+#               titik HH tadi -> BUY (SL di titik HL); mirror utk SELL.
+#               Zona HH/LH yang SUDAH pernah kesentuh menjadi zona HL/LH
+#               ke depan (tidak di-entry ulang sampai struktur baru).
+#   Risk      : RR 1:1 (SL di zona, TP = 1 x jarak SL);
+#               floating >= 0.6R -> SL digeser ke +0.2R;
+#               tren pembalik + masih profit -> close market.
+# Parameter angka di cc_config "s3" (bisa dioverride tanpa edit kode).
+
 
 def s2_cfg(cfg):
-    """S4: parameter strategy DIKOSONGKAN (user isi baru).  Kembalikan
-    dict kosong - tidak ada satu pun parameter warisan S3."""
-    return {}
+    """Parameter S4 dari cc_config "s3" (angka dari user v4.44)."""
+    k = dict((cfg.get("s3") or {}))
+    k.setdefault("ema_fast", 13)
+    k.setdefault("ema_slow", 21)
+    k.setdefault("bb_period", 25)
+    k.setdefault("bb_dev", 2.1)          # deviasi BB (utk chart/bias)
+    k.setdefault("adx_period", 14)
+    k.setdefault("adx_min", 20.0)
+    k.setdefault("m5_ema_fast", 13)
+    k.setdefault("m5_ema_slow", 21)
+    k.setdefault("swing_strength", 3)
+    k.setdefault("tp_rr", 1.0)           # RR 1:1
+    k.setdefault("be_r", 0.6)            # floating 0.6R -> SL ke +0.2R
+    k.setdefault("be_lock_r", 0.2)
+    k.setdefault("s4_exit", True)        # trailing & close-reversal S4
+    k.setdefault("daily_loss_usd", 30.0)
+    k.setdefault("daily_loss_idr", 540000.0)
+    k.setdefault("cooldown_min", 10)
+    k.setdefault("max_baskets", 3)
+    k.setdefault("warmup_sec", 20)
+    return k
 
 
-# ============================ FILTER EKSEKUSI (KOSONG) ===========================
+# ------------------------------ alat teknikal S4 -----------------------------
+
+def sma_at(bars, period):
+    """SMA close terakhir = garis MIDDLE Bollinger Band."""
+    try:
+        c = [float(v) for v in (bars.get("close") or [])]
+    except (TypeError, ValueError):
+        return None
+    if len(c) < int(period):
+        return None
+    w = c[-int(period):]
+    return sum(w) / float(period)
+
+
+def adx_wilder(bars, period=14):
+    """ADX Wilder klasik (S4: ADX 14, wajib > 20)."""
+    try:
+        h = [float(v) for v in (bars.get("high") or [])]
+        l = [float(v) for v in (bars.get("low") or [])]
+        c = [float(v) for v in (bars.get("close") or [])]
+    except (TypeError, ValueError):
+        return 0.0
+    n = min(len(h), len(l), len(c))
+    p = int(period or 14)
+    if n < 2 * p + 2:
+        return 0.0
+    tr_f = pdm_f = ndm_f = 0.0
+    dxs = []
+    for i in range(1, n):
+        up = h[i] - h[i - 1]
+        dn = l[i - 1] - l[i]
+        pdm = up if (up > dn and up > 0) else 0.0
+        ndm = dn if (dn > up and dn > 0) else 0.0
+        tr = max(h[i] - l[i], abs(h[i] - c[i - 1]), abs(l[i] - c[i - 1]))
+        if i < p:
+            tr_f += tr; pdm_f += pdm; ndm_f += ndm
+            continue
+        if i == p:
+            tr_f += tr; pdm_f += pdm; ndm_f += ndm
+        else:
+            tr_f = tr_f - tr_f / p + tr
+            pdm_f = pdm_f - pdm_f / p + pdm
+            ndm_f = ndm_f - ndm_f / p + ndm
+        di_p = (100.0 * pdm_f / tr_f) if tr_f > 0 else 0.0
+        di_n = (100.0 * ndm_f / tr_f) if tr_f > 0 else 0.0
+        den = di_p + di_n
+        dxs.append((100.0 * abs(di_p - di_n) / den) if den > 0 else 0.0)
+    if len(dxs) < p:
+        return 0.0
+    adx = sum(dxs[:p]) / float(p)
+    for v in dxs[p:]:
+        adx = (adx * (p - 1) + v) / float(p)
+    return float(adx)
+
+
+def s4_bias(bars, k=None):
+    """(user) Bias M15 dgn tumpukan EMA13/EMA21/BBmiddle.
+    "buy" jika EMA13>EMA21>mid; "sell" jika mid>EMA21>EMA13; else None."""
+    k = k or {}
+    ef = ema_at(bars or {}, int(k.get("ema_fast", 13)))
+    es = ema_at(bars or {}, int(k.get("ema_slow", 21)))
+    mid = sma_at(bars or {}, int(k.get("bb_period", 25)))
+    if ef is None or es is None or mid is None:
+        return None
+    if ef > es > mid:
+        return "buy"
+    if mid > es > ef:
+        return "sell"
+    return None
+
+
+def s4_m5_ok(sig, m5, k=None):
+    """(user) M15 BUY tapi M5 EMA21 di atas EMA13 -> SKIP BUY (mirror
+    utk SELL).  Data M5 kurang -> jangan blokir (fail-open)."""
+    k = k or {}
+    ef = ema_at(m5 or {}, int(k.get("m5_ema_fast", 13)))
+    es = ema_at(m5 or {}, int(k.get("m5_ema_slow", 21)))
+    if ef is None or es is None:
+        return True
+    if sig == "BUY" and es > ef:
+        return False
+    if sig == "SELL" and ef > es:
+        return False
+    return True
+
+
+def body_pivots(bars, strength=3, max_pivots=24):
+    """Pivot dari BADAN candle (close) -- BUKAN wick (permintaan user).
+    Return [(kind, idx, px), ...] kind "H"/"L", urut waktu."""
+    try:
+        c = [float(v) for v in (bars.get("close") or [])]
+    except (TypeError, ValueError):
+        return []
+    n = len(c)
+    s = int(strength or 3)
+    if n < 2 * s + 1:
+        return []
+    out = []
+    for i in range(s, n - s):
+        wl = c[i - s:i]
+        wr = c[i + 1:i + s + 1]
+        if c[i] >= max(wl) and c[i] > max(wr):
+            out.append(("H", i, c[i]))
+        elif c[i] <= min(wl) and c[i] < min(wr):
+            out.append(("L", i, c[i]))
+    return out[-int(max_pivots):]
+
+
+def s4_structure(bars, k=None, live=None):
+    """(user) Entry touch zona: uptrend HH -> HL -> harga naik MENYENTUH
+    titik HH -> BUY (SL = titik HL); mirror utk SELL.
+    Zona yang sudah pernah kesentuh pada bar SELESAI -> tidak di-entry
+    ulang (menjadi zona HL/LH ke depan).  live = harga saat ini (opsional;
+    default close bar berjalan).  Return (sig, zone_px, sl_px, why)/None.
+    """
+    k = k or {}
+    s = int(k.get("swing_strength", 3))
+    try:
+        c = [float(v) for v in (bars.get("close") or [])]
+        h = [float(v) for v in (bars.get("high") or [])]
+        l = [float(v) for v in (bars.get("low") or [])]
+    except (TypeError, ValueError):
+        return None
+    n = len(c)
+    if n < 2 * s + 3:
+        return None
+    pv = body_pivots(bars, s)
+    if len(pv) < 3:
+        return None
+    px = float(live) if live else c[-1]
+
+    # ---------- BUY: pv[-2]=HH (zona), pv[-1]=HL (SL) ----------
+    if pv[-1][0] == "L" and pv[-2][0] == "H":
+        H1_i, H1 = pv[-2][1], pv[-2][2]
+        L1_i, L1 = pv[-1][1], pv[-1][2]
+        prior = pv[:-2]
+        hs = [q[2] for q in prior if q[0] == "H"]
+        ls = [q[2] for q in prior if q[0] == "L"]
+        if hs and ls and H1 > max(hs) and L1 > max(ls):
+            # v4.44a: cek SEMUA bar selesai (n-1) -- dulu n-s sehingga
+            # s bar terakhir sebelum live tidak diperiksa -> re-entry
+            # zona yang baru saja kesentuh
+            ok = all(cc > L1 for cc in c[L1_i + 1:n - 1])
+            used = any(hh >= H1 for hh in h[L1_i + 1:n - 1]) or \
+                any(cc >= H1 for cc in c[L1_i + 1:n - 1])
+            live_hi = max(px, h[-1])
+            chase = H1 + 0.5 * (H1 - L1)
+            if ok and not used and live_hi >= H1 and live_hi <= chase:
+                return ("BUY", H1, L1,
+                        "S4 touch HH %.5f (HL %.5f, body)" % (H1, L1))
+
+    # ---------- SELL: pv[-2]=LL (zona), pv[-1]=LH (SL) ----------
+    if pv[-1][0] == "H" and pv[-2][0] == "L":
+        L1_i, L1 = pv[-2][1], pv[-2][2]
+        H1_i, H1 = pv[-1][1], pv[-1][2]
+        prior = pv[:-2]
+        hs = [q[2] for q in prior if q[0] == "H"]
+        ls = [q[2] for q in prior if q[0] == "L"]
+        if hs and ls and L1 < min(ls) and H1 < min(hs):
+            ok = all(cc < H1 for cc in c[H1_i + 1:n - 1])   # v4.44a
+            used = any(ll <= L1 for ll in l[H1_i + 1:n - 1]) or \
+                any(cc <= L1 for cc in c[H1_i + 1:n - 1])
+            live_lo = min(px, l[-1])
+            chase = L1 - 0.5 * (H1 - L1)
+            if ok and not used and live_lo <= L1 and live_lo >= chase:
+                return ("SELL", L1, H1,
+                        "S4 touch LL %.5f (LH %.5f, body)" % (L1, H1))
+    return None
+
+
+def s4_reversal(bars, sig, k=None):
+    """(user) Tren pembalikan M15: BUY -> EMA13 turun di bawah EMA21;
+    SELL -> EMA13 naik di atas EMA21.  Dipakai close dgn profit."""
+    k = k or {}
+    ef = ema_at(bars or {}, int(k.get("ema_fast", 13)))
+    es = ema_at(bars or {}, int(k.get("ema_slow", 21)))
+    if ef is None or es is None:
+        return False
+    if sig == "BUY":
+        return ef < es
+    if sig == "SELL":
+        return ef > es
+    return False
+
+
+# --------------------------- LOGIC ENTRY (user v4.44) ------------------------
+
+def evaluate(symbol, data, k=None, st=None):
+    """S4: bias EMA stack M15 + ADX>20 + filter M5 + struktur HH/HL
+    badan-candle -> entry touch zona (RR 1:1).  Tanpa sinyal = WAIT."""
+    k = k or {}
+    data = data or {}
+    m15 = data.get("m15") or {}
+    m5 = data.get("m5") or {}
+    info = data.get("info") or {}
+    bias = s4_bias(m15, k)
+    if not bias:
+        return _result(symbol, data, "WAIT",
+                       "bias M15 netral (EMA13/21/BBmid belum bertumpuk)")
+    adx_min = float(k.get("adx_min", 20.0))
+    adx = adx_wilder(m15, int(k.get("adx_period", 14)))
+    if adx <= adx_min:
+        return _result(symbol, data, "WAIT",
+                       "ADX %.1f <= %.1f (filter tren lemah)" % (adx, adx_min))
+    sig_req = "BUY" if bias == "buy" else "SELL"
+    if not s4_m5_ok(sig_req, m5, k):
+        return _result(symbol, data, "WAIT",
+                       "M5 kontra %s (EMA M5 terbalik) -- skip" % sig_req)
+    st4 = s4_structure(m15, k, live=info.get("bid"))
+    if not st4:
+        return _result(symbol, data, "WAIT",
+                       "belum ada zona HH/HL valid + touch (body M15)")
+    sig, zone, sl_px, why = st4
+    if (sig == "BUY" and bias != "buy") or \
+            (sig == "SELL" and bias != "sell"):
+        return _result(symbol, data, "WAIT",
+                       "struktur %s vs bias %s tak cocok" % (sig, bias))
+    price = float(info.get("bid") or 0.0)
+    if price <= 0:
+        return _result(symbol, data, "WAIT", "harga live belum siap")
+    dist = abs(price - sl_px)
+    point = float(info.get("point") or 0.0)
+    if dist <= 0 or (point > 0 and dist < point):
+        return _result(symbol, data, "WAIT", "jarak SL nol/tak valid")
+    tp_px = (price + dist) if sig == "BUY" else (price - dist)  # RR 1:1
+    res = _result(symbol, data, "READY", why)
+    res["side"] = sig
+    res["score"] = 85.0
+    res["price"] = price
+    res["sl_price"] = sl_px
+    res["tp_price"] = tp_px
+    res["sl_points"] = int(round(dist / point)) if point > 0 else 0
+    res["mtf"] = {"final": 85.0}
+    mom = min(100.0, max(0.0, adx * 2.5))
+    trn = 100.0 if bias == "buy" else 0.0
+    res["components_buy"] = {"structure": 100.0 if sig == "BUY" else 20.0,
+                             "liquidity": 60.0, "trend": trn,
+                             "momentum": mom, "volume": 50.0,
+                             "orderflow": 50.0}
+    res["components_sell"] = {"structure": 100.0 if sig == "SELL" else 20.0,
+                              "liquidity": 60.0,
+                              "trend": 100.0 - trn,
+                              "momentum": mom, "volume": 50.0,
+                              "orderflow": 50.0}
+    res["exec"] = {"sig": sig, "price": price, "sl": sl_px,
+                   "tp": tp_px, "lot": 0.0}
+    return res
+
+
+# ------------------------- FILTER EKSEKUSI (v4.44) ---------------------------
 
 def validate_execution(symbol, res, data, bid, ask, k=None, st=None,
                        cooldown_until=0, open_baskets=0, spread_points=0,
                        warmup_left=0):
-    """S4: filter eksekusi DIKOSONGKAN (user isi baru).  Sementara
-    SELALU blokir - tidak pernah ada paket eksekusi yang lolos."""
-    return (False, "filter eksekusi kosong - strategy 4 belum diisi",
-            0.0, 0.0, False)
-
-
-# ============================ EVALUATE (TITIK ISI STRATEGI BARU) =================
-
-def evaluate(symbol, data, k=None, st=None):
-    """S4: LOGIC ENTRY DIKOSONGKAN - selalu WAIT sampai user mengisi
-    strategi baru.  (Baris di bawah adalah satu-satunya isi file ini.)"""
-    return _result(symbol, data, "WAIT",
-                   "template kosong -- entry/logic/filter menunggu diisi baru")
-
-# ---------------------------------------------------------------------------
-# PANDUAN MENGISI (contoh bentuk, hapus saat mengisi):
-#   def evaluate(symbol, data, k=None, st=None):
-#       k = k or {}
-#       ... hitung sinyal dari data["m15"]/data["m5"]/data["m1"]/data["h1"]
-#       ... gunakan alat netral di atas (ema_at, atr_at, swings)
-#       layak  -> return _result(symbol, data, "BUY"/"SELL", "alasan") dgn
-#                 res["exec"] = {"sig":..,"price":..,"sl":..,"tp":..,"lot":..}
-#                 res["score"], res["components_buy"/"_sell"] utk conformance
-#       tidak  -> return _result(symbol, data, "WAIT", "alasan menolak")
-# ---------------------------------------------------------------------------
+    """(user) Filter eksekusi S4: RE-CEK bias + ADX + M5 dgn data fresh;
+    jarak SL harus valid; TP final = RR 1:1 dari jarak SL.
+    Return (ok, why, sl_price, tp_price, keep)."""
+    k = k or {}
+    ex = (res or {}).get("exec") or {}
+    sig = str(ex.get("sig") or "").upper()
+    if sig not in ("BUY", "SELL"):
+        return (False, "S4 tanpa arah eksekusi", 0.0, 0.0, False)
+    data = data or {}
+    m15 = data.get("m15") or {}
+    m5 = data.get("m5") or {}
+    bias = s4_bias(m15, k)
+    if bias != ("buy" if sig == "BUY" else "sell"):
+        return (False, "S4 bias M15 tak lagi searah (%s)"
+                % (bias or "netral"), 0.0, 0.0, False)
+    adx_min = float(k.get("adx_min", 20.0))
+    adx = adx_wilder(m15, int(k.get("adx_period", 14)))
+    if adx <= adx_min:
+        return (False, "S4 ADX %.1f <= %.1f saat eksekusi" % (adx, adx_min),
+                0.0, 0.0, False)
+    if not s4_m5_ok(sig, m5, k):
+        return (False, "S4 M5 kontra saat eksekusi", 0.0, 0.0, False)
+    entry = float(ex.get("price") or 0.0) or (bid if sig == "BUY" else ask)
+    sl = float(ex.get("sl") or 0.0)
+    if entry <= 0 or sl <= 0:
+        return (False, "S4 paket entry/SL tak valid", 0.0, 0.0, False)
+    dist = abs(entry - sl)
+    if dist <= 0:
+        return (False, "S4 jarak SL nol", 0.0, 0.0, False)
+    tp = (entry + dist) if sig == "BUY" else (entry - dist)      # RR 1:1
+    return (True, "S4 %s ok (ADX %.1f, RR 1:1)" % (sig, adx), sl, tp,
+            False)

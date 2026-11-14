@@ -263,8 +263,9 @@ class CommandCenter:
         self._s3_hist_try = {}
         self._s3_cloud_try = {}
         self.s2_started = time.time()
-        self.emit_log("ENGINE", "STRATEGY 4: TEMPLATE KOSONG - entry/logic/"
-                      "filter menunggu diisi (semua pair akan WAIT)")
+        self.emit_log("ENGINE", "STRATEGY 4: SNR BODY + EMA STACK aktif "
+                      "(v4.44, parameter user -- bias M15 + ADX>20 + "
+                      "M5 kontra + touch HH/HL, RR 1:1)")
         self._signal_csv_init()
 
     # ------------------------------------------------------------------ log --
@@ -1199,6 +1200,37 @@ class CommandCenter:
                     % (want, int(cd - time.time())))
             return
 
+        # v4.44 (user S4): MAX DAILY LOSS 30 USD / Rp 540.000 -- ikut
+        # mata uang akun (IDR/USD); realized hari ini dari riwayat close.
+        _dl = float(k.get("daily_loss_usd", 0.0) or 0.0)
+        if _dl > 0:
+            _now0 = time.time()
+            _ts0, _real0 = getattr(self, "_s4_dl_cache", (0.0, 0.0))
+            if _now0 - _ts0 > 60.0:
+                try:
+                    _cs = self.broker.closed_stats(
+                        self.risk.day_since() if self.risk else 0)
+                    _real0 = float((_cs or {}).get("realized", 0.0) or 0.0)
+                except Exception:
+                    _real0 = 0.0
+                self._s4_dl_cache = (_now0, _real0)
+            _cur0, _rate0 = self.account_usd_rate()
+            _cu0 = str(_cur0 or "").upper()
+            if _cu0 == "IDR":
+                _cap0 = float(k.get("daily_loss_idr", 540000.0) or 540000.0)
+            elif _cu0 == "USD":
+                _cap0 = _dl
+            else:
+                _cap0 = _dl * float(_rate0 or 1.0)
+            if _cap0 > 0 and _real0 <= -abs(_cap0):
+                res["status"] = "BLOCKED"
+                res["block_why"] = ("DAILY LOSS %.0f/%.0f %s"
+                                    % (_real0, -_cap0, _cu0))
+                self.emit_log("PROTECT", "%s -> SKIP (MAX DAILY LOSS "
+                              "%.0f %s)" % (want, _cap0, _cu0))
+                self.candidates.pop(want, None)
+                return
+
         # -- data terbaru utk validasi eksekusi --
         data = self._fetch_data(want, sym)
         if not data or not data.get("m1") or not data.get("m5"):
@@ -1386,6 +1418,26 @@ class CommandCenter:
                 _tr.bep_offset_r = float(self.cfg.get("bep_offset_r",
                                                       0.0) or 0.0)
                 self.s2state.set_trail(want, _tr)
+            # v4.44 (user S4): baseline = entry - SL ZONA aktual
+            # (aturan 0.6R -> +0.2R harus presisi thd SL struktural,
+            # bukan ATR).  Menimpa seed ATR di atas.
+            if k.get("s4_exit"):
+                try:
+                    _rd = abs(entry_px - float(sl_price or 0.0))
+                    if _rd > 0:
+                        _k2 = dict(k)
+                        _sm = float(_k2.get("sl_atr", 1.2) or 1.2)
+                        self.s2state.set_trail(
+                            want, cc_strategy2.ATRTrail(
+                                want, 1 if sig == "BUY" else -1, entry_px,
+                                _rd / _sm, _k2,
+                                tp_dist=(abs(float(tp_price or 0.0)
+                                             - entry_px)
+                                         if tp_price else 0.0),
+                                tp_r=(float(k.get("tp_rr", 1.0) or 0.0)
+                                      if tp_price else 0.0)))
+                except Exception:
+                    pass
             self.s2state.save()
             if tp_tpd > 0 and self._tp2_rr > 0:
                 tp_txt = ("TP1 %.1fR tutup %.0f%% -> TP2 %.1fR "
@@ -1586,6 +1638,56 @@ class CommandCenter:
             bid = float((tick or {}).get("bid") or info.get("bid") or 0.0)
             ask = float((tick or {}).get("ask") or info.get("ask") or 0.0)
             if bid <= 0 or ask <= 0:
+                continue
+            # v4.44 (user S4): exit khusus S4 -- floating 0.6R -> SL
+            # geser ke +0.2R; tren pembalik + profit -> close market
+            # (TP 1:1 sudah di broker).  Jalur ATR lama TIDAK utk S4.
+            if k.get("s4_exit"):
+                _rd = float(tr.risk_dist or 0.0)
+                _px = bid if tr.side > 0 else ask
+                _rn = ((_px - tr.entry) / _rd * tr.side) if _rd > 0 \
+                    else 0.0
+                if _rn > float(tr.peak or 0.0):
+                    tr.peak = _rn
+                _be_r = float(k.get("be_r", 0.6) or 0.6)
+                _lk = float(k.get("be_lock_r", 0.2) or 0.2)
+                if tr.peak >= _be_r and _rd > 0:
+                    _new = tr.entry + _lk * _rd * tr.side
+                    _cur = float(p.get("sl") or 0.0)
+                    _imp = ((_new > _cur) if tr.side > 0
+                            else (_cur <= 0 or _new < _cur))
+                    if _imp:
+                        try:
+                            self.broker.modify_sl(p["ticket"], _new)
+                            self.emit_log("INFO", "%s: S4 trailing "
+                                          "peak %.1fR -> SL ke +%.1fR"
+                                          % (want, tr.peak, _lk))
+                        except Exception:
+                            pass
+                if _rn > 0:
+                    try:
+                        _m15 = self.broker.copy_rates(bsym, "M15", 300)
+                        _sg = "BUY" if tr.side > 0 else "SELL"
+                        if _m15 and cc_strategy2.s4_reversal(_m15, _sg, k):
+                            self.broker.close_position(p["ticket"])
+                            self.emit_log("INFO", "%s: S4 close "
+                                          "REVERSAL dgn profit %.2fR"
+                                          % (want, _rn))
+                            try:
+                                cc_strategy2.journal_exit(
+                                    os.path.join("data",
+                                                 "s3_journal.jsonl"),
+                                    want, tr, code="S4_REVERSAL",
+                                    r_multiple=_rn)
+                            except Exception:
+                                pass
+                            self.s2state.set_cooldown(
+                                want, int(k.get("cooldown_min", 10)))
+                            self.s2state.del_trail(want)
+                            changed = True
+                    except Exception:
+                        pass
+                self.s2state.set_trail(want, tr)   # persist peak/mae
                 continue
             u = tr.update(bid, ask)
             # ---- TP MINIMAL (USD), mode "trail" (lama): harga menyentuh

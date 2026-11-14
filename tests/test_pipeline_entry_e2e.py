@@ -109,8 +109,8 @@ def _res_exec():
             "components_buy": {}, "components_sell": {}, "ohlc": []}
 
 
-def test_1_templat_kosong_tidak_pernah_order():
-    """validate_execution template -> SEMUA entry diblokir (aman)."""
+def test_1_sinyal_tak_valid_tidak_pernah_order():
+    """Filter eksekusi S4: data yang tak lolos re-check -> TIDAK order."""
     br = FakeBroker()
     ns = _ns(br)
     res = _res_exec()
@@ -118,7 +118,7 @@ def test_1_templat_kosong_tidak_pernah_order():
     CC.CommandCenter._try_execute_s2(ns, res, [])
     assert br.orders == []                       # TIDAK ada order
     assert res["status"] == "BLOCKED"
-    assert "belum diisi" in res["block_why"]
+    assert "S4" in res["block_why"]              # filter eksekusi S4
     assert "XAUUSD" not in ns.candidates         # kandidat dibuang
 
 
