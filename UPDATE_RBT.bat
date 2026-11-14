@@ -2,7 +2,7 @@
 setlocal
 title RBT FX - UPDATE SEKALI JALAN
 set TOKEN=GANTI_TOKEN_ANDA
-rem v4-template: token bisa ditaruh di file TOKEN.txt
+rem v4-template: token GitHub bisa ditaruh di TOKEN.txt
 rem (satu baris) di samping bat ini -- TIDAK ikut ke GitHub.
 if exist "%~dp0TOKEN.txt" set /p TOKEN=<"%~dp0TOKEN.txt"
 
@@ -15,13 +15,11 @@ echo File ini benar. PASTIKAN semua jendela MULAI_SEMUA.bat dan
 echo jendela dashboard SUDAH DITUTUP sebelum lanjut.
 echo(
 echo   [1] Strategy 1     [2] Strategy 2     [3] Strategy 3
-echo   [4] Strategy 4 (BARU - kosong, untuk strategy Anda)
-choice /C 1234 /N /M "Ketik 1, 2, 3, atau 4 lalu tekan Enter: "
+choice /C 123 /N /M "Ketik 1, 2, atau 3 lalu tekan Enter: "
 set R=%errorlevel%
-if "%R%"=="1" set REPO=Sistem-Trading-Strategy-1
-if "%R%"=="2" set REPO=Sistem-Trading-Strategy-2
-if "%R%"=="3" set REPO=Sistem-Trading-Strategy-3
-if "%R%"=="4" set REPO=Sistem-Trading-Strategy-4-SNR-EMA13-EMA21
+if "%R%"=="1" set REPO=Sistem-Trading-Strategy-4-SNR-EMA13-EMA21
+if "%R%"=="2" set REPO=Sistem-Trading-Strategy-4-SNR-EMA13-EMA21
+if "%R%"=="3" set REPO=Sistem-Trading-Strategy-4-SNR-EMA13-EMA21
 echo(
 echo [1/4] Mengunduh %REPO% dari GitHub ...
 powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Headers @{Authorization='Bearer %TOKEN%'} -Uri 'https://codeload.github.com/ributprasetyoaji/%REPO%/zip/refs/heads/main' -OutFile \"$env:TEMP\_rbt_update.zip\""
@@ -39,7 +37,7 @@ echo(
 echo  ============================================================
 echo   SELESAI! Folder ini sekarang versi TERBARU.
 echo   Jalankan lagi MULAI_SEMUA.bat di folder ini.
-echo   (Cek dashboard: versi harus v3.88 / v3.92 / v4.09 / template)
+echo   (Cek dashboard: versi harus v3.88 / v3.92 / v4.09)
 echo  ============================================================
 pause
 exit /b 0

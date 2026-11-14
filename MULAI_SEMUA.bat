@@ -35,10 +35,10 @@ rem ---------- [0/6] UPDATE CEPAT (zip ringan ~170KB; jalan juga bila
 rem       file ini dipanggil LANGSUNG tanpa lewat RBT_FX_STRATEGYx.bat)
 echo [0/6] Cek update program dari GitHub...
 set "REPO=ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21"
-set "TOKEN=GANTI_TOKEN_ANDA"
-rem v4-template: token bisa ditaruh di file TOKEN.txt
+set "TOKEN=GANTI_TOKEN_ANDA
+rem v4-template: token GitHub bisa ditaruh di TOKEN.txt
 rem (satu baris) di samping bat ini -- TIDAK ikut ke GitHub.
-if exist "%~dp0TOKEN.txt" set /p TOKEN=<"%~dp0TOKEN.txt"
+if exist "%~dp0TOKEN.txt" set /p TOKEN=<"%~dp0TOKEN.txt""
 set "UURL=https://codeload.github.com/%REPO%/zip/refs/heads/main"
 if exist "_rbt_upd.zip" del "_rbt_upd.zip" >nul 2>nul
 where curl >nul 2>nul

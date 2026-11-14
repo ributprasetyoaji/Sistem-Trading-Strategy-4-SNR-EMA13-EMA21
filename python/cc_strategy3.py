@@ -1544,12 +1544,7 @@ def _clamp100(v):
 # [10] EVALUATE -- pipeline utama (engine memanggil ini tiap scan)
 # ===========================================================================
 def evaluate(symbol, data, k=None, st=None):
-    # v0 TEMPLATE KOSONG (user, 10 Okt 2026): STRATEGY LAMA DIHAPUS --
-    # selalu "WAIT" tanpa exec -> engine TIDAK PERNAH entry.
-    # Isi strategy baru di sini (kontrak lengkap: docstring modul;
-    # semua helper/infra di file ini tetap utuh).
-    return _result(symbol, data, "WAIT",
-                   "template kosong -- strategy baru belum diisi")
+    return _result(symbol,data,"WAIT","template kosong -- strategy baru belum diisi")
     k = k or {}
     now = int(time.time())
     m15 = data.get("m15") or {}

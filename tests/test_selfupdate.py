@@ -63,10 +63,10 @@ def test_token_dari_bat(monkeypatch, tmp_path):
     monkeypatch.delenv("RBT_GH_TOKEN", raising=False)
     monkeypatch.chdir(tmp_path)
     (tmp_path / "MULAI_SEMUA.bat").write_text(
-        "set \"TOKEN=GANTI_TOKEN_ANDA\"\r\n",
+        "set \"TOKEN=github_pat_FAKE123456789012345678901234\"\r\n",
         encoding="utf-8")
     assert SU.resolve_token(
-        root=".") == "GANTI_TOKEN_ANDA"
+        root=".") == "github_pat_FAKE123456789012345678901234"
     (tmp_path / "MULAI_SEMUA.bat").unlink()
     assert SU.resolve_token(root=".") is None
 
