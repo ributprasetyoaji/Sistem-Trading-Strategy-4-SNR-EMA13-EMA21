@@ -305,6 +305,10 @@ background:rgba(0,255,156,.07);border:1px solid var(--bd2);border-radius:3px;ove
 .sbar i{display:block;height:100%;background:linear-gradient(90deg,#00b863,var(--acc));
 box-shadow:0 0 8px rgba(0,255,156,.55)}
 .sbar.hot i{position:relative}
+.swbtn{font-size:9px;font-weight:700;letter-spacing:.08em;padding:2px 7px;
+border-radius:4px;border:1px solid #243057;background:#0a0f1e;color:#8a92b8;
+cursor:pointer;font-family:var(--mon)}
+.swbtn.on{color:#04120b;background:var(--grn);border-color:var(--grn)}
 .sbar.hot i:after{content:'';position:absolute;inset:0;transform:translateX(-100%);
 background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);
 animation:shimmer 1.5s linear infinite}
@@ -463,7 +467,7 @@ grid-template-areas:"scan" "chart" "conf" "log" "pos"}
       </div>
       <div class="tscroll">
       <table><thead><tr><th>#</th><th>SYMBOL</th><th>PRICE</th><th>SPREAD</th>
-      <th>REGIME</th><th>SIGNAL</th><th>SCORE</th><th>TREND</th><th>STATUS</th></tr></thead>
+      <th>REGIME</th><th>SIGNAL</th><th>SCORE</th><th>TREND</th><th>STATUS</th><th style="width:52px">SW</th></tr></thead>
       <tbody id="scan"></tbody></table>
       </div>
     </div>
@@ -811,10 +815,18 @@ return '<tr data-sym="'+r.symbol+'" class="'+(SEL===r.symbol?'sel':'')+'">'+
  r.score>=55?'var(--amber)':'var(--dim)')+'">'+r.score.toFixed(0)+'%</span></td>'+
  '<td><div class="tbar"><div class="tr"><i style="width:'+tb+'%"></i></div>'+
  '<span class="sq" style="background:'+(tb>=55?'var(--grn)':'var(--red)')+'"></span></div></td>'+
- '<td>'+statusHTML(r)+'</td></tr>';}).join('')||
- '<tr><td colspan="9" style="text-align:center;color:var(--dim2)">[ tidak ada pair di kategori ini ]</td></tr>';
+ '<td>'+statusHTML(r)+'</td>'+
+ '<td><button class="swbtn'+(r.sw?' on':'')+'" data-sw="'+r.symbol+
+ '">'+(r.sw?'ON':'OFF')+'</button></td></tr>';}).join('')||
+ '<tr><td colspan="10" style="text-align:center;color:var(--dim2)">[ tidak ada pair di kategori ini ]</td></tr>';
 document.querySelectorAll('#scan tr').forEach(tr=>tr.onclick=()=>{
  if(tr.dataset.sym){SEL=tr.dataset.sym;renderCF(s);}});
+document.querySelectorAll('#scan .swbtn').forEach(function(b){b.onclick=function(ev){
+ev.preventDefault();ev.stopPropagation();
+var sym=b.dataset.sw,on=b.textContent!=='ON';
+fetch('api/pair_switch',{method:'POST',headers:{'Content-Type':'application/json'},
+body:JSON.stringify({symbol:sym,on:on})}).then(function(){tick();})
+.catch(function(){});};});
 renderCF(s);
 $('npos').textContent=s.positions.length;
 $('pos').innerHTML=s.positions.map((p,i)=>{const pt=p.point||0;
@@ -1068,6 +1080,28 @@ def make_handler(cc, password=""):
                     return
                 cc.toggle_halt()
                 self._send(200, json.dumps({"ok": True}), "application/json")
+            elif self.path == "/api/pair_switch":
+                # v4.34 (user): switch ON/OFF per pair -- OFF = pair tidak
+                # dianalisa/ditradingkan. Default semua OFF.
+                if not self._authed():
+                    self._send(401, '{"error":"auth"}', "application/json")
+                    return
+                try:
+                    n = int(self.headers.get("Content-Length", 0) or 0)
+                    b = json.loads(self.rfile.read(n).decode("utf-8",
+                                                             "ignore") or "{}")
+                    sym = str(b.get("symbol") or "").upper()
+                    on = bool(b.get("on"))
+                    if not sym:
+                        raise ValueError("symbol kosong")
+                    cc.set_pair_switch(sym, on)
+                    self._send(200, json.dumps(
+                        {"ok": True, "symbol": sym, "sw": on}),
+                        "application/json")
+                except Exception as e:
+                    self._send(400, json.dumps({"ok": False,
+                                                "error": str(e)}),
+                               "application/json")
             else:
                 self._send(404, "not found", "text/plain")
 

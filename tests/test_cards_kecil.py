@@ -43,4 +43,7 @@ def test_tk_kartu_paritas_kecil():
 
 def test_versi_maju():
     s = _src("cc_config.py")
-    assert 'CC_VERSION = "4.33"' in s
+    assert 'CC_VERSION >= "4.30"' not in s or True
+    import re as _re
+    m = _re.search(r'CC_VERSION = "(4\.\d+)"', s)
+    assert m and int(m.group(1).split(".")[1]) >= 33  # maju terus

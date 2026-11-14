@@ -262,6 +262,24 @@ class EngineClient(object):
         except Exception:
             return "", 0
 
+    def _post(self, port, path, obj, timeout=3.0):
+        req = urllib.request.Request(
+            "http://127.0.0.1:%d%s" % (port, path),
+            data=json.dumps(obj).encode("utf-8"),
+            headers={"Content-Type": "application/json"})
+        if self.cookie:
+            req.add_header("Cookie", self.cookie)
+        try:
+            with self._opener.open(req, timeout=timeout) as r:
+                return r.read().decode("utf-8", "ignore"), r.status
+        except Exception:
+            return "", 0
+
+    def pair_switch(self, port, sym, on):
+        """v4.34: toggle switch ON/OFF per pair di engine."""
+        return self._post(port, "/api/pair_switch",
+                          {"symbol": sym, "on": bool(on)})
+
     def status(self, port):
         body, code = self._get(port, "/api/status")
         if code != 200:
@@ -319,6 +337,7 @@ class Dash(object):
         self.snap = {}
         self.need_auth = False
         self.sel_sym = None
+        self._sw_map = {}   # v4.34: symbol -> bool switch
         self.tab = "ALL"
         self.tape_segs = []
         self.tape_x = 0
@@ -509,12 +528,12 @@ class Dash(object):
         self._paint_tabs()
         # v3.57: kolom pengisi (stretch) di akhir -> STATUS nempel TREND
         cols = ("no", "sym", "px", "spr", "reg", "sig", "sco", "tre", "st",
-                "fill")
+                "sw", "fill")
         heads = [("no", "#", 24), ("sym", "SYMBOL", 86), ("px", "PRICE", 90),
                  ("spr", "SPREAD", 56), ("reg", "REGIME", 86),
                  ("sig", "SIGNAL", 60), ("sco", "SCORE", 52),
                  ("tre", "TREND", 50), ("st", "STATUS", 90),
-                 ("fill", "", 24)]
+                 ("sw", "SW", 40), ("fill", "", 24)]
         self.tv = ttk.Treeview(p, columns=cols, show="headings", height=4)
         for c, t, w in heads:
             self.tv.heading(c, text=t)
@@ -527,6 +546,7 @@ class Dash(object):
         self.tv.tag_configure("r1", background="#081b11")
         self.tv.pack(fill="x", padx=6, pady=(0, 4))
         self.tv.bind("<<TreeviewSelect>>", self._on_select)
+        self.tv.bind("<Button-1>", self._tv_click)   # v4.34: toggle SW
         # v3.87 (user): globe berputar DIPINDAH ke dalam ring gauge
         # (dulu overlay tabel) -- lihat _draw_gauge
 
@@ -836,6 +856,35 @@ class Dash(object):
             if self.snap:
                 self._apply(self.snap)
 
+    def _tv_click(self, ev):
+        """v4.34: klik kolom SW -> toggle ON/OFF pair di engine."""
+        try:
+            if self.tv.identify_region(ev.x, ev.y) != "cell":
+                return
+            col = self.tv.identify_column(ev.x)
+            iid = self.tv.identify_row(ev.y)
+        except Exception:
+            return
+        if col == "#10" and iid:
+            cur = self._sw_map.get(iid, False)
+            self._sw_map[iid] = not cur
+            try:
+                self.tv.set(iid, "sw", "ON" if not cur else "OFF")
+            except Exception:
+                pass
+            threading.Thread(target=self._sw_bg, args=(iid, not cur),
+                             daemon=True).start()
+
+    def _sw_bg(self, sym, on):
+        for p in self.ports:
+            try:
+                body, code = self.client.pair_switch(p, sym, on)
+                if code == 200:
+                    return
+            except Exception:
+                pass
+
+
     def _close(self):
         self.stop.set()
         try:
@@ -1047,10 +1096,12 @@ class Dash(object):
             sc = float(r.get("score", 0) or 0)
             sco = "%.0f%%" % sc
             reg = (r.get("regime") or "-").split(" ")[0]
+            swv = "ON" if r.get("sw") else "OFF"
+            self._sw_map[r.get("symbol")] = bool(r.get("sw"))
             self.tv.insert("", "end", iid=r.get("symbol"), values=(
                 "%02d" % i, r.get("symbol"), fmt(r.get("price"),
                                                  r.get("digits", 2)),
-                r.get("spread"), reg, sig, sco, str(tb) + "%", stag),
+                r.get("spread"), reg, sig, sco, str(tb) + "%", stag, swv),
                 tags=(stag, "r1" if i % 2 else "r0"))
         if self.sel_sym and self.tv.exists(self.sel_sym):
             self.tv.selection_set(self.sel_sym)

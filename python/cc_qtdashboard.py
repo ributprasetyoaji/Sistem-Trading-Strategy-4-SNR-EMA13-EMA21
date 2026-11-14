@@ -247,6 +247,24 @@ class EngineClient(object):
         except Exception:
             return "", 0
 
+    def _post(self, port, path, obj, timeout=3.0):
+        req = urllib.request.Request(
+            "http://127.0.0.1:%d%s" % (port, path),
+            data=json.dumps(obj).encode("utf-8"),
+            headers={"Content-Type": "application/json"})
+        if self.cookie:
+            req.add_header("Cookie", self.cookie)
+        try:
+            with self._opener.open(req, timeout=timeout) as r:
+                return r.read().decode("utf-8", "ignore"), r.status
+        except Exception:
+            return "", 0
+
+    def pair_switch(self, port, sym, on):
+        """v4.34: toggle switch ON/OFF per pair di engine."""
+        return self._post(port, "/api/pair_switch",
+                          {"symbol": sym, "on": bool(on)})
+
     def status(self, port):
         body, code = self._get(port, "/api/status")
         if code != 200:
@@ -1249,6 +1267,7 @@ class Dash(QWidget):
         self.snap = {}
         self.need_auth = False
         self.sel_sym = None
+        self._sw_map = {}   # v4.34: symbol -> bool switch
         self.tab = "ALL"
         self.tape_segs = []
         self.eq_hist = []
@@ -1460,7 +1479,7 @@ class Dash(QWidget):
         # v3.57: kolom pengisi (stretch) di akhir -> STATUS nempel TREND
         cols = [("#", 26), ("SYMBOL", 86), ("PRICE", 90), ("SPREAD", 56),
                 ("REGIME", 86), ("SIGNAL", 60), ("SCORE", 52), ("TREND", 50),
-                ("STATUS", 90), ("", 24)]
+                ("STATUS", 90), ("SW", 40), ("", 24)]
         self.tv = QTableWidget(0, len(cols))
         self.tv.setHorizontalHeaderLabels([c for c, _ in cols])
         self.tv.verticalHeader().setVisible(False)
@@ -1695,11 +1714,35 @@ class Dash(QWidget):
         return super().eventFilter(obj, ev)
 
     def _on_select(self, row, _col):
+        if _col == 9:   # v4.34: kolom SW -> toggle ON/OFF pair
+            it1 = self.tv.item(row, 1)
+            if it1 is None:
+                return
+            sym = it1.text()
+            cur = self._sw_map.get(sym, False)
+            self._sw_map[sym] = not cur
+            it2 = self.tv.item(row, 9)
+            if it2 is not None:
+                it2.setText("ON" if not cur else "OFF")
+                it2.setForeground(QColor(GRN if not cur else "#565b7a"))
+            self.sel_sym = sym
+            threading.Thread(target=self._sw_bg, args=(sym, not cur),
+                             daemon=True).start()
+            return
         it = self.tv.item(row, 1)
         if it:
             self.sel_sym = it.text()
             if self.snap:
                 self._apply(self.snap)
+
+    def _sw_bg(self, sym, on):
+        for p in self.ports:
+            try:
+                body, code = self.client.pair_switch(p, sym, on)
+                if code == 200:
+                    return
+            except Exception:
+                pass
 
     def _halt(self):
         threading.Thread(target=self._halt_bg, daemon=True).start()
@@ -1954,16 +1997,21 @@ class Dash(QWidget):
                 stag = "WAIT"
             sc = float(r.get("score", 0) or 0)
             reg = (r.get("regime") or "-").split(" ")[0]
+            swv = "ON" if r.get("sw") else "OFF"
+            self._sw_map[r.get("symbol")] = bool(r.get("sw"))
             vals = ("%02d" % i, r.get("symbol"),
                     fmt(r.get("price"), r.get("digits", 2)), r.get("spread"),
-                    reg, sig, "%.0f%%" % sc, str(tb) + "%", stag)
+                    reg, sig, "%.0f%%" % sc, str(tb) + "%", stag, swv)
             r0 = self.tv.rowCount()
             self.tv.insertRow(r0)
             for c0, v0 in enumerate(vals):
                 it = QTableWidgetItem(str(v0))
-                it.setFont(mono(8, c0 == 1))
+                it.setFont(mono(8, c0 in (1, 9)))
                 it.setForeground(QColor(st_col.get(stag, TX))
                                  if c0 in (5, 8) else QColor(TX))
+                if c0 == 9:
+                    it.setForeground(QColor(GRN if r.get("sw")
+                                           else "#565b7a"))
                 self.tv.setItem(r0, c0, it)
             keep.append(r.get("symbol"))
         if self.sel_sym and self.sel_sym in keep:

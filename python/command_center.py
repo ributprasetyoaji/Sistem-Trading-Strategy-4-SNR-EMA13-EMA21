@@ -94,6 +94,39 @@ def _no_data_row(want):
             "ohlc": []}
 
 
+def _pair_sw_path():
+    return os.path.join("data", "pair_switch.json")
+
+
+def _load_pair_sw():
+    """v4.34: switch ON/OFF per pair (persisten). DEFAULT = SEMUA OFF --
+    pair hanya dianalisa/ditradingkan setelah user menyalakan switchnya."""
+    try:
+        with open(_pair_sw_path(), encoding="utf-8") as f:
+            d = json.load(f)
+        if isinstance(d, dict):
+            return {str(k).upper(): True for k, v in d.items() if v}
+    except Exception:
+        pass
+    return {}
+
+
+def _off_row(want, data=None):
+    """v4.34 (user): baris scanner utk pair yang di-OFF-kan lewat switch
+    kolom SW -- tidak dianalisa, tidak di-tradingkan, tetap tampil."""
+    r = _no_data_row(want)
+    r["status"] = "OFF"
+    r["sniper_why"] = "switch OFF -- pair tidak dianalisa/ditradingkan"
+    info = (data or {}).get("info") or {}
+    try:
+        r["price"] = float(info.get("bid") or 0.0)
+        r["digits"] = int(info.get("digits", 2) or 2)
+        r["spread"] = int(info.get("spread", 0) or 0)
+    except Exception:
+        pass
+    return r
+
+
 class CommandCenter:
     def __init__(self, cfg: CCConfig, log=print):
         self.cfg = cfg
@@ -127,6 +160,9 @@ class CommandCenter:
         self._prewarm_need = set()   # pair riwayat tipis -> thread prewarm
         self._paged_try = {}         # anti-spam paging broker per pair
         self._scan_fail = {}         # hitung gagal ambil data per pair
+        self.pair_sw = _load_pair_sw()   # v4.34: switch ON/OFF per pair
+        self.log("INFO", "SWITCH PAIR: %d ON dari %d (default OFF)" %
+                 (len(self.pair_sw), len(getattr(self, "wants", []) or [])))
         self._scan_warn_ts = {}      # anti-spam WARN per pair (5 mnt)
         self._scan_allfail = 0       # scan gagal TOTAL berurutan
         self._scan_last_ok = 0.0     # scan terakhir yang berhasil
@@ -652,6 +688,28 @@ class CommandCenter:
                 out["m15"] = hist
         return out
 
+    def pair_on(self, want):
+        return bool(self.pair_sw.get(str(want or "").upper(), False))
+
+    def set_pair_switch(self, want, on):
+        """v4.34 (user): switch per pair -- ON = dianalisa & ditradingkan;
+        OFF (default) = skip total. Persist di data/pair_switch.json."""
+        want = str(want or "").upper()
+        if on:
+            self.pair_sw[want] = True
+        else:
+            self.pair_sw.pop(want, None)
+        try:
+            os.makedirs("data", exist_ok=True)
+            _tmp = _pair_sw_path() + ".tmp"
+            with open(_tmp, "w", encoding="utf-8") as _f:
+                json.dump({k: True for k in self.pair_sw}, _f)
+            os.replace(_tmp, _pair_sw_path())
+            self.emit_log("INFO", "SWITCH %s -> %s"
+                          % (want, "ON" if on else "OFF"))
+        except Exception as e:
+            self.emit_log("WARN", "pair_switch save gagal: %s" % e)
+
     def scan_all(self):
         n_ok = 0
         for want, sym in list(self.resolved.items()):
@@ -673,6 +731,12 @@ class CommandCenter:
                     continue
                 self._scan_fail.pop(want, None)
                 n_ok += 1
+                if not self.pair_sw.get(want, False):
+                    # v4.34 (user): switch OFF -> TIDAK dianalisa &
+                    # TIDAK diberi sinyal; tetap tampil dgn status OFF
+                    self.scan[want] = _off_row(want, data)
+                    self.candidates.pop(want, None)
+                    continue
                 if self.s2_on:
                     # STRATEGY 2: momentum M1 -> MTF WPR 6TF -> presisi ->
                     # HOLD tunggu close M5 (cc_strategy2.evaluate)
@@ -1951,7 +2015,8 @@ class CommandCenter:
                      "consec_losses": self.risk.consec_losses,
                      "pause_until": self.risk.pause_until,
                      "trade_on": trade_on},
-            "scanner": scanner,
+            "scanner": [dict(r0, sw=self.pair_on(r0.get("symbol")))
+                        for r0 in scanner],
             "confluence": confluence,
             "positions": [{"ticket": p["ticket"], "symbol": p["symbol"],
                         "type": p["type"], "manual": bool(p.get("manual")),
