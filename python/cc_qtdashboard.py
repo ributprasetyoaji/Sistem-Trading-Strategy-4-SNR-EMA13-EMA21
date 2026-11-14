@@ -750,7 +750,7 @@ class Spark(QWidget):
     def __init__(self, dash):
         super().__init__()
         self.dash = dash
-        self.setFixedHeight(14)
+        self.setFixedHeight(10)
 
     def paintEvent(self, _e):
         p = QPainter(self)
@@ -783,44 +783,45 @@ class Card(QFrame):
     def __init__(self, ic, title, acc, dash):
         super().__init__()
         self.acc = acc
-        self.setMinimumHeight(86)
+        self.setMinimumHeight(58)
         gl = QGraphicsDropShadowEffect(self)
-        gl.setColor(qcol(acc, 90))
-        gl.setBlurRadius(20)
+        gl.setColor(qcol(acc, 60))
+        gl.setBlurRadius(14)
         gl.setOffset(0, 0)
         self.setGraphicsEffect(gl)
         self.glow = gl
         self.flash = 0.0
         self.hover = False
         self.v = QVBoxLayout(self)
-        self.v.setContentsMargins(11, 7, 11, 8)
-        self.v.setSpacing(1)
+        self.v.setContentsMargins(8, 4, 8, 5)
+        self.v.setSpacing(0)
         top = QHBoxLayout()
-        top.setSpacing(7)
+        top.setSpacing(5)
         icf = QLabel(ic)
-        icf.setFixedSize(22, 22)
+        icf.setFixedSize(17, 17)
         icf.setAlignment(Qt.AlignCenter)
         icf.setStyleSheet(
-            "color:%s;font-size:11pt;background:%s;border-radius:7px;"
+            "color:%s;font-size:8.5pt;background:%s;border-radius:5px;"
             % (acc, mix(BG, acc, 0.22).name()))
         top.addWidget(icf)
         tt = QLabel(title)
         f = sans(7, True)
         f.setLetterSpacing(QFont.AbsoluteSpacing, 0.8)
         tt.setFont(f)
-        tt.setStyleSheet("color:%s;font-size:7pt;font-weight:bold;"
+        tt.setStyleSheet("color:%s;font-size:6.5pt;font-weight:bold;"
                          "background:transparent;"
                          % mix(TX, DIM, 0.35).name())
         top.addWidget(tt)
         top.addStretch(1)
         self.v.addLayout(top)
         self.val = QLabel("-")
-        self.val.setFont(mono(13, True))
+        self.val.setFont(mono(10, True))
         self.val.setStyleSheet("color:%s;background:transparent;" % acc)
         self.v.addWidget(self.val)
         self.sub = QLabel("")
-        self.sub.setFont(sans(7))
-        self.sub.setStyleSheet("color:%s;background:transparent;"
+        self.sub.setFont(sans(6))
+        self.sub.setStyleSheet("color:%s;font-size:6.5pt;"
+                               "background:transparent;"
                                % mix(TX, DIM2, 0.4).name())
         self.v.addWidget(self.sub)
         self.spark = Spark(dash) if title == "EQUITY" else None
@@ -844,14 +845,14 @@ class Card(QFrame):
         gb.setColorAt(1.0, mix(BG, self.acc, 0.05))
         p.setPen(Qt.NoPen)
         p.setBrush(QBrush(gb))
-        p.drawRoundedRect(r, 12, 12)
+        p.drawRoundedRect(r, 9, 9)
         gbord = QLinearGradient(0, 0, self.width(), self.height())
         gbord.setColorAt(0.0, mix(BG, self.acc, 0.22))
         gbord.setColorAt(0.5, mix(BG, self.acc, 0.60))
         gbord.setColorAt(1.0, mix(BG, self.acc, 0.22))
         p.setPen(QPen(QBrush(gbord), 1))
         p.setBrush(Qt.NoBrush)
-        p.drawRoundedRect(r, 12, 12)
+        p.drawRoundedRect(r, 9, 9)
         p.setPen(QPen(qcol("#ffffff", 14), 1))
         p.drawLine(12, 1, self.width() - 12, 1)
 
@@ -862,7 +863,7 @@ class _Bar(QWidget):
     def __init__(self, _parent, acc):
         super().__init__()
         self.acc = acc
-        self.setFixedHeight(3)
+        self.setFixedHeight(2)
 
     def paintEvent(self, _e):
         p = QPainter(self)
@@ -1367,7 +1368,7 @@ class Dash(QWidget):
                           ("\u00a4", "KOMISI / FEE", VIO),
                           ("\u25a3", "OPEN POSITIONS", ACC)]
         crow = QHBoxLayout()
-        crow.setSpacing(7)
+        crow.setSpacing(5)
         self.cards = []
         for ic, ttl, acc in self.card_defs:
             c = Card(ic, ttl, acc, self)

@@ -446,7 +446,7 @@ class Dash(object):
                           ("\u26a0", "DRAWDOWN", RED),
                           ("\u00a4", "KOMISI / FEE", VIO),
                           ("\u25a3", "OPEN POSITIONS", ACC)]
-        self.cv_cards = tk.Canvas(self.root, bg=BG, height=92,
+        self.cv_cards = tk.Canvas(self.root, bg=BG, height=64,
                                   highlightthickness=0)
         self.cv_cards.pack(fill="x", padx=6, pady=(4, 0))
         self.cv_cards.bind("<Configure>", lambda e: self._draw_cards())
@@ -727,48 +727,48 @@ class Dash(object):
         vals = self._card_vals or []
         cv.update_idletasks()
         W = cv.winfo_width() or 1300
-        H = 92
+        H = 64
         n = len(self.card_defs)
         gap = 6
         cw = (W - gap * (n - 1)) / float(n)
         base = "#04120b"
         for i, (ic, title, acc) in enumerate(self.card_defs):
             x = i * (cw + gap)
-            self._rr(cv, x + 2, 5, x + cw + 1, H - 1, 10,
+            self._rr(cv, x + 2, 4, x + cw + 1, H - 1, 8,
                      fill="#010603", outline="")
-            self._rr(cv, x, 2, x + cw, H - 4, 10,
+            self._rr(cv, x, 2, x + cw, H - 4, 8,
                      fill=self._mix(base, acc, 0.10),
                      outline=self._mix(base, acc, 0.45))
             self._rr(cv, x + 8, 3, x + cw - 8, 4, 1,
                      fill=self._mix(base, acc, 0.55), outline="")
-            ds = 22
-            self._rr(cv, x + 6, 8, x + 6 + ds, 8 + ds, 7,
+            ds = 17
+            self._rr(cv, x + 5, 6, x + 5 + ds, 6 + ds, 5,
                      fill=self._mix(base, acc, 0.30), outline="")
-            cv.create_text(x + 6 + ds / 2.0, 8 + ds / 2.0 + 1, text=ic,
-                           fill=acc, font=("Consolas", 10, "bold"))
-            cv.create_text(x + 6 + ds + 8, 19, text=title, anchor="w",
+            cv.create_text(x + 5 + ds / 2.0, 6 + ds / 2.0 + 1, text=ic,
+                           fill=acc, font=("Consolas", 9, "bold"))
+            cv.create_text(x + 5 + ds + 6, 14, text=title, anchor="w",
                            fill=self._mix(TX, DIM, 0.45),
                            font=("Consolas", 7, "bold"))
             if i < len(vals):
                 val, vcol, sub = vals[i]
                 # nilai: ukur lebar piksel asli -> turunkan font / pangkas
                 avail = cw - 22
-                f12 = tkfont.Font(family="Consolas", size=12, weight="bold")
-                f10 = tkfont.Font(family="Consolas", size=10, weight="bold")
+                f12 = tkfont.Font(family="Consolas", size=10, weight="bold")
+                f10 = tkfont.Font(family="Consolas", size=8, weight="bold")
                 fnt, txt = f12, val
                 if f12.measure(val) > avail:
                     fnt, txt = f10, val
                     # pangkas NET -1 char per langkah (anti infinite loop)
                     while f10.measure(txt) > avail and len(txt) > 3:
                         txt = txt[:-3].rstrip() + ".."
-                cv.create_text(x + 12, 43, text=txt, anchor="w", fill=vcol,
+                cv.create_text(x + 10, 30, text=txt, anchor="w", fill=vcol,
                                font=fnt)
                 if sub:
                     f7 = tkfont.Font(family="Consolas", size=7)
                     st = sub
                     while f7.measure(st) > avail and len(st) > 3:
                         st = st[:-3].rstrip() + ".."
-                    cv.create_text(x + 12, 60, text=st, anchor="w",
+                    cv.create_text(x + 10, 44, text=st, anchor="w",
                                    fill=self._mix(TX, DIM2, 0.55),
                                    font=("Consolas", 7))
             if title == "EQUITY" and len(self.eq_hist) >= 2:
@@ -779,9 +779,9 @@ class Dash(object):
                 pts = []
                 for k0, v0 in enumerate(hh):
                     pts += [x + 12 + (cw - 24) * k0 / (len(hh) - 1.0),
-                            76 - 12 * (v0 - lo0) / (hi0 - lo0)]
+                            54 - 10 * (v0 - lo0) / (hi0 - lo0)]
                 cv.create_line(*pts, fill=CY, width=1)
-            self._rr(cv, x + 12, H - 14, x + cw - 12, H - 10, 2,
+            self._rr(cv, x + 10, H - 11, x + cw - 10, H - 8, 2,
                      fill=self._mix(base, acc, 0.60), outline="")
 
     def _paint_tabs(self):
