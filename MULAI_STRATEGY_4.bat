@@ -1,78 +1,75 @@
 @echo off
-setlocal enableextensions
-title RBT FX - MULAI STRATEGY 4 SATU KLIK
-cd /d "%~dp0"
-
-rem =================================================================
-rem  MULAI STRATEGY 4 SAJA - satu klik
-rem  Posisi file bebas: C:\RBT, Desktop, Downloads, atau di dalam
-rem  folder strategy-nya langsung - semua dicari otomatis.
-rem =================================================================
-
+setlocal
+title RBT FX - STRATEGY 4
+rem ================================================================
+rem  MULAI STRATEGY 4 - FILE FINAL UTUH (mandiri)
+rem  Letak file bebas: di dalam folder strategy, C:\RBT, Desktop,
+rem  Downloads - folder strategy dicari otomatis di semua tempat,
+rem  nama folder fleksibel (Strategy-1, Strategy_1, Strategy 1, dll).
+rem ================================================================
 set "DIR="
-echo [1/3] Cari folder STRATEGY 4 ...
-if exist "%~dp0MULAI_SEMUA.bat" if exist "%~dp0python\command_center.py" set "DIR=%~dp0"
-call :look "%~dp0Sistem-Trading-Strategy-4-SNR-EMA13-EMA21"
-call :look "C:\RBT\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21"
-call :look "C:\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21"
-call :look "%USERPROFILE%\Desktop\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21"
-call :look "%USERPROFILE%\Downloads\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21"
-call :look "%~dp0Sistem-Trading-Strategy-4-SNR-EMA13-EMA21-main"
-call :look "C:\RBT\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21-main"
-call :look "C:\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21-main"
-call :look "%USERPROFILE%\Desktop\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21-main"
-call :look "%USERPROFILE%\Downloads\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21-main"
-call :look "%~dp0Sistem-Trading-Strategy-4"
-call :look "C:\RBT\Sistem-Trading-Strategy-4"
-call :look "C:\Sistem-Trading-Strategy-4"
-call :look "%USERPROFILE%\Desktop\Sistem-Trading-Strategy-4"
-call :look "%USERPROFILE%\Downloads\Sistem-Trading-Strategy-4"
-call :look "%~dp0Sistem-Trading-Strategy-4-main"
-call :look "C:\RBT\Sistem-Trading-Strategy-4-main"
-call :look "C:\Sistem-Trading-Strategy-4-main"
-call :look "%USERPROFILE%\Desktop\Sistem-Trading-Strategy-4-main"
-call :look "%USERPROFILE%\Downloads\Sistem-Trading-Strategy-4-main"
-if not defined DIR goto miss
+set "DIRF="
+rem [1/3] file ini ada DI DALAM folder strategy?
+if exist "%~dp0MULAI_SEMUA.bat" set "DIR=%~dp0"
+rem [2/3] cari folder strategy di 4 lokasi, nama folder fleksibel
+for /d %%D in ("%~dp0*Strategy-4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
+for /d %%D in ("%~dp0*Strategy_4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
+for /d %%D in ("%~dp0*Strategy 4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
+for /d %%D in ("%~dp0*Strategy4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
+for /d %%D in ("C:\RBT\*Strategy-4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
+for /d %%D in ("C:\RBT\*Strategy_4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
+for /d %%D in ("C:\RBT\*Strategy 4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
+for /d %%D in ("C:\RBT\*Strategy4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
+for /d %%D in ("%USERPROFILE%\Desktop\*Strategy-4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
+for /d %%D in ("%USERPROFILE%\Desktop\*Strategy_4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
+for /d %%D in ("%USERPROFILE%\Desktop\*Strategy 4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
+for /d %%D in ("%USERPROFILE%\Downloads\*Strategy-4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
+for /d %%D in ("%USERPROFILE%\Downloads\*Strategy_4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
+for /d %%D in ("%USERPROFILE%\Downloads\*Strategy 4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
+for /d %%D in ("%USERPROFILE%\Downloads\*Strategy4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
+if defined DIR goto mulai
+rem [3/3] cadangan: folder strategy ketemu tapi MULAI_SEMUA.bat belum ada - engine langsung
+for /d %%D in ("%~dp0*Strategy-4*") do if not defined DIRF set "DIRF=%%D"
+for /d %%D in ("C:\RBT\*Strategy-4*") do if not defined DIRF set "DIRF=%%D"
+for /d %%D in ("C:\RBT\*Strategy_4*") do if not defined DIRF set "DIRF=%%D"
+for /d %%D in ("%USERPROFILE%\Desktop\*Strategy-4*") do if not defined DIRF set "DIRF=%%D"
+for /d %%D in ("%USERPROFILE%\Downloads\*Strategy-4*") do if not defined DIRF set "DIRF=%%D"
+if defined DIRF goto engine
+echo [X] Folder STRATEGY 4 tidak ketemu di lokasi manapun:
+echo     di samping file ini, C:\RBT, Desktop, Downloads.
+echo Pastikan folder Sistem-Trading-Strategy-4 ada di salah satu tempat itu.
+echo.
+pause
+exit /b 1
 
-echo Ketemu: %DIR%
-echo [2/3] Menyalakan STRATEGY 4 - engine plus dashboard...
+:mulai
 cd /d "%DIR%"
-if not exist "MULAI_SEMUA.bat" goto nomulai
+echo Menyalakan STRATEGY 4 di %DIR% ...
 call "MULAI_SEMUA.bat"
-goto selesai
-
-:nomulai
-if exist "RBT_FX_STRATEGY4.bat" call "RBT_FX_STRATEGY4.bat"
-if exist "RBT_FX_STRATEGY4.bat" goto selesai
-echo [X] MULAI_SEMUA.bat tidak ada di folder itu - update dulu:
-echo     klik 2x PERBAIKI_TOKEN.bat sekali, lalu coba lagi.
 echo.
-pause
-exit /b 1
-
-:miss
-echo.
-echo [X] Folder STRATEGY 4 tidak ketemu di lokasi standar:
-echo     - di samping file ini  -  C:\RBT  -  C:\
-echo     - Desktop  -  Downloads
-echo.
-echo Solusi: taruh file ini di C:\RBT sebelah folder strategy,
-echo atau di dalam folder strategy-nya langsung, lalu klik 2x lagi.
-echo.
-pause
-exit /b 1
-
-:selesai
-echo.
-echo [3/3] STRATEGY 4 berhenti - engine atau jendela ditutup.
-echo Klik 2x file ini lagi untuk menyalakan kembali.
-echo.
+echo STRATEGY 4 berhenti. Klik 2x file ini lagi untuk menyalakan.
 pause
 exit /b 0
 
-:look
-if defined DIR goto :eof
-if not exist "%~1\MULAI_SEMUA.bat" goto :eof
-set "DIR=%~1"
-echo [OK] folder ketemu: %~1
-goto :eof
+:engine
+cd /d "%DIRF%"
+echo MULAI_SEMUA.bat belum ada - menyalakan engine langsung di %DIRF%
+set "PY="
+python --version >nul 2>nul
+if not errorlevel 1 set "PY=python"
+if defined PY goto runeng
+py -3 --version >nul 2>nul
+if not errorlevel 1 set "PY=py -3"
+if defined PY goto runeng
+echo [X] Python tidak ketemu. Cara yang betul:
+echo     buka folder %DIRF% lalu klik 2x MULAI_SEMUA.bat di dalamnya.
+echo.
+pause
+exit /b 1
+
+:runeng
+"%PY%" -u python\command_center.py
+echo.
+echo STRATEGY 4 berhenti. Klik 2x file ini lagi untuk menyalakan.
+pause
+exit /b 0
