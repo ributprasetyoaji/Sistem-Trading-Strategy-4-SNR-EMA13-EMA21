@@ -2,38 +2,20 @@
 setlocal
 title RBT FX - STRATEGY 4
 rem ================================================================
-rem  MULAI STRATEGY 4 - v9 OTOMATIS DARI GITHUB
-rem  1. Folder strategy dicari otomatis di lokasi standar
-rem  2. Kalau TIDAK ada: bat MENGUNDUH SELURUH REPO dari GitHub
-rem     ke C:\RBT\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21 - tanpa perlu apa pun lagi
-rem  3. Kalau folder SUDAH ada: bat UPDATE dulu dari GitHub,
-rem     lalu menyalakan. Data login/state tidak pernah tertimpa.
-rem  Token dibaca dari TOKEN.txt di sebelah file ini; kalau belum
-rem  ada, diminta sekali lalu disimpan otomatis.
+rem  MULAI STRATEGY 4 - v10 LANGSUNG JALAN
+rem  - TOKEN.txt dicari di 3 tempat: sebelah file ini, C:\RBT,
+rem    dan di dalam folder strategy - TIDAK PERNAH DITANYA kalau
+rem    salah satu ada.
+rem  - Tanpa token pun tetap JALAN: pakai program lokal, update
+rem    GitHub dilewati. Token hanya ditanya kalau folder strategy
+rem    tidak ada DAN harus mengunduh dari GitHub.
+rem  - Folder tidak ada: bat mengunduh seluruh repo dari GitHub
+rem    ke C:\RBT\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21 secara otomatis.
 rem ================================================================
 
-set "TOKEN="
-if exist "%~dp0TOKEN.txt" set /p TOKEN=<"%~dp0TOKEN.txt"
-if defined TOKEN goto tok_ok
-echo Token GitHub belum ada - hanya sekali ini saja.
-set /p "TOKEN=Paste token GitHub lalu tekan Enter: "
-if not defined TOKEN goto tok_bad
-echo %TOKEN%| findstr /B /C:"ghp_" /C:"github_pat_" >nul
-if errorlevel 1 goto tok_bad
->"%~dp0TOKEN.txt" echo %TOKEN%
-echo [OK] Token disimpan di TOKEN.txt - berikutnya tidak ditanya lagi.
-goto tok_ok
-:tok_bad
-echo [X] Token tidak terbaca/salah format. Klik 2x file ini lagi.
-echo Token dikirim bot Telegram, diawali ghp_.
-echo.
-pause
-exit /b 1
-:tok_ok
-if defined TOKEN set "RBT_GH_TOKEN=%TOKEN%"
-
-rem ---- [1/4] cari folder strategy yang sudah ada ----
 set "DIR="
+set "DIRF="
+rem ---- [cari folder strategy dulu] ----
 if exist "%~dp0MULAI_SEMUA.bat" set "DIR=%~dp0"
 for /d %%D in ("%~dp0*Strategy-4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
 for /d %%D in ("%~dp0*Strategy_4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
@@ -62,14 +44,31 @@ for /d %%D in ("%USERPROFILE%\Downloads\*Strategy4*") do if exist "%%D\MULAI_SEM
 if defined DIR goto ada_folder
 
 rem ---- [2/4] tidak ketemu -> UNDUH OTOMATIS DARI GITHUB ----
+set "TOKEN="
+if exist "%~dp0TOKEN.txt" set /p TOKEN=<"%~dp0TOKEN.txt"
+if not defined TOKEN if exist "C:\RBT\TOKEN.txt" set /p TOKEN=<"C:\RBT\TOKEN.txt"
+if defined TOKEN goto unduh_langsung
+echo Folder strategy tidak ada - untuk mengunduh dari GitHub perlu token.
+set /p "TOKEN=Paste token GitHub lalu tekan Enter: "
+if not defined TOKEN goto gagal_input
+if "%TOKEN:~30,1%"=="" goto tok_bad
+>"%~dp0TOKEN.txt" echo %TOKEN%
+echo [OK] Token disimpan - berikutnya tidak ditanya lagi.
+:unduh_langsung
 set "DST=C:\RBT\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21"
-echo Folder lokal tidak ada - MENGUNDUH dari GitHub ke %DST% ...
+echo MENGUNDUH dari GitHub ke %DST% ...
 if not exist "C:\RBT\" mkdir "C:\RBT"
 call :unduh "Sistem-Trading-Strategy-4-SNR-EMA13-EMA21" "%DST%"
 if errorlevel 1 goto unduh_gagal
 echo [OK] Unduhan selesai.
 set "DIR=%DST%"
 goto ada_folder
+
+:tok_bad
+echo [X] Token terlalu pendek/salah. Paste token penuh yang diawali ghp_.
+echo.
+pause
+exit /b 1
 
 :unduh_gagal
 echo [X] Unduhan GAGAL - cek internet/koneksi VPS.
@@ -100,12 +99,18 @@ pause
 exit /b 1
 
 :ada_folder
-rem ---- [3/4] folder ada: UPDATE dari GitHub dulu (data login aman) ----
+rem ---- token: dicari diam-diam di 3 tempat, TIDAK DITANYA ----
+set "TOKEN="
+if exist "%~dp0TOKEN.txt" set /p TOKEN=<"%~dp0TOKEN.txt"
+if not defined TOKEN if exist "C:\RBT\TOKEN.txt" set /p TOKEN=<"C:\RBT\TOKEN.txt"
+if not defined TOKEN if exist "%DIR%\TOKEN.txt" set /p TOKEN=<"%DIR%\TOKEN.txt"
+if defined TOKEN set "RBT_GH_TOKEN=%TOKEN%"
+rem ---- update dari GitHub dulu (diam-diam dilewati kalau tanpa token/offline) ----
 cd /d "%DIR%"
-echo Update dari GitHub: Sistem-Trading-Strategy-4-SNR-EMA13-EMA21 ...
+if defined TOKEN echo Update dari GitHub: Sistem-Trading-Strategy-4-SNR-EMA13-EMA21 ...
 call :unduh "Sistem-Trading-Strategy-4-SNR-EMA13-EMA21" "%DIR%"
-if errorlevel 1 echo    Update dilewati (offline?) - memakai versi lokal.
-rem ---- [4/4] nyalakan ----
+if errorlevel 1 echo    Update dilewati (tanpa token/offline) - memakai program lokal.
+rem ---- nyalakan ----
 if not exist "MULAI_SEMUA.bat" goto startdirect
 echo Menyalakan STRATEGY 4 di %CD% ...
 call "MULAI_SEMUA.bat"
@@ -149,6 +154,7 @@ exit /b 0
 
 :unduh
 rem args: %1 = nama repo, %2 = folder tujuan
+if not defined TOKEN exit /b 1
 set "USRC="
 set "UZIP=%TEMP%\_rbt_dl.zip"
 set "UDIR=%TEMP%\_rbt_dl"
@@ -172,7 +178,7 @@ if not defined USRC exit /b 1
 robocopy "%USRC%" "%~2" /E /XF cc_state.json cc_day.json cc_status.json CC_SIGNAL.csv s2_state.json s1_state.json MT5_PATH.txt TOKEN.txt /XD logs replay __pycache__ .git redist /NFL /NDL /NJH /NJS /NP
 if errorlevel 8 exit /b 1
 if not exist "%~2\MULAI_SEMUA.bat" exit /b 1
->"%~2\TOKEN.txt" echo %TOKEN%
+if defined TOKEN if not exist "%~2\TOKEN.txt" >"%~2\TOKEN.txt" echo %TOKEN%
 if exist "%UDIR%" rmdir /s /q "%UDIR%" >nul 2>nul
 if exist "%UZIP%" del "%UZIP%" >nul 2>nul
 exit /b 0
