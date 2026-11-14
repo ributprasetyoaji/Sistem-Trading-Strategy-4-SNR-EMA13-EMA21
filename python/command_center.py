@@ -157,6 +157,16 @@ def _spark_from_bars(bars, n=60):
         return []
 
 
+def _min_lot(info):
+    """v4.42 (user): lot TERKECIL pair = volume_min broker (fallback
+    0.01).  Mode AUTO (tanpa lot manual) memakai ini."""
+    try:
+        vm = float((info or {}).get("volume_min", 0) or 0)
+    except (TypeError, ValueError):
+        vm = 0.0
+    return vm if vm > 0 else 0.01
+
+
 def _off_row(want, data=None):
     """v4.34 (user): baris scanner utk pair yang di-OFF-kan lewat switch
     kolom SW -- tidak dianalisa, tidak di-tradingkan, tetap tampil."""
@@ -210,8 +220,11 @@ class CommandCenter:
         self._scan_fail = {}         # hitung gagal ambil data per pair
         self.pair_sw = _load_pair_sw()   # v4.34: switch ON/OFF per pair
         self.pair_lot = _load_pair_lot()  # v4.37: lot manual per pair
+        _on = sorted(self.pair_sw.keys())
         self.log("INFO", "SWITCH PAIR: %d ON dari %d (default OFF)" %
-                 (len(self.pair_sw), len(getattr(self, "wants", []) or [])))
+                 (len(_on), len(getattr(self, "wants", []) or [])))
+        if _on:   # v4.42: daftar eksplisit -- tak ada pair "misterius"
+            self.log("INFO", "SWITCH ON: %s" % ", ".join(_on))
         self._scan_warn_ts = {}      # anti-spam WARN per pair (5 mnt)
         self._scan_allfail = 0       # scan gagal TOTAL berurutan
         self._scan_last_ok = 0.0     # scan terakhir yang berhasil
@@ -762,6 +775,21 @@ class CommandCenter:
         except Exception as e:
             self.emit_log("WARN", "pair_switch save gagal: %s" % e)
 
+    def pairs_reset_all_off(self):
+        """v4.42 (user): matikan SEMUA switch -- kembali default OFF."""
+        n = len(self.pair_sw)
+        self.pair_sw.clear()
+        try:
+            os.makedirs("data", exist_ok=True)
+            _tmp = _pair_sw_path() + ".tmp"
+            with open(_tmp, "w", encoding="utf-8") as _f:
+                json.dump({}, _f)
+            os.replace(_tmp, _pair_sw_path())
+        except Exception as e:
+            self.emit_log("WARN", "pairs_reset save gagal: %s" % e)
+        self.emit_log("INFO", "SEMUA SWITCH DIMATIKAN (%d pair)" % n)
+        return n
+
     def pair_lot_of(self, want):
         """v4.37: lot manual utk pair ini -- 0/None = AUTO."""
         try:
@@ -1001,6 +1029,15 @@ class CommandCenter:
             self.emit_log("INFO", "%s: LOT MANUAL %.2f (menimpa kalkulasi)"
                           % (res["symbol"], _ulot))
             lot = _ulot
+        else:
+            # v4.42 (user): AUTO = lot TERKECIL pair (volume_min broker)
+            _ml = _min_lot(info)
+            if not g_ok and lot <= 0 and lot_why and g_why == lot_why:
+                g_ok, g_why = True, ""
+            if abs(float(lot or 0) - _ml) > 1e-12:
+                self.emit_log("INFO", "%s: AUTO -> lot terkecil %.2f"
+                              % (res["symbol"], _ml))
+            lot = _ml
         if not g_ok:
             res["status"] = "BLOCKED"
             res["block_why"] = g_why
@@ -1228,6 +1265,16 @@ class CommandCenter:
             self.emit_log("INFO", "%s: LOT MANUAL %.2f (menimpa kalkulasi)"
                           % (want, _ulot))
             lot = _ulot
+        else:
+            # v4.42 (user): AUTO = lot TERKECIL pair (volume_min broker)
+            # -- menimpa kalkulasi risiko & lift min_entry_lot (v4.22)
+            _ml = _min_lot(info)
+            if not g_ok and lot <= 0 and lot_why and g_why == lot_why:
+                g_ok, g_why = True, ""
+            if abs(float(lot or 0) - _ml) > 1e-12:
+                self.emit_log("INFO", "%s: AUTO -> lot terkecil %.2f"
+                              % (want, _ml))
+            lot = _ml
         if not g_ok:
             res["status"] = "BLOCKED"
             res["block_why"] = g_why

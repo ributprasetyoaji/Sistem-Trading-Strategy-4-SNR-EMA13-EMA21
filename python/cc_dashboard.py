@@ -838,7 +838,7 @@ document.querySelectorAll('#scan .lotbtn').forEach(function(b){b.onclick=functio
 ev.preventDefault();ev.stopPropagation();
 var sym=b.dataset.lot;
 var cur=(typeof b.dataset.cur!=='undefined'&&b.dataset.cur!=='')?b.dataset.cur:'0';
-var v=prompt('LOT untuk '+sym+' (0 atau kosong = AUTO):',cur);
+var v=prompt('LOT untuk '+sym+' (0/kosong = AUTO = lot terkecil pair):',cur);
 if(v===null)return;
 v=parseFloat(String(v).replace(',','.'));
 if(isNaN(v)||v<0)return;
@@ -1157,6 +1157,19 @@ def make_handler(cc, password=""):
                     self._send(200, json.dumps(
                         {"ok": True, "symbol": sym, "sw": on}),
                         "application/json")
+                except Exception as e:
+                    self._send(400, json.dumps({"ok": False,
+                                                "error": str(e)}),
+                               "application/json")
+            elif self.path == "/api/pairs_reset":
+                # v4.42 (user): matikan SEMUA switch (default OFF)
+                if not self._authed():
+                    self._send(401, '{"error":"auth"}', "application/json")
+                    return
+                try:
+                    n = cc.pairs_reset_all_off()
+                    self._send(200, json.dumps({"ok": True, "off": n}),
+                               "application/json")
                 except Exception as e:
                     self._send(400, json.dumps({"ok": False,
                                                 "error": str(e)}),

@@ -5,6 +5,7 @@ import json
 import os
 import sys
 import threading
+import types
 import urllib.request
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "python"))
@@ -110,8 +111,74 @@ def test_qt_panel_lot_manual_dan_post_port_benar():
     assert "lot = Signal(str, str)" in qt
     # POST tidak salah sasaran: active_port dulu
     assert "def _post_ports" in qt
-    assert qt.count("for p in self._post_ports():") == 2   # sw + lot
+    assert qt.count("for p in self._post_ports():") == 3   # sw+lot+alloff
     assert "[self.active_port] if self.active_port else []" in qt
+
+
+def test_auto_lot_terkecil_dan_manual_menang(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    # AUTO = volume_min broker; fallback 0.01
+    assert CC._min_lot({"volume_min": 0.01}) == 0.01
+    assert CC._min_lot({"volume_min": 0.1}) == 0.1
+    assert CC._min_lot({}) == 0.01
+    assert CC._min_lot(None) == 0.01
+    # kedua jalur entry punya cabang AUTO = terkecil
+    src = open(os.path.join(os.path.dirname(__file__), "..", "python",
+                            "command_center.py"),
+               encoding="utf-8").read()
+    assert src.count("AUTO -> lot terkecil") == 2
+    assert src.count("_ml = _min_lot(info)") == 2
+    # manual tetap menang atas AUTO
+    assert src.count("LOT MANUAL %.2f (menimpa kalkulasi)") == 2
+
+
+def test_pairs_reset_all_off(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    ns = types.SimpleNamespace(pair_sw={"BTCUSD": True, "XAUUSD": True},
+                               emit_log=lambda t, m: None)
+    n = CC.CommandCenter.pairs_reset_all_off(ns)
+    assert n == 2 and ns.pair_sw == {}
+    assert CC._load_pair_sw() == {}          # file juga dibersihkan
+    # boot log menampilkan daftar pair ON (transparan)
+    src = open(os.path.join(os.path.dirname(__file__), "..", "python",
+                            "command_center.py"),
+               encoding="utf-8").read()
+    assert '"SWITCH ON: %s" % ", ".join(_on)' in src
+
+
+def test_endpoint_pairs_reset_live():
+    import threading, urllib.request, json as _j
+    from cc_dashboard import make_server
+
+    class FakeCC:
+        version = "4.42-test"
+
+        def __init__(self):
+            self.pair_sw = {"BTCUSD": True}
+
+        def get_status(self):
+            return {"version": self.version, "scanner": [],
+                    "positions": [], "mode": "S",
+                    "account": {"login": 0, "server": "T"}}
+
+        def pairs_reset_all_off(self):
+            n = len(self.pair_sw)
+            self.pair_sw.clear()
+            return n
+
+    cc = FakeCC()
+    srv = make_server(cc, 0, "")
+    port = srv.server_address[1]
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    try:
+        req = urllib.request.Request(
+            "http://127.0.0.1:%d/api/pairs_reset" % port, data=b"{}",
+            headers={"Content-Type": "application/json"})
+        js = _j.load(urllib.request.urlopen(req, timeout=5))
+        assert js == {"ok": True, "off": 1}
+    finally:
+        srv.shutdown()
+        srv.server_close()
 
 
 def test_klik_pair_menyinkronkan_panel_lot():

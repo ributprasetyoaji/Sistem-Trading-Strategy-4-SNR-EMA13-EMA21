@@ -283,6 +283,10 @@ class EngineClient(object):
         return self._post(port, "/api/pair_lot",
                           {"symbol": sym, "lot": float(lot)})
 
+    def pairs_reset(self, port):
+        """v4.42: matikan SEMUA switch pair."""
+        return self._post(port, "/api/pairs_reset", {})
+
     def status(self, port):
         body, code = self._get(port, "/api/status")
         if code != 200:
@@ -1547,7 +1551,7 @@ class Dash(QWidget):
             "color:#e8c574;}")
         lotrow.addWidget(self.cmb_syms)
         self.ent_lot = QLineEdit()
-        self.ent_lot.setPlaceholderText("0.05  (0=AUTO)")
+        self.ent_lot.setPlaceholderText("0.05  (0=AUTO=terkecil)")
         self.ent_lot.setFixedWidth(110)
         self.ent_lot.setStyleSheet(
             "QLineEdit{background:#0a0f1e;color:#ffd270;border:1px solid "
@@ -1559,6 +1563,11 @@ class Dash(QWidget):
         btn_lot.setCursor(Qt.PointingHandCursor)
         btn_lot.clicked.connect(self._apply_lot)
         lotrow.addWidget(btn_lot)
+        btn_alloff = QPushButton("SEMUA OFF")
+        btn_alloff.setObjectName("tabbtn")
+        btn_alloff.setCursor(Qt.PointingHandCursor)
+        btn_alloff.clicked.connect(self._all_off)
+        lotrow.addWidget(btn_alloff)
         self.lb_lot_info = QLabel("")
         self.lb_lot_info.setFont(mono(7))
         lotrow.addWidget(self.lb_lot_info)
@@ -1861,6 +1870,22 @@ class Dash(QWidget):
         self.sel_sym = sym
         threading.Thread(target=self._lot_bg, args=(sym, lot),
                          daemon=True).start()
+
+    def _all_off(self):
+        """v4.42 (user): matikan SEMUA switch -- perbaiki state tersimpan
+        yang tak diinginkan (mis. pair nyala sendiri saat testing)."""
+        threading.Thread(target=self._all_off_bg, daemon=True).start()
+
+    def _all_off_bg(self):
+        for p in self._post_ports():
+            try:
+                body, code = self.client.pairs_reset(p)
+                if code == 200:
+                    self.sig.lot.emit("SEMUA SWITCH DIMATIKAN", GRN)
+                    return
+            except Exception:
+                pass
+        self.sig.lot.emit("GAGAL reset -- engine tidak merespons", RED)
 
     def _post_ports(self):
         """v4.38: port engine UTAMA = yang terbukti hidup (active_port),
