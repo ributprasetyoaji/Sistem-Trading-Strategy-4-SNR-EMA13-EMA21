@@ -2,12 +2,15 @@
 setlocal
 title RBT FX - STRATEGY 4
 rem ================================================================
-rem  MULAI STRATEGY 4 - v10 LANGSUNG JALAN
-rem  - TOKEN.txt dicari di 3 tempat: sebelah file ini, C:\RBT,
-rem    dan di dalam folder strategy - TIDAK PERNAH DITANYA kalau
-rem    salah satu ada.
+rem  MULAI STRATEGY 4 - v15 LANGSUNG JALAN TANPA KOPI TOKEN
+rem  - Token GitHub dicari DIAM-DIAM di 5 tempat: sebelah file ini,
+rem    C:\RBT\TOKEN.txt, %APPDATA%\RBT_FX\gh_token.txt, folder
+rem    strategy lain di C:\RBT, dan folder strategy -- TIDAK DITANYA.
+rem  - Lokasi khusus (S4_LOKASI.txt) ikut dicari tiap kali mulai.
+rem  - Token pernah dipaste? Disimpan permanen di 2 tempat --
+rem    tidak akan pernah ditanya lagi.
 rem  - Tanpa token pun tetap JALAN: pakai program lokal, update
-rem    GitHub dilewati. Token hanya ditanya kalau folder strategy
+rem    GitHub dilewati. Token cuma ditanya kalau folder strategy
 rem    tidak ada DAN harus mengunduh dari GitHub.
 rem  - Folder tidak ada: bat mengunduh seluruh repo dari GitHub
 rem    ke C:\RBT\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21 secara otomatis.
@@ -42,18 +45,36 @@ for /d %%D in ("%USERPROFILE%\Downloads\*Strategy_4*") do if exist "%%D\MULAI_SE
 for /d %%D in ("%USERPROFILE%\Downloads\*Strategy 4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
 for /d %%D in ("%USERPROFILE%\Downloads\*Strategy4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
 if defined DIR goto ada_folder
+rem ---- [1b] lokasi khusus yg pernah diseret user (S4_LOKASI.txt) ----
+set "LOK="
+if exist "%~dp0S4_LOKASI.txt" set /p LOK=<"%~dp0S4_LOKASI.txt"
+if defined LOK set "LOK=%LOK:"=%"
+if defined LOK for /d %%D in ("%LOK%\*Strategy-4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
+if defined LOK for /d %%D in ("%LOK%\*Strategy_4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
+if defined LOK for /d %%D in ("%LOK%\*Strategy 4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
+if defined LOK for /d %%D in ("%LOK%\*Strategy4*") do if exist "%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%D"
+if defined LOK if exist "%LOK%\MULAI_SEMUA.bat" set "DIR=%LOK%"
+if defined DIR goto ada_folder
 
 rem ---- [2/4] tidak ketemu -> UNDUH OTOMATIS DARI GITHUB ----
+rem ---- token dicari DIAM-DIAM di 5 tempat (v15) - TIDAK DITANYA ----
 set "TOKEN="
 if exist "%~dp0TOKEN.txt" set /p TOKEN=<"%~dp0TOKEN.txt"
 if not defined TOKEN if exist "C:\RBT\TOKEN.txt" set /p TOKEN=<"C:\RBT\TOKEN.txt"
+if not defined TOKEN if exist "%APPDATA%\RBT_FX\gh_token.txt" set /p TOKEN=<"%APPDATA%\RBT_FX\gh_token.txt"
+for /d %%D in ("C:\RBT\*") do if exist "%%D\TOKEN.txt" if not defined TOKEN set /p TOKEN=<"%%D\TOKEN.txt"
 if defined TOKEN goto unduh_langsung
-echo Folder strategy tidak ada - untuk mengunduh dari GitHub perlu token.
-set /p "TOKEN=Paste token GitHub lalu tekan Enter: "
+echo Folder strategy tidak ada DAN token GitHub tidak ketemu di tempat biasa.
+echo CARA PALING MUDAH: jalankan PASANG_BAT_PLUS_TOKEN.bat sekali --
+echo token dipasang otomatis, TIDAK PERLU PASTE APA PUN.
+echo Atau paste token GitHub sekali di bawah (disimpan permanen).
+set /p "TOKEN=Paste token GitHub (Enter untuk batal): "
 if not defined TOKEN goto gagal_input
 if "%TOKEN:~30,1%"=="" goto tok_bad
 >"%~dp0TOKEN.txt" echo %TOKEN%
-echo [OK] Token disimpan - berikutnya tidak ditanya lagi.
+if not exist "%APPDATA%\RBT_FX" mkdir "%APPDATA%\RBT_FX" >nul 2>nul
+>"%APPDATA%\RBT_FX\gh_token.txt" echo %TOKEN%
+echo [OK] Token GitHub disimpan di 2 tempat - TIDAK AKAN DITANYA LAGI.
 :unduh_langsung
 set "DST=C:\RBT\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21"
 echo MENGUNDUH dari GitHub ke %DST% ...
@@ -99,10 +120,12 @@ pause
 exit /b 1
 
 :ada_folder
-rem ---- token: dicari diam-diam di 3 tempat, TIDAK DITANYA ----
+rem ---- token: dicari DIAM-DIAM di 5 tempat (v15) - TIDAK DITANYA ----
 set "TOKEN="
 if exist "%~dp0TOKEN.txt" set /p TOKEN=<"%~dp0TOKEN.txt"
 if not defined TOKEN if exist "C:\RBT\TOKEN.txt" set /p TOKEN=<"C:\RBT\TOKEN.txt"
+if not defined TOKEN if exist "%APPDATA%\RBT_FX\gh_token.txt" set /p TOKEN=<"%APPDATA%\RBT_FX\gh_token.txt"
+for /d %%D in ("C:\RBT\*") do if exist "%%D\TOKEN.txt" if not defined TOKEN set /p TOKEN=<"%%D\TOKEN.txt"
 if not defined TOKEN if exist "%DIR%\TOKEN.txt" set /p TOKEN=<"%DIR%\TOKEN.txt"
 if defined TOKEN set "RBT_GH_TOKEN=%TOKEN%"
 rem ---- update dari GitHub dulu (diam-diam dilewati kalau tanpa token/offline) ----
@@ -138,6 +161,14 @@ set "DASH=python\cc_qtdashboard.py"
 :dashgo
 set "PYW=%PY%"
 for %%P in (%PY%) do if exist "%%~dpPpythonw.exe" set "PYW=%%~dpPpythonw.exe"
+rem ---- v11: matikan proses lama pemegang port 8082 (dashboard web S4).
+rem     Kalau engine lama masih hidup, browser dapat halaman LAMA dan
+rem     engine baru gagal pegang port. Dua cara (netstat+powershell),
+rem     dua-duanya diam kalau tidak ada yang memegang port. ----
+for /f "tokens=5" %%p in ('netstat -aon ^| findstr ":8082" ^| findstr "LISTENING"') do taskkill /F /PID %%p >nul 2>&1
+powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 8082 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }" >nul 2>&1
+powershell -NoProfile -Command "Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object { $_.ProcessId -ne $PID -and ($_.CommandLine -like '*cc_qtdashboard*' -or $_.CommandLine -like '*cc_tkdashboard*') } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }" >nul 2>&1
+wmic process where "CommandLine like '%%cc_qtdashboard%%' or CommandLine like '%%cc_tkdashboard%%'" delete >nul 2>&1
 start "RBT FX DASHBOARD" %PYW% "%DASH%" --port 8082
 echo Dashboard dinyalakan. Engine berjalan DI JENDELA INI - log hidup.
 echo JANGAN tutup jendela ini selama trading.
@@ -175,7 +206,7 @@ if defined USRC goto u_have
 for /d %%D in ("%UDIR%\*") do if exist "%%D\MULAI_SEMUA.bat" if not defined USRC set "USRC=%%D"
 if not defined USRC exit /b 1
 :u_have
-robocopy "%USRC%" "%~2" /E /XF cc_state.json cc_day.json cc_status.json CC_SIGNAL.csv s2_state.json s1_state.json MT5_PATH.txt TOKEN.txt s3_state.json s3_journal.jsonl s3_hist_*.json cc_heartbeat.json telegram_chat.txt telegram_token.txt /XD logs replay __pycache__ .git redist /NFL /NDL /NJH /NJS /NP
+robocopy "%USRC%" "%~2" /E /XF cc_state.json cc_day.json cc_status.json CC_SIGNAL.csv s2_state.json s1_state.json MT5_PATH.txt TOKEN.txt s3_state.json s3_journal.jsonl s3_hist_*.json cc_heartbeat.json telegram_chat.txt telegram_token.txt pair_switch.json pair_lot.json /XD logs replay __pycache__ .git redist /NFL /NDL /NJH /NJS /NP
 if errorlevel 8 exit /b 1
 if not exist "%~2\MULAI_SEMUA.bat" exit /b 1
 if defined TOKEN if not exist "%~2\TOKEN.txt" >"%~2\TOKEN.txt" echo %TOKEN%
