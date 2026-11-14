@@ -2,14 +2,7 @@
 setlocal
 title RBT FX - PASANG 4 FILE BAT MULAI STRATEGY
 cd /d "%~dp0"
-
-rem =================================================================
-rem  PEMASANG 4 BAT MULAI STRATEGY (versi repo - bebas token)
-rem  Sumber token: TOKEN.txt di folder ini; kalau belum ada diminta
-rem  paste sekali lalu disimpan. Untuk pemasangan dengan token
-rem  tertanam, pakai PASANG_BAT_PLUS_TOKEN.bat (file lokal).
-rem =================================================================
-
+rem PEMASANG 4 BAT (versi repo bebas token; token via TOKEN.txt/paste)
 echo ================================================================
 echo    RBT FX - PASANG 4 FILE BAT MULAI STRATEGY
 echo    Folder: %~dp0
@@ -72,9 +65,10 @@ if exist "_rbt_1.b64" del "_rbt_1.b64" >nul 2>nul
 >>"_rbt_1.b64" echo U2VjdXJpdHlQcm90b2NvbFR5cGVdOjpUbHMxMjtJbnZva2UtV2ViUmVxdWVzdCAtVXNlQmFzaWNQYXJzaW5nIC1IZWFkZXJzIEB7QXV0aG9yaXphdGlvbj0nQmVhcmVyICVUT0tFTiUnfSAtVXJpICclVVVSTCUnIC1PdXRGaWxlICclVVpJUCUnfWNhdGNoe2V4aXQgMX0iDQo6dV9jaGsNCmlmIG5vdCBleGlzdCAiJVVaSVAlIiBleG
 >>"_rbt_1.b64" echo l0IC9iIDENCmZvciAlJUYgaW4gKCIlVVpJUCUiKSBkbyBpZiAlJX56RiBMU1MgNTAwMDAgZXhpdCAvYiAxDQpwb3dlcnNoZWxsIC1Ob1Byb2ZpbGUgLUNvbW1hbmQgInRyeXtFeHBhbmQtQXJjaGl2ZSAtRm9yY2UgLUxpdGVyYWxQYXRoICclVVpJUCUnICclVURJUiUnfWNhdGNoe2V4aXQgMX0iDQppZiBleGlzdCAiJVVESVIlXCV+
 >>"_rbt_1.b64" echo MS1tYWluIiBzZXQgIlVTUkM9JVVESVIlXCV+MS1tYWluIg0KaWYgZGVmaW5lZCBVU1JDIGdvdG8gdV9oYXZlDQpmb3IgL2QgJSVEIGluICgiJVVESVIlXCoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgVVNSQyBzZXQgIlVTUkM9JSVEIg0KaWYgbm90IGRlZmluZWQgVVNSQyBleGl0IC
->>"_rbt_1.b64" echo 9iIDENCjp1X2hhdmUNCnJvYm9jb3B5ICIlVVNSQyUiICIlfjIiIC9FIC9YRiBjY19zdGF0ZS5qc29uIGNjX2RheS5qc29uIGNjX3N0YXR1cy5qc29uIENDX1NJR05BTC5jc3YgczJfc3RhdGUuanNvbiBzMV9zdGF0ZS5qc29uIE1UNV9QQVRILnR4dCBUT0tFTi50eHQgL1hEIGxvZ3MgcmVwbGF5IF9fcHljYWNoZV9fIC5naXQgcmVk
->>"_rbt_1.b64" echo aXN0IC9ORkwgL05ETCAvTkpIIC9OSlMgL05QDQppZiBlcnJvcmxldmVsIDggZXhpdCAvYiAxDQppZiBub3QgZXhpc3QgIiV+MlxNVUxBSV9TRU1VQS5iYXQiIGV4aXQgL2IgMQ0KaWYgZGVmaW5lZCBUT0tFTiBpZiBub3QgZXhpc3QgIiV+MlxUT0tFTi50eHQiID4iJX4yXFRPS0VOLnR4dCIgZWNobyAlVE9LRU4lDQppZiBleGlzdC
->>"_rbt_1.b64" echo AiJVVESVIlIiBybWRpciAvcyAvcSAiJVVESVIlIiA+bnVsIDI+bnVsDQppZiBleGlzdCAiJVVaSVAlIiBkZWwgIiVVWklQJSIgPm51bCAyPm51bA0KZXhpdCAvYiAwDQo=
+>>"_rbt_1.b64" echo 9iIDENCjp1X2hhdmUNCnJvYm9jb3B5ICIlVVNSQyUiICIlfjIiIC9FIC9YRiBjY19zdGF0ZS5qc29uIGNjX2RheS5qc29uIGNjX3N0YXR1cy5qc29uIENDX1NJR05BTC5jc3YgczJfc3RhdGUuanNvbiBzMV9zdGF0ZS5qc29uIE1UNV9QQVRILnR4dCBUT0tFTi50eHQgczNfc3RhdGUuanNvbiBzM19qb3VybmFsLmpzb25sIHMzX2hp
+>>"_rbt_1.b64" echo c3RfKi5qc29uIGNjX2hlYXJ0YmVhdC5qc29uIHRlbGVncmFtX2NoYXQudHh0IHRlbGVncmFtX3Rva2VuLnR4dCAvWEQgbG9ncyByZXBsYXkgX19weWNhY2hlX18gLmdpdCByZWRpc3QgL05GTCAvTkRMIC9OSkggL05KUyAvTlANCmlmIGVycm9ybGV2ZWwgOCBleGl0IC9iIDENCmlmIG5vdCBleGlzdCAiJX4yXE1VTEFJX1NFTVVBLm
+>>"_rbt_1.b64" echo JhdCIgZXhpdCAvYiAxDQppZiBkZWZpbmVkIFRPS0VOIGlmIG5vdCBleGlzdCAiJX4yXFRPS0VOLnR4dCIgPiIlfjJcVE9LRU4udHh0IiBlY2hvICVUT0tFTiUNCmlmIGV4aXN0ICIlVURJUiUiIHJtZGlyIC9zIC9xICIlVURJUiUiID5udWwgMj5udWwNCmlmIGV4aXN0ICIlVVpJUCUiIGRlbCAiJVVaSVAlIiA+bnVsIDI+bnVsDQpl
+>>"_rbt_1.b64" echo eGl0IC9iIDANCg==
 certutil -decode "_rbt_1.b64" "MULAI_STRATEGY_1.bat" >nul 2>nul
 if errorlevel 1 goto certfail
 if exist "_rbt_1.b64" del "_rbt_1.b64" >nul 2>nul
@@ -130,9 +124,9 @@ if exist "_rbt_2.b64" del "_rbt_2.b64" >nul 2>nul
 >>"_rbt_2.b64" echo 1Vc2VCYXNpY1BhcnNpbmcgLUhlYWRlcnMgQHtBdXRob3JpemF0aW9uPSdCZWFyZXIgJVRPS0VOJSd9IC1VcmkgJyVVVVJMJScgLU91dEZpbGUgJyVVWklQJSd9Y2F0Y2h7ZXhpdCAxfSINCjp1X2Noaw0KaWYgbm90IGV4aXN0ICIlVVpJUCUiIGV4aXQgL2IgMQ0KZm9yICUlRiBpbiAoIiVVWklQJSIpIGRvIGlmICUlfnpGIExTUyA1
 >>"_rbt_2.b64" echo MDAwMCBleGl0IC9iIDENCnBvd2Vyc2hlbGwgLU5vUHJvZmlsZSAtQ29tbWFuZCAidHJ5e0V4cGFuZC1BcmNoaXZlIC1Gb3JjZSAtTGl0ZXJhbFBhdGggJyVVWklQJScgJyVVRElSJSd9Y2F0Y2h7ZXhpdCAxfSINCmlmIGV4aXN0ICIlVURJUiVcJX4xLW1haW4iIHNldCAiVVNSQz0lVURJUiVcJX4xLW1haW4iDQppZiBkZWZpbmVkIF
 >>"_rbt_2.b64" echo VTUkMgZ290byB1X2hhdmUNCmZvciAvZCAlJUQgaW4gKCIlVURJUiVcKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBVU1JDIHNldCAiVVNSQz0lJUQiDQppZiBub3QgZGVmaW5lZCBVU1JDIGV4aXQgL2IgMQ0KOnVfaGF2ZQ0Kcm9ib2NvcHkgIiVVU1JDJSIgIiV+MiIgL0UgL1hGIGNj
->>"_rbt_2.b64" echo X3N0YXRlLmpzb24gY2NfZGF5Lmpzb24gY2Nfc3RhdHVzLmpzb24gQ0NfU0lHTkFMLmNzdiBzMl9zdGF0ZS5qc29uIHMxX3N0YXRlLmpzb24gTVQ1X1BBVEgudHh0IFRPS0VOLnR4dCAvWEQgbG9ncyByZXBsYXkgX19weWNhY2hlX18gLmdpdCByZWRpc3QgL05GTCAvTkRMIC9OSkggL05KUyAvTlANCmlmIGVycm9ybGV2ZWwgOCBleG
->>"_rbt_2.b64" echo l0IC9iIDENCmlmIG5vdCBleGlzdCAiJX4yXE1VTEFJX1NFTVVBLmJhdCIgZXhpdCAvYiAxDQppZiBkZWZpbmVkIFRPS0VOIGlmIG5vdCBleGlzdCAiJX4yXFRPS0VOLnR4dCIgPiIlfjJcVE9LRU4udHh0IiBlY2hvICVUT0tFTiUNCmlmIGV4aXN0ICIlVURJUiUiIHJtZGlyIC9zIC9xICIlVURJUiUiID5udWwgMj5udWwNCmlmIGV4
->>"_rbt_2.b64" echo aXN0ICIlVVpJUCUiIGRlbCAiJVVaSVAlIiA+bnVsIDI+bnVsDQpleGl0IC9iIDANCg==
+>>"_rbt_2.b64" echo X3N0YXRlLmpzb24gY2NfZGF5Lmpzb24gY2Nfc3RhdHVzLmpzb24gQ0NfU0lHTkFMLmNzdiBzMl9zdGF0ZS5qc29uIHMxX3N0YXRlLmpzb24gTVQ1X1BBVEgudHh0IFRPS0VOLnR4dCBzM19zdGF0ZS5qc29uIHMzX2pvdXJuYWwuanNvbmwgczNfaGlzdF8qLmpzb24gY2NfaGVhcnRiZWF0Lmpzb24gdGVsZWdyYW1fY2hhdC50eHQgdG
+>>"_rbt_2.b64" echo VsZWdyYW1fdG9rZW4udHh0IC9YRCBsb2dzIHJlcGxheSBfX3B5Y2FjaGVfXyAuZ2l0IHJlZGlzdCAvTkZMIC9OREwgL05KSCAvTkpTIC9OUA0KaWYgZXJyb3JsZXZlbCA4IGV4aXQgL2IgMQ0KaWYgbm90IGV4aXN0ICIlfjJcTVVMQUlfU0VNVUEuYmF0IiBleGl0IC9iIDENCmlmIGRlZmluZWQgVE9LRU4gaWYgbm90IGV4aXN0ICIl
+>>"_rbt_2.b64" echo fjJcVE9LRU4udHh0IiA+IiV+MlxUT0tFTi50eHQiIGVjaG8gJVRPS0VOJQ0KaWYgZXhpc3QgIiVVRElSJSIgcm1kaXIgL3MgL3EgIiVVRElSJSIgPm51bCAyPm51bA0KaWYgZXhpc3QgIiVVWklQJSIgZGVsICIlVVpJUCUiID5udWwgMj5udWwNCmV4aXQgL2IgMA0K
 certutil -decode "_rbt_2.b64" "MULAI_STRATEGY_2.bat" >nul 2>nul
 if errorlevel 1 goto certfail
 if exist "_rbt_2.b64" del "_rbt_2.b64" >nul 2>nul
@@ -188,9 +182,9 @@ if exist "_rbt_3.b64" del "_rbt_3.b64" >nul 2>nul
 >>"_rbt_3.b64" echo 1Vc2VCYXNpY1BhcnNpbmcgLUhlYWRlcnMgQHtBdXRob3JpemF0aW9uPSdCZWFyZXIgJVRPS0VOJSd9IC1VcmkgJyVVVVJMJScgLU91dEZpbGUgJyVVWklQJSd9Y2F0Y2h7ZXhpdCAxfSINCjp1X2Noaw0KaWYgbm90IGV4aXN0ICIlVVpJUCUiIGV4aXQgL2IgMQ0KZm9yICUlRiBpbiAoIiVVWklQJSIpIGRvIGlmICUlfnpGIExTUyA1
 >>"_rbt_3.b64" echo MDAwMCBleGl0IC9iIDENCnBvd2Vyc2hlbGwgLU5vUHJvZmlsZSAtQ29tbWFuZCAidHJ5e0V4cGFuZC1BcmNoaXZlIC1Gb3JjZSAtTGl0ZXJhbFBhdGggJyVVWklQJScgJyVVRElSJSd9Y2F0Y2h7ZXhpdCAxfSINCmlmIGV4aXN0ICIlVURJUiVcJX4xLW1haW4iIHNldCAiVVNSQz0lVURJUiVcJX4xLW1haW4iDQppZiBkZWZpbmVkIF
 >>"_rbt_3.b64" echo VTUkMgZ290byB1X2hhdmUNCmZvciAvZCAlJUQgaW4gKCIlVURJUiVcKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBVU1JDIHNldCAiVVNSQz0lJUQiDQppZiBub3QgZGVmaW5lZCBVU1JDIGV4aXQgL2IgMQ0KOnVfaGF2ZQ0Kcm9ib2NvcHkgIiVVU1JDJSIgIiV+MiIgL0UgL1hGIGNj
->>"_rbt_3.b64" echo X3N0YXRlLmpzb24gY2NfZGF5Lmpzb24gY2Nfc3RhdHVzLmpzb24gQ0NfU0lHTkFMLmNzdiBzMl9zdGF0ZS5qc29uIHMxX3N0YXRlLmpzb24gTVQ1X1BBVEgudHh0IFRPS0VOLnR4dCAvWEQgbG9ncyByZXBsYXkgX19weWNhY2hlX18gLmdpdCByZWRpc3QgL05GTCAvTkRMIC9OSkggL05KUyAvTlANCmlmIGVycm9ybGV2ZWwgOCBleG
->>"_rbt_3.b64" echo l0IC9iIDENCmlmIG5vdCBleGlzdCAiJX4yXE1VTEFJX1NFTVVBLmJhdCIgZXhpdCAvYiAxDQppZiBkZWZpbmVkIFRPS0VOIGlmIG5vdCBleGlzdCAiJX4yXFRPS0VOLnR4dCIgPiIlfjJcVE9LRU4udHh0IiBlY2hvICVUT0tFTiUNCmlmIGV4aXN0ICIlVURJUiUiIHJtZGlyIC9zIC9xICIlVURJUiUiID5udWwgMj5udWwNCmlmIGV4
->>"_rbt_3.b64" echo aXN0ICIlVVpJUCUiIGRlbCAiJVVaSVAlIiA+bnVsIDI+bnVsDQpleGl0IC9iIDANCg==
+>>"_rbt_3.b64" echo X3N0YXRlLmpzb24gY2NfZGF5Lmpzb24gY2Nfc3RhdHVzLmpzb24gQ0NfU0lHTkFMLmNzdiBzMl9zdGF0ZS5qc29uIHMxX3N0YXRlLmpzb24gTVQ1X1BBVEgudHh0IFRPS0VOLnR4dCBzM19zdGF0ZS5qc29uIHMzX2pvdXJuYWwuanNvbmwgczNfaGlzdF8qLmpzb24gY2NfaGVhcnRiZWF0Lmpzb24gdGVsZWdyYW1fY2hhdC50eHQgdG
+>>"_rbt_3.b64" echo VsZWdyYW1fdG9rZW4udHh0IC9YRCBsb2dzIHJlcGxheSBfX3B5Y2FjaGVfXyAuZ2l0IHJlZGlzdCAvTkZMIC9OREwgL05KSCAvTkpTIC9OUA0KaWYgZXJyb3JsZXZlbCA4IGV4aXQgL2IgMQ0KaWYgbm90IGV4aXN0ICIlfjJcTVVMQUlfU0VNVUEuYmF0IiBleGl0IC9iIDENCmlmIGRlZmluZWQgVE9LRU4gaWYgbm90IGV4aXN0ICIl
+>>"_rbt_3.b64" echo fjJcVE9LRU4udHh0IiA+IiV+MlxUT0tFTi50eHQiIGVjaG8gJVRPS0VOJQ0KaWYgZXhpc3QgIiVVRElSJSIgcm1kaXIgL3MgL3EgIiVVRElSJSIgPm51bCAyPm51bA0KaWYgZXhpc3QgIiVVWklQJSIgZGVsICIlVVpJUCUiID5udWwgMj5udWwNCmV4aXQgL2IgMA0K
 certutil -decode "_rbt_3.b64" "MULAI_STRATEGY_3.bat" >nul 2>nul
 if errorlevel 1 goto certfail
 if exist "_rbt_3.b64" del "_rbt_3.b64" >nul 2>nul
@@ -246,9 +240,10 @@ if exist "_rbt_4.b64" del "_rbt_4.b64" >nul 2>nul
 >>"_rbt_4.b64" echo RNYW5hZ2VyXTo6U2VjdXJpdHlQcm90b2NvbD1bTmV0LlNlY3VyaXR5UHJvdG9jb2xUeXBlXTo6VGxzMTI7SW52b2tlLVdlYlJlcXVlc3QgLVVzZUJhc2ljUGFyc2luZyAtSGVhZGVycyBAe0F1dGhvcml6YXRpb249J0JlYXJlciAlVE9LRU4lJ30gLVVyaSAnJVVVUkwlJyAtT3V0RmlsZSAnJVVaSVAlJ31jYXRjaHtleGl0IDF9Ig0K
 >>"_rbt_4.b64" echo OnVfY2hrDQppZiBub3QgZXhpc3QgIiVVWklQJSIgZXhpdCAvYiAxDQpmb3IgJSVGIGluICgiJVVaSVAlIikgZG8gaWYgJSV+ekYgTFNTIDUwMDAwIGV4aXQgL2IgMQ0KcG93ZXJzaGVsbCAtTm9Qcm9maWxlIC1Db21tYW5kICJ0cnl7RXhwYW5kLUFyY2hpdmUgLUZvcmNlIC1MaXRlcmFsUGF0aCAnJVVaSVAlJyAnJVVESVIlJ31jYX
 >>"_rbt_4.b64" echo RjaHtleGl0IDF9Ig0KaWYgZXhpc3QgIiVVRElSJVwlfjEtbWFpbiIgc2V0ICJVU1JDPSVVRElSJVwlfjEtbWFpbiINCmlmIGRlZmluZWQgVVNSQyBnb3RvIHVfaGF2ZQ0KZm9yIC9kICUlRCBpbiAoIiVVRElSJVwqIikgZG8gaWYgZXhpc3QgIiUlRFxNVUxBSV9TRU1VQS5iYXQiIGlmIG5vdCBkZWZpbmVkIFVTUkMgc2V0ICJVU1JD
->>"_rbt_4.b64" echo PSUlRCINCmlmIG5vdCBkZWZpbmVkIFVTUkMgZXhpdCAvYiAxDQo6dV9oYXZlDQpyb2JvY29weSAiJVVTUkMlIiAiJX4yIiAvRSAvWEYgY2Nfc3RhdGUuanNvbiBjY19kYXkuanNvbiBjY19zdGF0dXMuanNvbiBDQ19TSUdOQUwuY3N2IHMyX3N0YXRlLmpzb24gczFfc3RhdGUuanNvbiBNVDVfUEFUSC50eHQgVE9LRU4udHh0IC9YRC
->>"_rbt_4.b64" echo Bsb2dzIHJlcGxheSBfX3B5Y2FjaGVfXyAuZ2l0IHJlZGlzdCAvTkZMIC9OREwgL05KSCAvTkpTIC9OUA0KaWYgZXJyb3JsZXZlbCA4IGV4aXQgL2IgMQ0KaWYgbm90IGV4aXN0ICIlfjJcTVVMQUlfU0VNVUEuYmF0IiBleGl0IC9iIDENCmlmIGRlZmluZWQgVE9LRU4gaWYgbm90IGV4aXN0ICIlfjJcVE9LRU4udHh0IiA+IiV+MlxU
->>"_rbt_4.b64" echo T0tFTi50eHQiIGVjaG8gJVRPS0VOJQ0KaWYgZXhpc3QgIiVVRElSJSIgcm1kaXIgL3MgL3EgIiVVRElSJSIgPm51bCAyPm51bA0KaWYgZXhpc3QgIiVVWklQJSIgZGVsICIlVVpJUCUiID5udWwgMj5udWwNCmV4aXQgL2IgMA0K
+>>"_rbt_4.b64" echo PSUlRCINCmlmIG5vdCBkZWZpbmVkIFVTUkMgZXhpdCAvYiAxDQo6dV9oYXZlDQpyb2JvY29weSAiJVVTUkMlIiAiJX4yIiAvRSAvWEYgY2Nfc3RhdGUuanNvbiBjY19kYXkuanNvbiBjY19zdGF0dXMuanNvbiBDQ19TSUdOQUwuY3N2IHMyX3N0YXRlLmpzb24gczFfc3RhdGUuanNvbiBNVDVfUEFUSC50eHQgVE9LRU4udHh0IHMzX3
+>>"_rbt_4.b64" echo N0YXRlLmpzb24gczNfam91cm5hbC5qc29ubCBzM19oaXN0XyouanNvbiBjY19oZWFydGJlYXQuanNvbiB0ZWxlZ3JhbV9jaGF0LnR4dCB0ZWxlZ3JhbV90b2tlbi50eHQgL1hEIGxvZ3MgcmVwbGF5IF9fcHljYWNoZV9fIC5naXQgcmVkaXN0IC9ORkwgL05ETCAvTkpIIC9OSlMgL05QDQppZiBlcnJvcmxldmVsIDggZXhpdCAvYiAx
+>>"_rbt_4.b64" echo DQppZiBub3QgZXhpc3QgIiV+MlxNVUxBSV9TRU1VQS5iYXQiIGV4aXQgL2IgMQ0KaWYgZGVmaW5lZCBUT0tFTiBpZiBub3QgZXhpc3QgIiV+MlxUT0tFTi50eHQiID4iJX4yXFRPS0VOLnR4dCIgZWNobyAlVE9LRU4lDQppZiBleGlzdCAiJVVESVIlIiBybWRpciAvcyAvcSAiJVVESVIlIiA+bnVsIDI+bnVsDQppZiBleGlzdCAiJV
+>>"_rbt_4.b64" echo VaSVAlIiBkZWwgIiVVWklQJSIgPm51bCAyPm51bA0KZXhpdCAvYiAwDQo=
 certutil -decode "_rbt_4.b64" "MULAI_STRATEGY_4.bat" >nul 2>nul
 if errorlevel 1 goto certfail
 if exist "_rbt_4.b64" del "_rbt_4.b64" >nul 2>nul
@@ -274,24 +269,3 @@ if exist "_rbt_R4.b64" del "_rbt_R4.b64" >nul 2>nul
 if not exist "RBT_FX_STRATEGY4.bat" goto certfail
 echo [OK] RBT_FX_STRATEGY4.bat dipasang (byte-perfect)
 
-rem ---- salin bat ke dalam tiap folder strategy yang ada ----
-if exist "C:\RBT\Sistem-Trading-Strategy-1\" copy /Y "MULAI_STRATEGY_1.bat" "C:\RBT\Sistem-Trading-Strategy-1\" >nul
-if exist "C:\RBT\Sistem-Trading-Strategy-2\" copy /Y "MULAI_STRATEGY_2.bat" "C:\RBT\Sistem-Trading-Strategy-2\" >nul
-if exist "C:\RBT\Sistem-Trading-Strategy-3\" copy /Y "MULAI_STRATEGY_3.bat" "C:\RBT\Sistem-Trading-Strategy-3\" >nul
-if exist "C:\RBT\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21\" copy /Y "MULAI_STRATEGY_4.bat" "C:\RBT\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21\" >nul
-if exist "C:\RBT\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21\" copy /Y "RBT_FX_STRATEGY4.bat" "C:\RBT\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21\" >nul
-echo [OK] salinan ditaruh di dalam tiap folder strategy yang ketemu.
-echo.
-echo ================================================================
-echo    SELESAI! Klik 2x MULAI_STRATEGY_1.bat - atau 2 / 3 / 4 -
-echo    untuk menyalakan strategy pilihan Anda.
-echo ================================================================
-echo.
-pause
-exit /b 0
-
-:certfail
-echo [X] certutil gagal menulis file. FOTO LAYAR ini lalu kirim ke chat.
-echo.
-pause
-exit /b 1

@@ -175,7 +175,7 @@ if defined USRC goto u_have
 for /d %%D in ("%UDIR%\*") do if exist "%%D\MULAI_SEMUA.bat" if not defined USRC set "USRC=%%D"
 if not defined USRC exit /b 1
 :u_have
-robocopy "%USRC%" "%~2" /E /XF cc_state.json cc_day.json cc_status.json CC_SIGNAL.csv s2_state.json s1_state.json MT5_PATH.txt TOKEN.txt  s3_state.json s3_journal.jsonl s3_hist_*.json cc_heartbeat.json telegram_chat.txt telegram_token.txt/XD logs replay __pycache__ .git redist /NFL /NDL /NJH /NJS /NP
+robocopy "%USRC%" "%~2" /E /XF cc_state.json cc_day.json cc_status.json CC_SIGNAL.csv s2_state.json s1_state.json MT5_PATH.txt TOKEN.txt s3_state.json s3_journal.jsonl s3_hist_*.json cc_heartbeat.json telegram_chat.txt telegram_token.txt /XD logs replay __pycache__ .git redist /NFL /NDL /NJH /NJS /NP
 if errorlevel 8 exit /b 1
 if not exist "%~2\MULAI_SEMUA.bat" exit /b 1
 if defined TOKEN if not exist "%~2\TOKEN.txt" >"%~2\TOKEN.txt" echo %TOKEN%
