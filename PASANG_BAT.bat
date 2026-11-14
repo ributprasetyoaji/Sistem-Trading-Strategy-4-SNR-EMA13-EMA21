@@ -1,619 +1,240 @@
 @echo off
-setlocal enableextensions
+setlocal
 title RBT FX - PASANG 4 FILE BAT MULAI STRATEGY
 cd /d "%~dp0"
 
 rem =================================================================
-rem  PEMASANG 4 FILE BAT - MULAI STRATEGY 1/2/3/4
-rem  File bat DIBUAT LANGSUNG oleh program ini di folder ini:
-rem  tanpa internet, tanpa token, tanpa zip - jadi PASTI UTUH
-rem  dan tidak bisa diblokir/rusak saat unduh.
-rem  Caranya: taruh file ini di C:\RBT lalu klik 2x.
+rem  PEMASANG 4 FILE BAT (metode BASE64+CERTUTIL)
+rem  Byte-perfect: tidak bisa rusak oleh cmd (tanpa penulis-echo).
+rem  Taruh file ini di C:\RBT lalu klik 2x. Tutup dulu jendela trading.
 rem =================================================================
 
 echo ================================================================
 echo    RBT FX - PASANG 4 FILE BAT MULAI STRATEGY
-echo    Membuat MULAI_STRATEGY_1.bat s/d 4.bat di folder ini...
 echo    Folder: %~dp0
 echo ================================================================
 echo.
-
-
-
 rem ====== MULAI_STRATEGY_1.bat ======
 if exist "MULAI_STRATEGY_1.bat" del "MULAI_STRATEGY_1.bat" >nul 2>nul
->>"MULAI_STRATEGY_1.bat" echo @echo off
->>"MULAI_STRATEGY_1.bat" echo setlocal
->>"MULAI_STRATEGY_1.bat" echo title RBT FX - STRATEGY 1
->>"MULAI_STRATEGY_1.bat" echo rem ================================================================
->>"MULAI_STRATEGY_1.bat" echo rem  MULAI STRATEGY 1 - FINAL v7
->>"MULAI_STRATEGY_1.bat" echo rem  Cari otomatis di: samping file ini, C:\RBT, Desktop,
->>"MULAI_STRATEGY_1.bat" echo rem  OneDrive Desktop, Documents, Downloads (nama folder bebas).
->>"MULAI_STRATEGY_1.bat" echo rem  Kalau tidak ketemu: cukup SERET folder strategy ke jendela ini
->>"MULAI_STRATEGY_1.bat" echo rem  - lokasi DIINGAT selamanya - berikutnya otomatis lagi.
->>"MULAI_STRATEGY_1.bat" echo rem ================================================================
->>"MULAI_STRATEGY_1.bat" echo set "DIR="
->>"MULAI_STRATEGY_1.bat" echo set "DIRF="
->>"MULAI_STRATEGY_1.bat" echo if exist "%%~dp0S1_LOKASI.txt" set /p DIR=<"%%~dp0S1_LOKASI.txt"
->>"MULAI_STRATEGY_1.bat" echo if defined DIR if exist "%%DIR%%\MULAI_SEMUA.bat" goto mulai
->>"MULAI_STRATEGY_1.bat" echo set "DIR="
->>"MULAI_STRATEGY_1.bat" echo if exist "%%~dp0MULAI_SEMUA.bat" set "DIR=%%~dp0"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%~dp0*Strategy-1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%~dp0*Strategy_1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%~dp0*Strategy 1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%~dp0*Strategy1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("C:\RBT\*Strategy-1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("C:\RBT\*Strategy_1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("C:\RBT\*Strategy 1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("C:\RBT\*Strategy1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy-1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy_1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy 1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy-1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy_1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy 1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy-1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy_1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy 1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy-1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy_1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy 1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo if defined DIR goto mulai
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%~dp0*Strategy-1*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("C:\RBT\*Strategy-1*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy-1*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy-1*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy-1*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy-1*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo if defined DIRF goto engine
->>"MULAI_STRATEGY_1.bat" echo echo [X] Folder STRATEGY 1 tidak ketemu otomatis.
->>"MULAI_STRATEGY_1.bat" echo echo.
->>"MULAI_STRATEGY_1.bat" echo echo ---- INFO UNTUK DIAGNOSIS (kalau mampir foto layar ini) ----
->>"MULAI_STRATEGY_1.bat" echo echo Profil Windows: %%USERPROFILE%%
->>"MULAI_STRATEGY_1.bat" echo dir /b "C:\RBT" 2>nul | findstr /I "strategy"
->>"MULAI_STRATEGY_1.bat" echo dir /b "%%USERPROFILE%%\Desktop" 2>nul | findstr /I "strategy"
->>"MULAI_STRATEGY_1.bat" echo dir /b "%%USERPROFILE%%\Downloads" 2>nul | findstr /I "strategy"
->>"MULAI_STRATEGY_1.bat" echo dir /b "%%~dp0" | findstr /I "strategy"
->>"MULAI_STRATEGY_1.bat" echo echo ---- AKHIR INFO ----
->>"MULAI_STRATEGY_1.bat" echo echo.
->>"MULAI_STRATEGY_1.bat" echo echo ====== CARA PASTI (10 detik) ======
->>"MULAI_STRATEGY_1.bat" echo echo 1. Buka File Explorer (ikon folder kuning di taskbar)
->>"MULAI_STRATEGY_1.bat" echo echo 2. Cari folder Sistem-Trading-Strategy-1
->>"MULAI_STRATEGY_1.bat" echo echo 3. SERET folder itu pakai mouse ke JENDELA HITAM INI
->>"MULAI_STRATEGY_1.bat" echo echo 4. Lepaskan di dalam jendela ini, lalu tekan Enter
->>"MULAI_STRATEGY_1.bat" echo echo.
->>"MULAI_STRATEGY_1.bat" echo set /p "LOK=Seret folder ke sini lalu tekan Enter: "
->>"MULAI_STRATEGY_1.bat" echo set "LOK=%%LOK:"=%%"
->>"MULAI_STRATEGY_1.bat" echo if not defined LOK goto gagal_input
->>"MULAI_STRATEGY_1.bat" echo for /d %%%%D in ("%%LOK%%\*Strategy-1*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_1.bat" echo if exist "%%LOK%%\Sistem-Trading-Strategy-1\MULAI_SEMUA.bat" set "DIR=%%LOK%%\Sistem-Trading-Strategy-1"
->>"MULAI_STRATEGY_1.bat" echo if exist "%%LOK%%\MULAI_SEMUA.bat" set "DIR=%%LOK%%"
->>"MULAI_STRATEGY_1.bat" echo if not defined DIR goto input_salah
->>"MULAI_STRATEGY_1.bat" echo >"%%~dp0S1_LOKASI.txt" echo %%LOK%%
->>"MULAI_STRATEGY_1.bat" echo echo [OK] Lokasi disimpan: %%DIR%%
->>"MULAI_STRATEGY_1.bat" echo goto mulai
->>"MULAI_STRATEGY_1.bat" echo.
->>"MULAI_STRATEGY_1.bat" echo :input_salah
->>"MULAI_STRATEGY_1.bat" echo echo [X] Di folder yang diseret tidak ada MULAI_SEMUA.bat.
->>"MULAI_STRATEGY_1.bat" echo echo Kemungkinan yang diseret folder induk atau folder salah.
->>"MULAI_STRATEGY_1.bat" echo echo Seret folder yang DI DALAMNYA terlihat MULAI_SEMUA.bat.
->>"MULAI_STRATEGY_1.bat" echo echo.
->>"MULAI_STRATEGY_1.bat" echo pause
->>"MULAI_STRATEGY_1.bat" echo exit /b 1
->>"MULAI_STRATEGY_1.bat" echo.
->>"MULAI_STRATEGY_1.bat" echo :gagal_input
->>"MULAI_STRATEGY_1.bat" echo echo Tidak ada input. Klik 2x file ini lagi untuk mencoba.
->>"MULAI_STRATEGY_1.bat" echo echo.
->>"MULAI_STRATEGY_1.bat" echo pause
->>"MULAI_STRATEGY_1.bat" echo exit /b 1
->>"MULAI_STRATEGY_1.bat" echo.
->>"MULAI_STRATEGY_1.bat" echo :mulai
->>"MULAI_STRATEGY_1.bat" echo cd /d "%%DIR%%"
->>"MULAI_STRATEGY_1.bat" echo findstr /C:"TOKEN.txt" "MULAI_SEMUA.bat" >nul 2>nul
->>"MULAI_STRATEGY_1.bat" echo if errorlevel 1 goto oldbat
->>"MULAI_STRATEGY_1.bat" echo echo Menyalakan STRATEGY 1 di %%DIR%% ...
->>"MULAI_STRATEGY_1.bat" echo call "MULAI_SEMUA.bat"
->>"MULAI_STRATEGY_1.bat" echo goto selesai
->>"MULAI_STRATEGY_1.bat" echo.
->>"MULAI_STRATEGY_1.bat" echo :oldbat
->>"MULAI_STRATEGY_1.bat" echo echo MULAI_SEMUA.bat versi LAMA terdeteksi - jalur update lamanya selalu GAGAL.
->>"MULAI_STRATEGY_1.bat" echo echo Engine plus dashboard dinyalakan LANGSUNG melewatinya.
->>"MULAI_STRATEGY_1.bat" echo echo.
->>"MULAI_STRATEGY_1.bat" echo goto startdirect
->>"MULAI_STRATEGY_1.bat" echo.
->>"MULAI_STRATEGY_1.bat" echo :engine
->>"MULAI_STRATEGY_1.bat" echo cd /d "%%DIRF%%"
->>"MULAI_STRATEGY_1.bat" echo echo MULAI_SEMUA.bat belum ada di folder itu - engine dinyalakan langsung.
->>"MULAI_STRATEGY_1.bat" echo :startdirect
->>"MULAI_STRATEGY_1.bat" echo set "PY="
->>"MULAI_STRATEGY_1.bat" echo python --version >nul 2>nul
->>"MULAI_STRATEGY_1.bat" echo if not errorlevel 1 set "PY=python"
->>"MULAI_STRATEGY_1.bat" echo if defined PY goto pyok
->>"MULAI_STRATEGY_1.bat" echo py -3 --version >nul 2>nul
->>"MULAI_STRATEGY_1.bat" echo if not errorlevel 1 set "PY=py -3"
->>"MULAI_STRATEGY_1.bat" echo if defined PY goto pyok
->>"MULAI_STRATEGY_1.bat" echo echo [X] Python tidak ketemu di VPS ini.
->>"MULAI_STRATEGY_1.bat" echo echo Buka folder %%CD%% lalu klik 2x MULAI_SEMUA.bat di dalamnya.
->>"MULAI_STRATEGY_1.bat" echo echo.
->>"MULAI_STRATEGY_1.bat" echo pause
->>"MULAI_STRATEGY_1.bat" echo exit /b 1
->>"MULAI_STRATEGY_1.bat" echo.
->>"MULAI_STRATEGY_1.bat" echo :pyok
->>"MULAI_STRATEGY_1.bat" echo set "DASH=python\cc_tkdashboard.py"
->>"MULAI_STRATEGY_1.bat" echo %%PY%% -c "import PySide6" >nul 2>nul
->>"MULAI_STRATEGY_1.bat" echo if errorlevel 1 goto dashgo
->>"MULAI_STRATEGY_1.bat" echo set "DASH=python\cc_qtdashboard.py"
->>"MULAI_STRATEGY_1.bat" echo :dashgo
->>"MULAI_STRATEGY_1.bat" echo set "PYW=%%PY%%"
->>"MULAI_STRATEGY_1.bat" echo for %%%%P in (%%PY%%) do if exist "%%%%~dpPpythonw.exe" set "PYW=%%%%~dpPpythonw.exe"
->>"MULAI_STRATEGY_1.bat" echo start "RBT FX DASHBOARD" %%PYW%% "%%DASH%%" --port 8080
->>"MULAI_STRATEGY_1.bat" echo echo Dashboard dinyalakan. Engine berjalan DI JENDELA INI - log hidup di bawah.
->>"MULAI_STRATEGY_1.bat" echo echo JANGAN tutup jendela ini selama trading.
->>"MULAI_STRATEGY_1.bat" echo echo.
->>"MULAI_STRATEGY_1.bat" echo %%PY%% -u python\command_center.py
->>"MULAI_STRATEGY_1.bat" echo goto selesai
->>"MULAI_STRATEGY_1.bat" echo.
->>"MULAI_STRATEGY_1.bat" echo :selesai
->>"MULAI_STRATEGY_1.bat" echo echo.
->>"MULAI_STRATEGY_1.bat" echo echo STRATEGY 1 berhenti. Klik 2x file ini lagi untuk menyalakan.
->>"MULAI_STRATEGY_1.bat" echo echo.
->>"MULAI_STRATEGY_1.bat" echo pause
->>"MULAI_STRATEGY_1.bat" echo exit /b 0
->>"MULAI_STRATEGY_1.bat" echo.
-if exist "MULAI_STRATEGY_1.bat" echo [OK] MULAI_STRATEGY_1.bat dibuat
+if exist "_rbt_1.b64" del "_rbt_1.b64" >nul 2>nul
+>>"_rbt_1.b64" echo QGVjaG8gb2ZmDQpzZXRsb2NhbA0KdGl0bGUgUkJUIEZYIC0gU1RSQVRFR1kgMQ0KcmVtID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCnJlbSAgTVVMQUkgU1RSQVRFR1kgMSAtIEZJTkFMIHY3DQpyZW0gIENhcmkgb3RvbWF0aXMgZGk6IHNhbXBpbmcgZmlsZS
+>>"_rbt_1.b64" echo BpbmksIEM6XFJCVCwgRGVza3RvcCwNCnJlbSAgT25lRHJpdmUgRGVza3RvcCwgRG9jdW1lbnRzLCBEb3dubG9hZHMgKG5hbWEgZm9sZGVyIGJlYmFzKS4NCnJlbSAgS2FsYXUgdGlkYWsga2V0ZW11OiBjdWt1cCBTRVJFVCBmb2xkZXIgc3RyYXRlZ3kga2UgamVuZGVsYSBpbmkNCnJlbSAgLSBsb2thc2kgRElJTkdBVCBzZWxhbWFu
+>>"_rbt_1.b64" echo eWEgLSBiZXJpa3V0bnlhIG90b21hdGlzIGxhZ2kuDQpyZW0gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0Kc2V0ICJESVI9Ig0Kc2V0ICJESVJGPSINCmlmIGV4aXN0ICIlfmRwMFMxX0xPS0FTSS50eHQiIHNldCAvcCBESVI9PCIlfmRwMFMxX0xPS0FTSS50eH
+>>"_rbt_1.b64" echo QiDQppZiBkZWZpbmVkIERJUiBpZiBleGlzdCAiJURJUiVcTVVMQUlfU0VNVUEuYmF0IiBnb3RvIG11bGFpDQpzZXQgIkRJUj0iDQppZiBleGlzdCAiJX5kcDBNVUxBSV9TRU1VQS5iYXQiIHNldCAiRElSPSV+ZHAwIg0KZm9yIC9kICUlRCBpbiAoIiV+ZHAwKlN0cmF0ZWd5LTEqIikgZG8gaWYgZXhpc3QgIiUlRFxNVUxBSV9TRU1V
+>>"_rbt_1.b64" echo QS5iYXQiIGlmIG5vdCBkZWZpbmVkIERJUiBzZXQgIkRJUj0lJUQiDQpmb3IgL2QgJSVEIGluICgiJX5kcDAqU3RyYXRlZ3lfMSoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlfmRwMCpTdHJhdGVneSAxKiIpIGRvIGlmIG
+>>"_rbt_1.b64" echo V4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiV+ZHAwKlN0cmF0ZWd5MSoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCJDOlxSQlRc
+>>"_rbt_1.b64" echo KlN0cmF0ZWd5LTEqIikgZG8gaWYgZXhpc3QgIiUlRFxNVUxBSV9TRU1VQS5iYXQiIGlmIG5vdCBkZWZpbmVkIERJUiBzZXQgIkRJUj0lJUQiDQpmb3IgL2QgJSVEIGluICgiQzpcUkJUXCpTdHJhdGVneV8xKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg
+>>"_rbt_1.b64" echo 0KZm9yIC9kICUlRCBpbiAoIkM6XFJCVFwqU3RyYXRlZ3kgMSoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCJDOlxSQlRcKlN0cmF0ZWd5MSoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRl
+>>"_rbt_1.b64" echo ZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERlc2t0b3BcKlN0cmF0ZWd5LTEqIikgZG8gaWYgZXhpc3QgIiUlRFxNVUxBSV9TRU1VQS5iYXQiIGlmIG5vdCBkZWZpbmVkIERJUiBzZXQgIkRJUj0lJUQiDQpmb3IgL2QgJSVEIGluICgiJVVTRVJQUk9GSUxFJVxEZXNrdG9wXCpTdH
+>>"_rbt_1.b64" echo JhdGVneV8xKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRGVza3RvcFwqU3RyYXRlZ3kgMSoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNl
+>>"_rbt_1.b64" echo dCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERlc2t0b3BcKlN0cmF0ZWd5MSoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXE9uZURyaXZlXERlc2t0b3BcKlN0cmF0ZW
+>>"_rbt_1.b64" echo d5LTEqIikgZG8gaWYgZXhpc3QgIiUlRFxNVUxBSV9TRU1VQS5iYXQiIGlmIG5vdCBkZWZpbmVkIERJUiBzZXQgIkRJUj0lJUQiDQpmb3IgL2QgJSVEIGluICgiJVVTRVJQUk9GSUxFJVxPbmVEcml2ZVxEZXNrdG9wXCpTdHJhdGVneV8xKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBE
+>>"_rbt_1.b64" echo SVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcT25lRHJpdmVcRGVza3RvcFwqU3RyYXRlZ3kgMSoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXE9uZURyaXZlXE
+>>"_rbt_1.b64" echo Rlc2t0b3BcKlN0cmF0ZWd5MSoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERvY3VtZW50c1wqU3RyYXRlZ3ktMSoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRl
+>>"_rbt_1.b64" echo ZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERvY3VtZW50c1wqU3RyYXRlZ3lfMSoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERvY3VtZW50c1
+>>"_rbt_1.b64" echo wqU3RyYXRlZ3kgMSoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERvY3VtZW50c1wqU3RyYXRlZ3kxKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBE
+>>"_rbt_1.b64" echo SVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRG93bmxvYWRzXCpTdHJhdGVneS0xKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRG93bmxvYWRzXCpTdHJhdG
+>>"_rbt_1.b64" echo VneV8xKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRG93bmxvYWRzXCpTdHJhdGVneSAxKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0
+>>"_rbt_1.b64" echo ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRG93bmxvYWRzXCpTdHJhdGVneTEqIikgZG8gaWYgZXhpc3QgIiUlRFxNVUxBSV9TRU1VQS5iYXQiIGlmIG5vdCBkZWZpbmVkIERJUiBzZXQgIkRJUj0lJUQiDQppZiBkZWZpbmVkIERJUiBnb3RvIG11bGFpDQpmb3IgL2QgJSVEIGluICgiJX5kcDAqU3RyYX
+>>"_rbt_1.b64" echo RlZ3ktMSoiKSBkbyBpZiBub3QgZGVmaW5lZCBESVJGIHNldCAiRElSRj0lJUQiDQpmb3IgL2QgJSVEIGluICgiQzpcUkJUXCpTdHJhdGVneS0xKiIpIGRvIGlmIG5vdCBkZWZpbmVkIERJUkYgc2V0ICJESVJGPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERlc2t0b3BcKlN0cmF0ZWd5LTEqIikgZG8gaWYgbm90
+>>"_rbt_1.b64" echo IGRlZmluZWQgRElSRiBzZXQgIkRJUkY9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcT25lRHJpdmVcRGVza3RvcFwqU3RyYXRlZ3ktMSoiKSBkbyBpZiBub3QgZGVmaW5lZCBESVJGIHNldCAiRElSRj0lJUQiDQpmb3IgL2QgJSVEIGluICgiJVVTRVJQUk9GSUxFJVxEb2N1bWVudHNcKlN0cmF0ZWd5LTEqIikgZG
+>>"_rbt_1.b64" echo 8gaWYgbm90IGRlZmluZWQgRElSRiBzZXQgIkRJUkY9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRG93bmxvYWRzXCpTdHJhdGVneS0xKiIpIGRvIGlmIG5vdCBkZWZpbmVkIERJUkYgc2V0ICJESVJGPSUlRCINCmlmIGRlZmluZWQgRElSRiBnb3RvIGVuZ2luZQ0KZWNobyBbWF0gRm9sZGVyIFNUUkFURUdZIDEg
+>>"_rbt_1.b64" echo dGlkYWsga2V0ZW11IG90b21hdGlzLg0KZWNoby4NCmVjaG8gLS0tLSBJTkZPIFVOVFVLIERJQUdOT1NJUyAoa2FsYXUgbWFtcGlyIGZvdG8gbGF5YXIgaW5pKSAtLS0tDQplY2hvIFByb2ZpbCBXaW5kb3dzOiAlVVNFUlBST0ZJTEUlDQpkaXIgL2IgIkM6XFJCVCIgMj5udWwgfCBmaW5kc3RyIC9JICJzdHJhdGVneSINCmRpciAvYi
+>>"_rbt_1.b64" echo AiJVVTRVJQUk9GSUxFJVxEZXNrdG9wIiAyPm51bCB8IGZpbmRzdHIgL0kgInN0cmF0ZWd5Ig0KZGlyIC9iICIlVVNFUlBST0ZJTEUlXERvd25sb2FkcyIgMj5udWwgfCBmaW5kc3RyIC9JICJzdHJhdGVneSINCmRpciAvYiAiJX5kcDAuIiB8IGZpbmRzdHIgL0kgInN0cmF0ZWd5Ig0KZWNobyAtLS0tIEFLSElSIElORk8gLS0tLQ0K
+>>"_rbt_1.b64" echo ZWNoby4NCmVjaG8gPT09PT09IENBUkEgUEFTVEkgKDEwIGRldGlrKSA9PT09PT0NCmVjaG8gMS4gQnVrYSBGaWxlIEV4cGxvcmVyIChpa29uIGZvbGRlciBrdW5pbmcgZGkgdGFza2JhcikNCmVjaG8gMi4gQ2FyaSBmb2xkZXIgU2lzdGVtLVRyYWRpbmctU3RyYXRlZ3ktMQ0KZWNobyAzLiBTRVJFVCBmb2xkZXIgaXR1IHBha2FpIG
+>>"_rbt_1.b64" echo 1vdXNlIGtlIEpFTkRFTEEgSElUQU0gSU5JDQplY2hvIDQuIExlcGFza2FuIGRpIGRhbGFtIGplbmRlbGEgaW5pLCBsYWx1IHRla2FuIEVudGVyDQplY2hvLg0Kc2V0IC9wICJMT0s9U2VyZXQgZm9sZGVyIGtlIHNpbmkgbGFsdSB0ZWthbiBFbnRlcjogIg0Kc2V0ICJMT0s9JUxPSzoiPSUiDQppZiBub3QgZGVmaW5lZCBMT0sgZ290
+>>"_rbt_1.b64" echo byBnYWdhbF9pbnB1dA0KZm9yIC9kICUlRCBpbiAoIiVMT0slXCpTdHJhdGVneS0xKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg0KaWYgZXhpc3QgIiVMT0slXFNpc3RlbS1UcmFkaW5nLVN0cmF0ZWd5LTFcTVVMQUlfU0VNVUEuYmF0IiBzZXQgIkRJUj
+>>"_rbt_1.b64" echo 0lTE9LJVxTaXN0ZW0tVHJhZGluZy1TdHJhdGVneS0xIg0KaWYgZXhpc3QgIiVMT0slXE1VTEFJX1NFTVVBLmJhdCIgc2V0ICJESVI9JUxPSyUiDQppZiBub3QgZGVmaW5lZCBESVIgZ290byBpbnB1dF9zYWxhaA0KPiIlfmRwMFMxX0xPS0FTSS50eHQiIGVjaG8gJUxPSyUNCmVjaG8gW09LXSBMb2thc2kgZGlzaW1wYW46ICVESVIl
+>>"_rbt_1.b64" echo DQpnb3RvIG11bGFpDQoNCjppbnB1dF9zYWxhaA0KZWNobyBbWF0gRGkgZm9sZGVyIHlhbmcgZGlzZXJldCB0aWRhayBhZGEgTVVMQUlfU0VNVUEuYmF0Lg0KZWNobyBLZW11bmdraW5hbiB5YW5nIGRpc2VyZXQgZm9sZGVyIGluZHVrIGF0YXUgZm9sZGVyIHNhbGFoLg0KZWNobyBTZXJldCBmb2xkZXIgeWFuZyBESSBEQUxBTU5ZQS
+>>"_rbt_1.b64" echo B0ZXJsaWhhdCBNVUxBSV9TRU1VQS5iYXQuDQplY2hvLg0KcGF1c2UNCmV4aXQgL2IgMQ0KDQo6Z2FnYWxfaW5wdXQNCmVjaG8gVGlkYWsgYWRhIGlucHV0LiBLbGlrIDJ4IGZpbGUgaW5pIGxhZ2kgdW50dWsgbWVuY29iYS4NCmVjaG8uDQpwYXVzZQ0KZXhpdCAvYiAxDQoNCjptdWxhaQ0KY2QgL2QgIiVESVIlIg0KZmluZHN0ciAv
+>>"_rbt_1.b64" echo QzoiVE9LRU4udHh0IiAiTVVMQUlfU0VNVUEuYmF0IiA+bnVsIDI+bnVsDQppZiBlcnJvcmxldmVsIDEgZ290byBvbGRiYXQNCmVjaG8gTWVueWFsYWthbiBTVFJBVEVHWSAxIGRpICVESVIlIC4uLg0KY2FsbCAiTVVMQUlfU0VNVUEuYmF0Ig0KZ290byBzZWxlc2FpDQoNCjpvbGRiYXQNCmVjaG8gTVVMQUlfU0VNVUEuYmF0IHZlcn
+>>"_rbt_1.b64" echo NpIExBTUEgdGVyZGV0ZWtzaSAtIGphbHVyIHVwZGF0ZSBsYW1hbnlhIHNlbGFsdSBHQUdBTC4NCmVjaG8gRW5naW5lIHBsdXMgZGFzaGJvYXJkIGRpbnlhbGFrYW4gTEFOR1NVTkcgbWVsZXdhdGlueWEuDQplY2hvLg0KZ290byBzdGFydGRpcmVjdA0KDQo6ZW5naW5lDQpjZCAvZCAiJURJUkYlIg0KZWNobyBNVUxBSV9TRU1VQS5i
+>>"_rbt_1.b64" echo YXQgYmVsdW0gYWRhIGRpIGZvbGRlciBpdHUgLSBlbmdpbmUgZGlueWFsYWthbiBsYW5nc3VuZy4NCjpzdGFydGRpcmVjdA0Kc2V0ICJQWT0iDQpweXRob24gLS12ZXJzaW9uID5udWwgMj5udWwNCmlmIG5vdCBlcnJvcmxldmVsIDEgc2V0ICJQWT1weXRob24iDQppZiBkZWZpbmVkIFBZIGdvdG8gcHlvaw0KcHkgLTMgLS12ZXJzaW
+>>"_rbt_1.b64" echo 9uID5udWwgMj5udWwNCmlmIG5vdCBlcnJvcmxldmVsIDEgc2V0ICJQWT1weSAtMyINCmlmIGRlZmluZWQgUFkgZ290byBweW9rDQplY2hvIFtYXSBQeXRob24gdGlkYWsga2V0ZW11IGRpIFZQUyBpbmkuDQplY2hvIEJ1a2EgZm9sZGVyICVDRCUgbGFsdSBrbGlrIDJ4IE1VTEFJX1NFTVVBLmJhdCBkaSBkYWxhbW55YS4NCmVjaG8u
+>>"_rbt_1.b64" echo DQpwYXVzZQ0KZXhpdCAvYiAxDQoNCjpweW9rDQpzZXQgIkRBU0g9cHl0aG9uXGNjX3RrZGFzaGJvYXJkLnB5Ig0KJVBZJSAtYyAiaW1wb3J0IFB5U2lkZTYiID5udWwgMj5udWwNCmlmIGVycm9ybGV2ZWwgMSBnb3RvIGRhc2hnbw0Kc2V0ICJEQVNIPXB5dGhvblxjY19xdGRhc2hib2FyZC5weSINCjpkYXNoZ28NCnNldCAiUFlXPS
+>>"_rbt_1.b64" echo VQWSUiDQpmb3IgJSVQIGluICglUFklKSBkbyBpZiBleGlzdCAiJSV+ZHBQcHl0aG9udy5leGUiIHNldCAiUFlXPSUlfmRwUHB5dGhvbncuZXhlIg0Kc3RhcnQgIlJCVCBGWCBEQVNIQk9BUkQiICVQWVclICIlREFTSCUiIC0tcG9ydCA4MDgwDQplY2hvIERhc2hib2FyZCBkaW55YWxha2FuLiBFbmdpbmUgYmVyamFsYW4gREkgSkVO
+>>"_rbt_1.b64" echo REVMQSBJTkkgLSBsb2cgaGlkdXAgZGkgYmF3YWguDQplY2hvIEpBTkdBTiB0dXR1cCBqZW5kZWxhIGluaSBzZWxhbWEgdHJhZGluZy4NCmVjaG8uDQolUFklIC11IHB5dGhvblxjb21tYW5kX2NlbnRlci5weQ0KZ290byBzZWxlc2FpDQoNCjpzZWxlc2FpDQplY2hvLg0KZWNobyBTVFJBVEVHWSAxIGJlcmhlbnRpLiBLbGlrIDJ4IG
+>>"_rbt_1.b64" echo ZpbGUgaW5pIGxhZ2kgdW50dWsgbWVueWFsYWthbi4NCmVjaG8uDQpwYXVzZQ0KZXhpdCAvYiAwDQo=
+certutil -decode "_rbt_1.b64" "MULAI_STRATEGY_1.bat" >nul 2>nul
+if errorlevel 1 goto certfail
+if exist "_rbt_1.b64" del "_rbt_1.b64" >nul 2>nul
+if not exist "MULAI_STRATEGY_1.bat" goto certfail
+echo [OK] MULAI_STRATEGY_1.bat dipasang (byte-perfect)
 
 rem ====== MULAI_STRATEGY_2.bat ======
 if exist "MULAI_STRATEGY_2.bat" del "MULAI_STRATEGY_2.bat" >nul 2>nul
->>"MULAI_STRATEGY_2.bat" echo @echo off
->>"MULAI_STRATEGY_2.bat" echo setlocal
->>"MULAI_STRATEGY_2.bat" echo title RBT FX - STRATEGY 2
->>"MULAI_STRATEGY_2.bat" echo rem ================================================================
->>"MULAI_STRATEGY_2.bat" echo rem  MULAI STRATEGY 2 - FINAL v7
->>"MULAI_STRATEGY_2.bat" echo rem  Cari otomatis di: samping file ini, C:\RBT, Desktop,
->>"MULAI_STRATEGY_2.bat" echo rem  OneDrive Desktop, Documents, Downloads (nama folder bebas).
->>"MULAI_STRATEGY_2.bat" echo rem  Kalau tidak ketemu: cukup SERET folder strategy ke jendela ini
->>"MULAI_STRATEGY_2.bat" echo rem  - lokasi DIINGAT selamanya - berikutnya otomatis lagi.
->>"MULAI_STRATEGY_2.bat" echo rem ================================================================
->>"MULAI_STRATEGY_2.bat" echo set "DIR="
->>"MULAI_STRATEGY_2.bat" echo set "DIRF="
->>"MULAI_STRATEGY_2.bat" echo if exist "%%~dp0S2_LOKASI.txt" set /p DIR=<"%%~dp0S2_LOKASI.txt"
->>"MULAI_STRATEGY_2.bat" echo if defined DIR if exist "%%DIR%%\MULAI_SEMUA.bat" goto mulai
->>"MULAI_STRATEGY_2.bat" echo set "DIR="
->>"MULAI_STRATEGY_2.bat" echo if exist "%%~dp0MULAI_SEMUA.bat" set "DIR=%%~dp0"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%~dp0*Strategy-2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%~dp0*Strategy_2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%~dp0*Strategy 2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%~dp0*Strategy2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("C:\RBT\*Strategy-2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("C:\RBT\*Strategy_2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("C:\RBT\*Strategy 2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("C:\RBT\*Strategy2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy-2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy_2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy 2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy-2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy_2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy 2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy-2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy_2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy 2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy-2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy_2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy 2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo if defined DIR goto mulai
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%~dp0*Strategy-2*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("C:\RBT\*Strategy-2*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy-2*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy-2*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy-2*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy-2*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo if defined DIRF goto engine
->>"MULAI_STRATEGY_2.bat" echo echo [X] Folder STRATEGY 2 tidak ketemu otomatis.
->>"MULAI_STRATEGY_2.bat" echo echo.
->>"MULAI_STRATEGY_2.bat" echo echo ---- INFO UNTUK DIAGNOSIS (kalau mampir foto layar ini) ----
->>"MULAI_STRATEGY_2.bat" echo echo Profil Windows: %%USERPROFILE%%
->>"MULAI_STRATEGY_2.bat" echo dir /b "C:\RBT" 2>nul | findstr /I "strategy"
->>"MULAI_STRATEGY_2.bat" echo dir /b "%%USERPROFILE%%\Desktop" 2>nul | findstr /I "strategy"
->>"MULAI_STRATEGY_2.bat" echo dir /b "%%USERPROFILE%%\Downloads" 2>nul | findstr /I "strategy"
->>"MULAI_STRATEGY_2.bat" echo dir /b "%%~dp0" | findstr /I "strategy"
->>"MULAI_STRATEGY_2.bat" echo echo ---- AKHIR INFO ----
->>"MULAI_STRATEGY_2.bat" echo echo.
->>"MULAI_STRATEGY_2.bat" echo echo ====== CARA PASTI (10 detik) ======
->>"MULAI_STRATEGY_2.bat" echo echo 1. Buka File Explorer (ikon folder kuning di taskbar)
->>"MULAI_STRATEGY_2.bat" echo echo 2. Cari folder Sistem-Trading-Strategy-2
->>"MULAI_STRATEGY_2.bat" echo echo 3. SERET folder itu pakai mouse ke JENDELA HITAM INI
->>"MULAI_STRATEGY_2.bat" echo echo 4. Lepaskan di dalam jendela ini, lalu tekan Enter
->>"MULAI_STRATEGY_2.bat" echo echo.
->>"MULAI_STRATEGY_2.bat" echo set /p "LOK=Seret folder ke sini lalu tekan Enter: "
->>"MULAI_STRATEGY_2.bat" echo set "LOK=%%LOK:"=%%"
->>"MULAI_STRATEGY_2.bat" echo if not defined LOK goto gagal_input
->>"MULAI_STRATEGY_2.bat" echo for /d %%%%D in ("%%LOK%%\*Strategy-2*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_2.bat" echo if exist "%%LOK%%\Sistem-Trading-Strategy-2\MULAI_SEMUA.bat" set "DIR=%%LOK%%\Sistem-Trading-Strategy-2"
->>"MULAI_STRATEGY_2.bat" echo if exist "%%LOK%%\MULAI_SEMUA.bat" set "DIR=%%LOK%%"
->>"MULAI_STRATEGY_2.bat" echo if not defined DIR goto input_salah
->>"MULAI_STRATEGY_2.bat" echo >"%%~dp0S2_LOKASI.txt" echo %%LOK%%
->>"MULAI_STRATEGY_2.bat" echo echo [OK] Lokasi disimpan: %%DIR%%
->>"MULAI_STRATEGY_2.bat" echo goto mulai
->>"MULAI_STRATEGY_2.bat" echo.
->>"MULAI_STRATEGY_2.bat" echo :input_salah
->>"MULAI_STRATEGY_2.bat" echo echo [X] Di folder yang diseret tidak ada MULAI_SEMUA.bat.
->>"MULAI_STRATEGY_2.bat" echo echo Kemungkinan yang diseret folder induk atau folder salah.
->>"MULAI_STRATEGY_2.bat" echo echo Seret folder yang DI DALAMNYA terlihat MULAI_SEMUA.bat.
->>"MULAI_STRATEGY_2.bat" echo echo.
->>"MULAI_STRATEGY_2.bat" echo pause
->>"MULAI_STRATEGY_2.bat" echo exit /b 1
->>"MULAI_STRATEGY_2.bat" echo.
->>"MULAI_STRATEGY_2.bat" echo :gagal_input
->>"MULAI_STRATEGY_2.bat" echo echo Tidak ada input. Klik 2x file ini lagi untuk mencoba.
->>"MULAI_STRATEGY_2.bat" echo echo.
->>"MULAI_STRATEGY_2.bat" echo pause
->>"MULAI_STRATEGY_2.bat" echo exit /b 1
->>"MULAI_STRATEGY_2.bat" echo.
->>"MULAI_STRATEGY_2.bat" echo :mulai
->>"MULAI_STRATEGY_2.bat" echo cd /d "%%DIR%%"
->>"MULAI_STRATEGY_2.bat" echo echo Menyalakan STRATEGY 2 di %%DIR%% ...
->>"MULAI_STRATEGY_2.bat" echo call "MULAI_SEMUA.bat"
->>"MULAI_STRATEGY_2.bat" echo goto selesai
->>"MULAI_STRATEGY_2.bat" echo.
->>"MULAI_STRATEGY_2.bat" echo :engine
->>"MULAI_STRATEGY_2.bat" echo cd /d "%%DIRF%%"
->>"MULAI_STRATEGY_2.bat" echo echo MULAI_SEMUA.bat belum ada di folder itu - engine dinyalakan langsung.
->>"MULAI_STRATEGY_2.bat" echo :startdirect
->>"MULAI_STRATEGY_2.bat" echo set "PY="
->>"MULAI_STRATEGY_2.bat" echo python --version >nul 2>nul
->>"MULAI_STRATEGY_2.bat" echo if not errorlevel 1 set "PY=python"
->>"MULAI_STRATEGY_2.bat" echo if defined PY goto pyok
->>"MULAI_STRATEGY_2.bat" echo py -3 --version >nul 2>nul
->>"MULAI_STRATEGY_2.bat" echo if not errorlevel 1 set "PY=py -3"
->>"MULAI_STRATEGY_2.bat" echo if defined PY goto pyok
->>"MULAI_STRATEGY_2.bat" echo echo [X] Python tidak ketemu di VPS ini.
->>"MULAI_STRATEGY_2.bat" echo echo Buka folder %%CD%% lalu klik 2x MULAI_SEMUA.bat di dalamnya.
->>"MULAI_STRATEGY_2.bat" echo echo.
->>"MULAI_STRATEGY_2.bat" echo pause
->>"MULAI_STRATEGY_2.bat" echo exit /b 1
->>"MULAI_STRATEGY_2.bat" echo.
->>"MULAI_STRATEGY_2.bat" echo :pyok
->>"MULAI_STRATEGY_2.bat" echo set "DASH=python\cc_tkdashboard.py"
->>"MULAI_STRATEGY_2.bat" echo %%PY%% -c "import PySide6" >nul 2>nul
->>"MULAI_STRATEGY_2.bat" echo if errorlevel 1 goto dashgo
->>"MULAI_STRATEGY_2.bat" echo set "DASH=python\cc_qtdashboard.py"
->>"MULAI_STRATEGY_2.bat" echo :dashgo
->>"MULAI_STRATEGY_2.bat" echo set "PYW=%%PY%%"
->>"MULAI_STRATEGY_2.bat" echo for %%%%P in (%%PY%%) do if exist "%%%%~dpPpythonw.exe" set "PYW=%%%%~dpPpythonw.exe"
->>"MULAI_STRATEGY_2.bat" echo start "RBT FX DASHBOARD" %%PYW%% "%%DASH%%" --port 8082
->>"MULAI_STRATEGY_2.bat" echo echo Dashboard dinyalakan. Engine berjalan DI JENDELA INI - log hidup di bawah.
->>"MULAI_STRATEGY_2.bat" echo echo JANGAN tutup jendela ini selama trading.
->>"MULAI_STRATEGY_2.bat" echo echo.
->>"MULAI_STRATEGY_2.bat" echo %%PY%% -u python\command_center.py
->>"MULAI_STRATEGY_2.bat" echo goto selesai
->>"MULAI_STRATEGY_2.bat" echo.
->>"MULAI_STRATEGY_2.bat" echo :selesai
->>"MULAI_STRATEGY_2.bat" echo echo.
->>"MULAI_STRATEGY_2.bat" echo echo STRATEGY 2 berhenti. Klik 2x file ini lagi untuk menyalakan.
->>"MULAI_STRATEGY_2.bat" echo echo.
->>"MULAI_STRATEGY_2.bat" echo pause
->>"MULAI_STRATEGY_2.bat" echo exit /b 0
->>"MULAI_STRATEGY_2.bat" echo.
-if exist "MULAI_STRATEGY_2.bat" echo [OK] MULAI_STRATEGY_2.bat dibuat
+if exist "_rbt_2.b64" del "_rbt_2.b64" >nul 2>nul
+>>"_rbt_2.b64" echo QGVjaG8gb2ZmDQpzZXRsb2NhbA0KdGl0bGUgUkJUIEZYIC0gU1RSQVRFR1kgMg0KcmVtID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCnJlbSAgTVVMQUkgU1RSQVRFR1kgMiAtIEZJTkFMIHY3DQpyZW0gIENhcmkgb3RvbWF0aXMgZGk6IHNhbXBpbmcgZmlsZS
+>>"_rbt_2.b64" echo BpbmksIEM6XFJCVCwgRGVza3RvcCwNCnJlbSAgT25lRHJpdmUgRGVza3RvcCwgRG9jdW1lbnRzLCBEb3dubG9hZHMgKG5hbWEgZm9sZGVyIGJlYmFzKS4NCnJlbSAgS2FsYXUgdGlkYWsga2V0ZW11OiBjdWt1cCBTRVJFVCBmb2xkZXIgc3RyYXRlZ3kga2UgamVuZGVsYSBpbmkNCnJlbSAgLSBsb2thc2kgRElJTkdBVCBzZWxhbWFu
+>>"_rbt_2.b64" echo eWEgLSBiZXJpa3V0bnlhIG90b21hdGlzIGxhZ2kuDQpyZW0gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0Kc2V0ICJESVI9Ig0Kc2V0ICJESVJGPSINCmlmIGV4aXN0ICIlfmRwMFMyX0xPS0FTSS50eHQiIHNldCAvcCBESVI9PCIlfmRwMFMyX0xPS0FTSS50eH
+>>"_rbt_2.b64" echo QiDQppZiBkZWZpbmVkIERJUiBpZiBleGlzdCAiJURJUiVcTVVMQUlfU0VNVUEuYmF0IiBnb3RvIG11bGFpDQpzZXQgIkRJUj0iDQppZiBleGlzdCAiJX5kcDBNVUxBSV9TRU1VQS5iYXQiIHNldCAiRElSPSV+ZHAwIg0KZm9yIC9kICUlRCBpbiAoIiV+ZHAwKlN0cmF0ZWd5LTIqIikgZG8gaWYgZXhpc3QgIiUlRFxNVUxBSV9TRU1V
+>>"_rbt_2.b64" echo QS5iYXQiIGlmIG5vdCBkZWZpbmVkIERJUiBzZXQgIkRJUj0lJUQiDQpmb3IgL2QgJSVEIGluICgiJX5kcDAqU3RyYXRlZ3lfMioiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlfmRwMCpTdHJhdGVneSAyKiIpIGRvIGlmIG
+>>"_rbt_2.b64" echo V4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiV+ZHAwKlN0cmF0ZWd5MioiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCJDOlxSQlRc
+>>"_rbt_2.b64" echo KlN0cmF0ZWd5LTIqIikgZG8gaWYgZXhpc3QgIiUlRFxNVUxBSV9TRU1VQS5iYXQiIGlmIG5vdCBkZWZpbmVkIERJUiBzZXQgIkRJUj0lJUQiDQpmb3IgL2QgJSVEIGluICgiQzpcUkJUXCpTdHJhdGVneV8yKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg
+>>"_rbt_2.b64" echo 0KZm9yIC9kICUlRCBpbiAoIkM6XFJCVFwqU3RyYXRlZ3kgMioiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCJDOlxSQlRcKlN0cmF0ZWd5MioiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRl
+>>"_rbt_2.b64" echo ZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERlc2t0b3BcKlN0cmF0ZWd5LTIqIikgZG8gaWYgZXhpc3QgIiUlRFxNVUxBSV9TRU1VQS5iYXQiIGlmIG5vdCBkZWZpbmVkIERJUiBzZXQgIkRJUj0lJUQiDQpmb3IgL2QgJSVEIGluICgiJVVTRVJQUk9GSUxFJVxEZXNrdG9wXCpTdH
+>>"_rbt_2.b64" echo JhdGVneV8yKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRGVza3RvcFwqU3RyYXRlZ3kgMioiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNl
+>>"_rbt_2.b64" echo dCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERlc2t0b3BcKlN0cmF0ZWd5MioiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXE9uZURyaXZlXERlc2t0b3BcKlN0cmF0ZW
+>>"_rbt_2.b64" echo d5LTIqIikgZG8gaWYgZXhpc3QgIiUlRFxNVUxBSV9TRU1VQS5iYXQiIGlmIG5vdCBkZWZpbmVkIERJUiBzZXQgIkRJUj0lJUQiDQpmb3IgL2QgJSVEIGluICgiJVVTRVJQUk9GSUxFJVxPbmVEcml2ZVxEZXNrdG9wXCpTdHJhdGVneV8yKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBE
+>>"_rbt_2.b64" echo SVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcT25lRHJpdmVcRGVza3RvcFwqU3RyYXRlZ3kgMioiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXE9uZURyaXZlXE
+>>"_rbt_2.b64" echo Rlc2t0b3BcKlN0cmF0ZWd5MioiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERvY3VtZW50c1wqU3RyYXRlZ3ktMioiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRl
+>>"_rbt_2.b64" echo ZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERvY3VtZW50c1wqU3RyYXRlZ3lfMioiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERvY3VtZW50c1
+>>"_rbt_2.b64" echo wqU3RyYXRlZ3kgMioiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERvY3VtZW50c1wqU3RyYXRlZ3kyKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBE
+>>"_rbt_2.b64" echo SVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRG93bmxvYWRzXCpTdHJhdGVneS0yKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRG93bmxvYWRzXCpTdHJhdG
+>>"_rbt_2.b64" echo VneV8yKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRG93bmxvYWRzXCpTdHJhdGVneSAyKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0
+>>"_rbt_2.b64" echo ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRG93bmxvYWRzXCpTdHJhdGVneTIqIikgZG8gaWYgZXhpc3QgIiUlRFxNVUxBSV9TRU1VQS5iYXQiIGlmIG5vdCBkZWZpbmVkIERJUiBzZXQgIkRJUj0lJUQiDQppZiBkZWZpbmVkIERJUiBnb3RvIG11bGFpDQpmb3IgL2QgJSVEIGluICgiJX5kcDAqU3RyYX
+>>"_rbt_2.b64" echo RlZ3ktMioiKSBkbyBpZiBub3QgZGVmaW5lZCBESVJGIHNldCAiRElSRj0lJUQiDQpmb3IgL2QgJSVEIGluICgiQzpcUkJUXCpTdHJhdGVneS0yKiIpIGRvIGlmIG5vdCBkZWZpbmVkIERJUkYgc2V0ICJESVJGPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERlc2t0b3BcKlN0cmF0ZWd5LTIqIikgZG8gaWYgbm90
+>>"_rbt_2.b64" echo IGRlZmluZWQgRElSRiBzZXQgIkRJUkY9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcT25lRHJpdmVcRGVza3RvcFwqU3RyYXRlZ3ktMioiKSBkbyBpZiBub3QgZGVmaW5lZCBESVJGIHNldCAiRElSRj0lJUQiDQpmb3IgL2QgJSVEIGluICgiJVVTRVJQUk9GSUxFJVxEb2N1bWVudHNcKlN0cmF0ZWd5LTIqIikgZG
+>>"_rbt_2.b64" echo 8gaWYgbm90IGRlZmluZWQgRElSRiBzZXQgIkRJUkY9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRG93bmxvYWRzXCpTdHJhdGVneS0yKiIpIGRvIGlmIG5vdCBkZWZpbmVkIERJUkYgc2V0ICJESVJGPSUlRCINCmlmIGRlZmluZWQgRElSRiBnb3RvIGVuZ2luZQ0KZWNobyBbWF0gRm9sZGVyIFNUUkFURUdZIDIg
+>>"_rbt_2.b64" echo dGlkYWsga2V0ZW11IG90b21hdGlzLg0KZWNoby4NCmVjaG8gLS0tLSBJTkZPIFVOVFVLIERJQUdOT1NJUyAoa2FsYXUgbWFtcGlyIGZvdG8gbGF5YXIgaW5pKSAtLS0tDQplY2hvIFByb2ZpbCBXaW5kb3dzOiAlVVNFUlBST0ZJTEUlDQpkaXIgL2IgIkM6XFJCVCIgMj5udWwgfCBmaW5kc3RyIC9JICJzdHJhdGVneSINCmRpciAvYi
+>>"_rbt_2.b64" echo AiJVVTRVJQUk9GSUxFJVxEZXNrdG9wIiAyPm51bCB8IGZpbmRzdHIgL0kgInN0cmF0ZWd5Ig0KZGlyIC9iICIlVVNFUlBST0ZJTEUlXERvd25sb2FkcyIgMj5udWwgfCBmaW5kc3RyIC9JICJzdHJhdGVneSINCmRpciAvYiAiJX5kcDAuIiB8IGZpbmRzdHIgL0kgInN0cmF0ZWd5Ig0KZWNobyAtLS0tIEFLSElSIElORk8gLS0tLQ0K
+>>"_rbt_2.b64" echo ZWNoby4NCmVjaG8gPT09PT09IENBUkEgUEFTVEkgKDEwIGRldGlrKSA9PT09PT0NCmVjaG8gMS4gQnVrYSBGaWxlIEV4cGxvcmVyIChpa29uIGZvbGRlciBrdW5pbmcgZGkgdGFza2JhcikNCmVjaG8gMi4gQ2FyaSBmb2xkZXIgU2lzdGVtLVRyYWRpbmctU3RyYXRlZ3ktMg0KZWNobyAzLiBTRVJFVCBmb2xkZXIgaXR1IHBha2FpIG
+>>"_rbt_2.b64" echo 1vdXNlIGtlIEpFTkRFTEEgSElUQU0gSU5JDQplY2hvIDQuIExlcGFza2FuIGRpIGRhbGFtIGplbmRlbGEgaW5pLCBsYWx1IHRla2FuIEVudGVyDQplY2hvLg0Kc2V0IC9wICJMT0s9U2VyZXQgZm9sZGVyIGtlIHNpbmkgbGFsdSB0ZWthbiBFbnRlcjogIg0Kc2V0ICJMT0s9JUxPSzoiPSUiDQppZiBub3QgZGVmaW5lZCBMT0sgZ290
+>>"_rbt_2.b64" echo byBnYWdhbF9pbnB1dA0KZm9yIC9kICUlRCBpbiAoIiVMT0slXCpTdHJhdGVneS0yKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg0KaWYgZXhpc3QgIiVMT0slXFNpc3RlbS1UcmFkaW5nLVN0cmF0ZWd5LTJcTVVMQUlfU0VNVUEuYmF0IiBzZXQgIkRJUj
+>>"_rbt_2.b64" echo 0lTE9LJVxTaXN0ZW0tVHJhZGluZy1TdHJhdGVneS0yIg0KaWYgZXhpc3QgIiVMT0slXE1VTEFJX1NFTVVBLmJhdCIgc2V0ICJESVI9JUxPSyUiDQppZiBub3QgZGVmaW5lZCBESVIgZ290byBpbnB1dF9zYWxhaA0KPiIlfmRwMFMyX0xPS0FTSS50eHQiIGVjaG8gJUxPSyUNCmVjaG8gW09LXSBMb2thc2kgZGlzaW1wYW46ICVESVIl
+>>"_rbt_2.b64" echo DQpnb3RvIG11bGFpDQoNCjppbnB1dF9zYWxhaA0KZWNobyBbWF0gRGkgZm9sZGVyIHlhbmcgZGlzZXJldCB0aWRhayBhZGEgTVVMQUlfU0VNVUEuYmF0Lg0KZWNobyBLZW11bmdraW5hbiB5YW5nIGRpc2VyZXQgZm9sZGVyIGluZHVrIGF0YXUgZm9sZGVyIHNhbGFoLg0KZWNobyBTZXJldCBmb2xkZXIgeWFuZyBESSBEQUxBTU5ZQS
+>>"_rbt_2.b64" echo B0ZXJsaWhhdCBNVUxBSV9TRU1VQS5iYXQuDQplY2hvLg0KcGF1c2UNCmV4aXQgL2IgMQ0KDQo6Z2FnYWxfaW5wdXQNCmVjaG8gVGlkYWsgYWRhIGlucHV0LiBLbGlrIDJ4IGZpbGUgaW5pIGxhZ2kgdW50dWsgbWVuY29iYS4NCmVjaG8uDQpwYXVzZQ0KZXhpdCAvYiAxDQoNCjptdWxhaQ0KY2QgL2QgIiVESVIlIg0KZWNobyBNZW55
+>>"_rbt_2.b64" echo YWxha2FuIFNUUkFURUdZIDIgZGkgJURJUiUgLi4uDQpjYWxsICJNVUxBSV9TRU1VQS5iYXQiDQpnb3RvIHNlbGVzYWkNCg0KOmVuZ2luZQ0KY2QgL2QgIiVESVJGJSINCmVjaG8gTVVMQUlfU0VNVUEuYmF0IGJlbHVtIGFkYSBkaSBmb2xkZXIgaXR1IC0gZW5naW5lIGRpbnlhbGFrYW4gbGFuZ3N1bmcuDQo6c3RhcnRkaXJlY3QNCn
+>>"_rbt_2.b64" echo NldCAiUFk9Ig0KcHl0aG9uIC0tdmVyc2lvbiA+bnVsIDI+bnVsDQppZiBub3QgZXJyb3JsZXZlbCAxIHNldCAiUFk9cHl0aG9uIg0KaWYgZGVmaW5lZCBQWSBnb3RvIHB5b2sNCnB5IC0zIC0tdmVyc2lvbiA+bnVsIDI+bnVsDQppZiBub3QgZXJyb3JsZXZlbCAxIHNldCAiUFk9cHkgLTMiDQppZiBkZWZpbmVkIFBZIGdvdG8gcHlv
+>>"_rbt_2.b64" echo aw0KZWNobyBbWF0gUHl0aG9uIHRpZGFrIGtldGVtdSBkaSBWUFMgaW5pLg0KZWNobyBCdWthIGZvbGRlciAlQ0QlIGxhbHUga2xpayAyeCBNVUxBSV9TRU1VQS5iYXQgZGkgZGFsYW1ueWEuDQplY2hvLg0KcGF1c2UNCmV4aXQgL2IgMQ0KDQo6cHlvaw0Kc2V0ICJEQVNIPXB5dGhvblxjY190a2Rhc2hib2FyZC5weSINCiVQWSUgLW
+>>"_rbt_2.b64" echo MgImltcG9ydCBQeVNpZGU2IiA+bnVsIDI+bnVsDQppZiBlcnJvcmxldmVsIDEgZ290byBkYXNoZ28NCnNldCAiREFTSD1weXRob25cY2NfcXRkYXNoYm9hcmQucHkiDQo6ZGFzaGdvDQpzZXQgIlBZVz0lUFklIg0KZm9yICUlUCBpbiAoJVBZJSkgZG8gaWYgZXhpc3QgIiUlfmRwUHB5dGhvbncuZXhlIiBzZXQgIlBZVz0lJX5kcFBw
+>>"_rbt_2.b64" echo eXRob253LmV4ZSINCnN0YXJ0ICJSQlQgRlggREFTSEJPQVJEIiAlUFlXJSAiJURBU0glIiAtLXBvcnQgODA4Mg0KZWNobyBEYXNoYm9hcmQgZGlueWFsYWthbi4gRW5naW5lIGJlcmphbGFuIERJIEpFTkRFTEEgSU5JIC0gbG9nIGhpZHVwIGRpIGJhd2FoLg0KZWNobyBKQU5HQU4gdHV0dXAgamVuZGVsYSBpbmkgc2VsYW1hIHRyYW
+>>"_rbt_2.b64" echo RpbmcuDQplY2hvLg0KJVBZJSAtdSBweXRob25cY29tbWFuZF9jZW50ZXIucHkNCmdvdG8gc2VsZXNhaQ0KDQo6c2VsZXNhaQ0KZWNoby4NCmVjaG8gU1RSQVRFR1kgMiBiZXJoZW50aS4gS2xpayAyeCBmaWxlIGluaSBsYWdpIHVudHVrIG1lbnlhbGFrYW4uDQplY2hvLg0KcGF1c2UNCmV4aXQgL2IgMA0K
+certutil -decode "_rbt_2.b64" "MULAI_STRATEGY_2.bat" >nul 2>nul
+if errorlevel 1 goto certfail
+if exist "_rbt_2.b64" del "_rbt_2.b64" >nul 2>nul
+if not exist "MULAI_STRATEGY_2.bat" goto certfail
+echo [OK] MULAI_STRATEGY_2.bat dipasang (byte-perfect)
 
 rem ====== MULAI_STRATEGY_3.bat ======
 if exist "MULAI_STRATEGY_3.bat" del "MULAI_STRATEGY_3.bat" >nul 2>nul
->>"MULAI_STRATEGY_3.bat" echo @echo off
->>"MULAI_STRATEGY_3.bat" echo setlocal
->>"MULAI_STRATEGY_3.bat" echo title RBT FX - STRATEGY 3
->>"MULAI_STRATEGY_3.bat" echo rem ================================================================
->>"MULAI_STRATEGY_3.bat" echo rem  MULAI STRATEGY 3 - FINAL v7
->>"MULAI_STRATEGY_3.bat" echo rem  Cari otomatis di: samping file ini, C:\RBT, Desktop,
->>"MULAI_STRATEGY_3.bat" echo rem  OneDrive Desktop, Documents, Downloads (nama folder bebas).
->>"MULAI_STRATEGY_3.bat" echo rem  Kalau tidak ketemu: cukup SERET folder strategy ke jendela ini
->>"MULAI_STRATEGY_3.bat" echo rem  - lokasi DIINGAT selamanya - berikutnya otomatis lagi.
->>"MULAI_STRATEGY_3.bat" echo rem ================================================================
->>"MULAI_STRATEGY_3.bat" echo set "DIR="
->>"MULAI_STRATEGY_3.bat" echo set "DIRF="
->>"MULAI_STRATEGY_3.bat" echo if exist "%%~dp0S3_LOKASI.txt" set /p DIR=<"%%~dp0S3_LOKASI.txt"
->>"MULAI_STRATEGY_3.bat" echo if defined DIR if exist "%%DIR%%\MULAI_SEMUA.bat" goto mulai
->>"MULAI_STRATEGY_3.bat" echo set "DIR="
->>"MULAI_STRATEGY_3.bat" echo if exist "%%~dp0MULAI_SEMUA.bat" set "DIR=%%~dp0"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%~dp0*Strategy-3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%~dp0*Strategy_3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%~dp0*Strategy 3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%~dp0*Strategy3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("C:\RBT\*Strategy-3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("C:\RBT\*Strategy_3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("C:\RBT\*Strategy 3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("C:\RBT\*Strategy3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy-3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy_3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy 3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy-3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy_3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy 3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy-3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy_3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy 3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy-3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy_3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy 3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo if defined DIR goto mulai
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%~dp0*Strategy-3*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("C:\RBT\*Strategy-3*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy-3*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy-3*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy-3*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy-3*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo if defined DIRF goto engine
->>"MULAI_STRATEGY_3.bat" echo echo [X] Folder STRATEGY 3 tidak ketemu otomatis.
->>"MULAI_STRATEGY_3.bat" echo echo.
->>"MULAI_STRATEGY_3.bat" echo echo ---- INFO UNTUK DIAGNOSIS (kalau mampir foto layar ini) ----
->>"MULAI_STRATEGY_3.bat" echo echo Profil Windows: %%USERPROFILE%%
->>"MULAI_STRATEGY_3.bat" echo dir /b "C:\RBT" 2>nul | findstr /I "strategy"
->>"MULAI_STRATEGY_3.bat" echo dir /b "%%USERPROFILE%%\Desktop" 2>nul | findstr /I "strategy"
->>"MULAI_STRATEGY_3.bat" echo dir /b "%%USERPROFILE%%\Downloads" 2>nul | findstr /I "strategy"
->>"MULAI_STRATEGY_3.bat" echo dir /b "%%~dp0" | findstr /I "strategy"
->>"MULAI_STRATEGY_3.bat" echo echo ---- AKHIR INFO ----
->>"MULAI_STRATEGY_3.bat" echo echo.
->>"MULAI_STRATEGY_3.bat" echo echo ====== CARA PASTI (10 detik) ======
->>"MULAI_STRATEGY_3.bat" echo echo 1. Buka File Explorer (ikon folder kuning di taskbar)
->>"MULAI_STRATEGY_3.bat" echo echo 2. Cari folder Sistem-Trading-Strategy-3
->>"MULAI_STRATEGY_3.bat" echo echo 3. SERET folder itu pakai mouse ke JENDELA HITAM INI
->>"MULAI_STRATEGY_3.bat" echo echo 4. Lepaskan di dalam jendela ini, lalu tekan Enter
->>"MULAI_STRATEGY_3.bat" echo echo.
->>"MULAI_STRATEGY_3.bat" echo set /p "LOK=Seret folder ke sini lalu tekan Enter: "
->>"MULAI_STRATEGY_3.bat" echo set "LOK=%%LOK:"=%%"
->>"MULAI_STRATEGY_3.bat" echo if not defined LOK goto gagal_input
->>"MULAI_STRATEGY_3.bat" echo for /d %%%%D in ("%%LOK%%\*Strategy-3*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_3.bat" echo if exist "%%LOK%%\Sistem-Trading-Strategy-3\MULAI_SEMUA.bat" set "DIR=%%LOK%%\Sistem-Trading-Strategy-3"
->>"MULAI_STRATEGY_3.bat" echo if exist "%%LOK%%\MULAI_SEMUA.bat" set "DIR=%%LOK%%"
->>"MULAI_STRATEGY_3.bat" echo if not defined DIR goto input_salah
->>"MULAI_STRATEGY_3.bat" echo >"%%~dp0S3_LOKASI.txt" echo %%LOK%%
->>"MULAI_STRATEGY_3.bat" echo echo [OK] Lokasi disimpan: %%DIR%%
->>"MULAI_STRATEGY_3.bat" echo goto mulai
->>"MULAI_STRATEGY_3.bat" echo.
->>"MULAI_STRATEGY_3.bat" echo :input_salah
->>"MULAI_STRATEGY_3.bat" echo echo [X] Di folder yang diseret tidak ada MULAI_SEMUA.bat.
->>"MULAI_STRATEGY_3.bat" echo echo Kemungkinan yang diseret folder induk atau folder salah.
->>"MULAI_STRATEGY_3.bat" echo echo Seret folder yang DI DALAMNYA terlihat MULAI_SEMUA.bat.
->>"MULAI_STRATEGY_3.bat" echo echo.
->>"MULAI_STRATEGY_3.bat" echo pause
->>"MULAI_STRATEGY_3.bat" echo exit /b 1
->>"MULAI_STRATEGY_3.bat" echo.
->>"MULAI_STRATEGY_3.bat" echo :gagal_input
->>"MULAI_STRATEGY_3.bat" echo echo Tidak ada input. Klik 2x file ini lagi untuk mencoba.
->>"MULAI_STRATEGY_3.bat" echo echo.
->>"MULAI_STRATEGY_3.bat" echo pause
->>"MULAI_STRATEGY_3.bat" echo exit /b 1
->>"MULAI_STRATEGY_3.bat" echo.
->>"MULAI_STRATEGY_3.bat" echo :mulai
->>"MULAI_STRATEGY_3.bat" echo cd /d "%%DIR%%"
->>"MULAI_STRATEGY_3.bat" echo echo Menyalakan STRATEGY 3 di %%DIR%% ...
->>"MULAI_STRATEGY_3.bat" echo call "MULAI_SEMUA.bat"
->>"MULAI_STRATEGY_3.bat" echo goto selesai
->>"MULAI_STRATEGY_3.bat" echo.
->>"MULAI_STRATEGY_3.bat" echo :engine
->>"MULAI_STRATEGY_3.bat" echo cd /d "%%DIRF%%"
->>"MULAI_STRATEGY_3.bat" echo echo MULAI_SEMUA.bat belum ada di folder itu - engine dinyalakan langsung.
->>"MULAI_STRATEGY_3.bat" echo :startdirect
->>"MULAI_STRATEGY_3.bat" echo set "PY="
->>"MULAI_STRATEGY_3.bat" echo python --version >nul 2>nul
->>"MULAI_STRATEGY_3.bat" echo if not errorlevel 1 set "PY=python"
->>"MULAI_STRATEGY_3.bat" echo if defined PY goto pyok
->>"MULAI_STRATEGY_3.bat" echo py -3 --version >nul 2>nul
->>"MULAI_STRATEGY_3.bat" echo if not errorlevel 1 set "PY=py -3"
->>"MULAI_STRATEGY_3.bat" echo if defined PY goto pyok
->>"MULAI_STRATEGY_3.bat" echo echo [X] Python tidak ketemu di VPS ini.
->>"MULAI_STRATEGY_3.bat" echo echo Buka folder %%CD%% lalu klik 2x MULAI_SEMUA.bat di dalamnya.
->>"MULAI_STRATEGY_3.bat" echo echo.
->>"MULAI_STRATEGY_3.bat" echo pause
->>"MULAI_STRATEGY_3.bat" echo exit /b 1
->>"MULAI_STRATEGY_3.bat" echo.
->>"MULAI_STRATEGY_3.bat" echo :pyok
->>"MULAI_STRATEGY_3.bat" echo set "DASH=python\cc_tkdashboard.py"
->>"MULAI_STRATEGY_3.bat" echo %%PY%% -c "import PySide6" >nul 2>nul
->>"MULAI_STRATEGY_3.bat" echo if errorlevel 1 goto dashgo
->>"MULAI_STRATEGY_3.bat" echo set "DASH=python\cc_qtdashboard.py"
->>"MULAI_STRATEGY_3.bat" echo :dashgo
->>"MULAI_STRATEGY_3.bat" echo set "PYW=%%PY%%"
->>"MULAI_STRATEGY_3.bat" echo for %%%%P in (%%PY%%) do if exist "%%%%~dpPpythonw.exe" set "PYW=%%%%~dpPpythonw.exe"
->>"MULAI_STRATEGY_3.bat" echo start "RBT FX DASHBOARD" %%PYW%% "%%DASH%%" --port 8082
->>"MULAI_STRATEGY_3.bat" echo echo Dashboard dinyalakan. Engine berjalan DI JENDELA INI - log hidup di bawah.
->>"MULAI_STRATEGY_3.bat" echo echo JANGAN tutup jendela ini selama trading.
->>"MULAI_STRATEGY_3.bat" echo echo.
->>"MULAI_STRATEGY_3.bat" echo %%PY%% -u python\command_center.py
->>"MULAI_STRATEGY_3.bat" echo goto selesai
->>"MULAI_STRATEGY_3.bat" echo.
->>"MULAI_STRATEGY_3.bat" echo :selesai
->>"MULAI_STRATEGY_3.bat" echo echo.
->>"MULAI_STRATEGY_3.bat" echo echo STRATEGY 3 berhenti. Klik 2x file ini lagi untuk menyalakan.
->>"MULAI_STRATEGY_3.bat" echo echo.
->>"MULAI_STRATEGY_3.bat" echo pause
->>"MULAI_STRATEGY_3.bat" echo exit /b 0
->>"MULAI_STRATEGY_3.bat" echo.
-if exist "MULAI_STRATEGY_3.bat" echo [OK] MULAI_STRATEGY_3.bat dibuat
+if exist "_rbt_3.b64" del "_rbt_3.b64" >nul 2>nul
+>>"_rbt_3.b64" echo QGVjaG8gb2ZmDQpzZXRsb2NhbA0KdGl0bGUgUkJUIEZYIC0gU1RSQVRFR1kgMw0KcmVtID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCnJlbSAgTVVMQUkgU1RSQVRFR1kgMyAtIEZJTkFMIHY3DQpyZW0gIENhcmkgb3RvbWF0aXMgZGk6IHNhbXBpbmcgZmlsZS
+>>"_rbt_3.b64" echo BpbmksIEM6XFJCVCwgRGVza3RvcCwNCnJlbSAgT25lRHJpdmUgRGVza3RvcCwgRG9jdW1lbnRzLCBEb3dubG9hZHMgKG5hbWEgZm9sZGVyIGJlYmFzKS4NCnJlbSAgS2FsYXUgdGlkYWsga2V0ZW11OiBjdWt1cCBTRVJFVCBmb2xkZXIgc3RyYXRlZ3kga2UgamVuZGVsYSBpbmkNCnJlbSAgLSBsb2thc2kgRElJTkdBVCBzZWxhbWFu
+>>"_rbt_3.b64" echo eWEgLSBiZXJpa3V0bnlhIG90b21hdGlzIGxhZ2kuDQpyZW0gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0Kc2V0ICJESVI9Ig0Kc2V0ICJESVJGPSINCmlmIGV4aXN0ICIlfmRwMFMzX0xPS0FTSS50eHQiIHNldCAvcCBESVI9PCIlfmRwMFMzX0xPS0FTSS50eH
+>>"_rbt_3.b64" echo QiDQppZiBkZWZpbmVkIERJUiBpZiBleGlzdCAiJURJUiVcTVVMQUlfU0VNVUEuYmF0IiBnb3RvIG11bGFpDQpzZXQgIkRJUj0iDQppZiBleGlzdCAiJX5kcDBNVUxBSV9TRU1VQS5iYXQiIHNldCAiRElSPSV+ZHAwIg0KZm9yIC9kICUlRCBpbiAoIiV+ZHAwKlN0cmF0ZWd5LTMqIikgZG8gaWYgZXhpc3QgIiUlRFxNVUxBSV9TRU1V
+>>"_rbt_3.b64" echo QS5iYXQiIGlmIG5vdCBkZWZpbmVkIERJUiBzZXQgIkRJUj0lJUQiDQpmb3IgL2QgJSVEIGluICgiJX5kcDAqU3RyYXRlZ3lfMyoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlfmRwMCpTdHJhdGVneSAzKiIpIGRvIGlmIG
+>>"_rbt_3.b64" echo V4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiV+ZHAwKlN0cmF0ZWd5MyoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCJDOlxSQlRc
+>>"_rbt_3.b64" echo KlN0cmF0ZWd5LTMqIikgZG8gaWYgZXhpc3QgIiUlRFxNVUxBSV9TRU1VQS5iYXQiIGlmIG5vdCBkZWZpbmVkIERJUiBzZXQgIkRJUj0lJUQiDQpmb3IgL2QgJSVEIGluICgiQzpcUkJUXCpTdHJhdGVneV8zKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg
+>>"_rbt_3.b64" echo 0KZm9yIC9kICUlRCBpbiAoIkM6XFJCVFwqU3RyYXRlZ3kgMyoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCJDOlxSQlRcKlN0cmF0ZWd5MyoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRl
+>>"_rbt_3.b64" echo ZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERlc2t0b3BcKlN0cmF0ZWd5LTMqIikgZG8gaWYgZXhpc3QgIiUlRFxNVUxBSV9TRU1VQS5iYXQiIGlmIG5vdCBkZWZpbmVkIERJUiBzZXQgIkRJUj0lJUQiDQpmb3IgL2QgJSVEIGluICgiJVVTRVJQUk9GSUxFJVxEZXNrdG9wXCpTdH
+>>"_rbt_3.b64" echo JhdGVneV8zKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRGVza3RvcFwqU3RyYXRlZ3kgMyoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNl
+>>"_rbt_3.b64" echo dCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERlc2t0b3BcKlN0cmF0ZWd5MyoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXE9uZURyaXZlXERlc2t0b3BcKlN0cmF0ZW
+>>"_rbt_3.b64" echo d5LTMqIikgZG8gaWYgZXhpc3QgIiUlRFxNVUxBSV9TRU1VQS5iYXQiIGlmIG5vdCBkZWZpbmVkIERJUiBzZXQgIkRJUj0lJUQiDQpmb3IgL2QgJSVEIGluICgiJVVTRVJQUk9GSUxFJVxPbmVEcml2ZVxEZXNrdG9wXCpTdHJhdGVneV8zKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBE
+>>"_rbt_3.b64" echo SVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcT25lRHJpdmVcRGVza3RvcFwqU3RyYXRlZ3kgMyoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXE9uZURyaXZlXE
+>>"_rbt_3.b64" echo Rlc2t0b3BcKlN0cmF0ZWd5MyoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERvY3VtZW50c1wqU3RyYXRlZ3ktMyoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRl
+>>"_rbt_3.b64" echo ZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERvY3VtZW50c1wqU3RyYXRlZ3lfMyoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERvY3VtZW50c1
+>>"_rbt_3.b64" echo wqU3RyYXRlZ3kgMyoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERvY3VtZW50c1wqU3RyYXRlZ3kzKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBE
+>>"_rbt_3.b64" echo SVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRG93bmxvYWRzXCpTdHJhdGVneS0zKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRG93bmxvYWRzXCpTdHJhdG
+>>"_rbt_3.b64" echo VneV8zKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRG93bmxvYWRzXCpTdHJhdGVneSAzKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0
+>>"_rbt_3.b64" echo ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRG93bmxvYWRzXCpTdHJhdGVneTMqIikgZG8gaWYgZXhpc3QgIiUlRFxNVUxBSV9TRU1VQS5iYXQiIGlmIG5vdCBkZWZpbmVkIERJUiBzZXQgIkRJUj0lJUQiDQppZiBkZWZpbmVkIERJUiBnb3RvIG11bGFpDQpmb3IgL2QgJSVEIGluICgiJX5kcDAqU3RyYX
+>>"_rbt_3.b64" echo RlZ3ktMyoiKSBkbyBpZiBub3QgZGVmaW5lZCBESVJGIHNldCAiRElSRj0lJUQiDQpmb3IgL2QgJSVEIGluICgiQzpcUkJUXCpTdHJhdGVneS0zKiIpIGRvIGlmIG5vdCBkZWZpbmVkIERJUkYgc2V0ICJESVJGPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERlc2t0b3BcKlN0cmF0ZWd5LTMqIikgZG8gaWYgbm90
+>>"_rbt_3.b64" echo IGRlZmluZWQgRElSRiBzZXQgIkRJUkY9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcT25lRHJpdmVcRGVza3RvcFwqU3RyYXRlZ3ktMyoiKSBkbyBpZiBub3QgZGVmaW5lZCBESVJGIHNldCAiRElSRj0lJUQiDQpmb3IgL2QgJSVEIGluICgiJVVTRVJQUk9GSUxFJVxEb2N1bWVudHNcKlN0cmF0ZWd5LTMqIikgZG
+>>"_rbt_3.b64" echo 8gaWYgbm90IGRlZmluZWQgRElSRiBzZXQgIkRJUkY9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRG93bmxvYWRzXCpTdHJhdGVneS0zKiIpIGRvIGlmIG5vdCBkZWZpbmVkIERJUkYgc2V0ICJESVJGPSUlRCINCmlmIGRlZmluZWQgRElSRiBnb3RvIGVuZ2luZQ0KZWNobyBbWF0gRm9sZGVyIFNUUkFURUdZIDMg
+>>"_rbt_3.b64" echo dGlkYWsga2V0ZW11IG90b21hdGlzLg0KZWNoby4NCmVjaG8gLS0tLSBJTkZPIFVOVFVLIERJQUdOT1NJUyAoa2FsYXUgbWFtcGlyIGZvdG8gbGF5YXIgaW5pKSAtLS0tDQplY2hvIFByb2ZpbCBXaW5kb3dzOiAlVVNFUlBST0ZJTEUlDQpkaXIgL2IgIkM6XFJCVCIgMj5udWwgfCBmaW5kc3RyIC9JICJzdHJhdGVneSINCmRpciAvYi
+>>"_rbt_3.b64" echo AiJVVTRVJQUk9GSUxFJVxEZXNrdG9wIiAyPm51bCB8IGZpbmRzdHIgL0kgInN0cmF0ZWd5Ig0KZGlyIC9iICIlVVNFUlBST0ZJTEUlXERvd25sb2FkcyIgMj5udWwgfCBmaW5kc3RyIC9JICJzdHJhdGVneSINCmRpciAvYiAiJX5kcDAuIiB8IGZpbmRzdHIgL0kgInN0cmF0ZWd5Ig0KZWNobyAtLS0tIEFLSElSIElORk8gLS0tLQ0K
+>>"_rbt_3.b64" echo ZWNoby4NCmVjaG8gPT09PT09IENBUkEgUEFTVEkgKDEwIGRldGlrKSA9PT09PT0NCmVjaG8gMS4gQnVrYSBGaWxlIEV4cGxvcmVyIChpa29uIGZvbGRlciBrdW5pbmcgZGkgdGFza2JhcikNCmVjaG8gMi4gQ2FyaSBmb2xkZXIgU2lzdGVtLVRyYWRpbmctU3RyYXRlZ3ktMw0KZWNobyAzLiBTRVJFVCBmb2xkZXIgaXR1IHBha2FpIG
+>>"_rbt_3.b64" echo 1vdXNlIGtlIEpFTkRFTEEgSElUQU0gSU5JDQplY2hvIDQuIExlcGFza2FuIGRpIGRhbGFtIGplbmRlbGEgaW5pLCBsYWx1IHRla2FuIEVudGVyDQplY2hvLg0Kc2V0IC9wICJMT0s9U2VyZXQgZm9sZGVyIGtlIHNpbmkgbGFsdSB0ZWthbiBFbnRlcjogIg0Kc2V0ICJMT0s9JUxPSzoiPSUiDQppZiBub3QgZGVmaW5lZCBMT0sgZ290
+>>"_rbt_3.b64" echo byBnYWdhbF9pbnB1dA0KZm9yIC9kICUlRCBpbiAoIiVMT0slXCpTdHJhdGVneS0zKiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg0KaWYgZXhpc3QgIiVMT0slXFNpc3RlbS1UcmFkaW5nLVN0cmF0ZWd5LTNcTVVMQUlfU0VNVUEuYmF0IiBzZXQgIkRJUj
+>>"_rbt_3.b64" echo 0lTE9LJVxTaXN0ZW0tVHJhZGluZy1TdHJhdGVneS0zIg0KaWYgZXhpc3QgIiVMT0slXE1VTEFJX1NFTVVBLmJhdCIgc2V0ICJESVI9JUxPSyUiDQppZiBub3QgZGVmaW5lZCBESVIgZ290byBpbnB1dF9zYWxhaA0KPiIlfmRwMFMzX0xPS0FTSS50eHQiIGVjaG8gJUxPSyUNCmVjaG8gW09LXSBMb2thc2kgZGlzaW1wYW46ICVESVIl
+>>"_rbt_3.b64" echo DQpnb3RvIG11bGFpDQoNCjppbnB1dF9zYWxhaA0KZWNobyBbWF0gRGkgZm9sZGVyIHlhbmcgZGlzZXJldCB0aWRhayBhZGEgTVVMQUlfU0VNVUEuYmF0Lg0KZWNobyBLZW11bmdraW5hbiB5YW5nIGRpc2VyZXQgZm9sZGVyIGluZHVrIGF0YXUgZm9sZGVyIHNhbGFoLg0KZWNobyBTZXJldCBmb2xkZXIgeWFuZyBESSBEQUxBTU5ZQS
+>>"_rbt_3.b64" echo B0ZXJsaWhhdCBNVUxBSV9TRU1VQS5iYXQuDQplY2hvLg0KcGF1c2UNCmV4aXQgL2IgMQ0KDQo6Z2FnYWxfaW5wdXQNCmVjaG8gVGlkYWsgYWRhIGlucHV0LiBLbGlrIDJ4IGZpbGUgaW5pIGxhZ2kgdW50dWsgbWVuY29iYS4NCmVjaG8uDQpwYXVzZQ0KZXhpdCAvYiAxDQoNCjptdWxhaQ0KY2QgL2QgIiVESVIlIg0KZWNobyBNZW55
+>>"_rbt_3.b64" echo YWxha2FuIFNUUkFURUdZIDMgZGkgJURJUiUgLi4uDQpjYWxsICJNVUxBSV9TRU1VQS5iYXQiDQpnb3RvIHNlbGVzYWkNCg0KOmVuZ2luZQ0KY2QgL2QgIiVESVJGJSINCmVjaG8gTVVMQUlfU0VNVUEuYmF0IGJlbHVtIGFkYSBkaSBmb2xkZXIgaXR1IC0gZW5naW5lIGRpbnlhbGFrYW4gbGFuZ3N1bmcuDQo6c3RhcnRkaXJlY3QNCn
+>>"_rbt_3.b64" echo NldCAiUFk9Ig0KcHl0aG9uIC0tdmVyc2lvbiA+bnVsIDI+bnVsDQppZiBub3QgZXJyb3JsZXZlbCAxIHNldCAiUFk9cHl0aG9uIg0KaWYgZGVmaW5lZCBQWSBnb3RvIHB5b2sNCnB5IC0zIC0tdmVyc2lvbiA+bnVsIDI+bnVsDQppZiBub3QgZXJyb3JsZXZlbCAxIHNldCAiUFk9cHkgLTMiDQppZiBkZWZpbmVkIFBZIGdvdG8gcHlv
+>>"_rbt_3.b64" echo aw0KZWNobyBbWF0gUHl0aG9uIHRpZGFrIGtldGVtdSBkaSBWUFMgaW5pLg0KZWNobyBCdWthIGZvbGRlciAlQ0QlIGxhbHUga2xpayAyeCBNVUxBSV9TRU1VQS5iYXQgZGkgZGFsYW1ueWEuDQplY2hvLg0KcGF1c2UNCmV4aXQgL2IgMQ0KDQo6cHlvaw0Kc2V0ICJEQVNIPXB5dGhvblxjY190a2Rhc2hib2FyZC5weSINCiVQWSUgLW
+>>"_rbt_3.b64" echo MgImltcG9ydCBQeVNpZGU2IiA+bnVsIDI+bnVsDQppZiBlcnJvcmxldmVsIDEgZ290byBkYXNoZ28NCnNldCAiREFTSD1weXRob25cY2NfcXRkYXNoYm9hcmQucHkiDQo6ZGFzaGdvDQpzZXQgIlBZVz0lUFklIg0KZm9yICUlUCBpbiAoJVBZJSkgZG8gaWYgZXhpc3QgIiUlfmRwUHB5dGhvbncuZXhlIiBzZXQgIlBZVz0lJX5kcFBw
+>>"_rbt_3.b64" echo eXRob253LmV4ZSINCnN0YXJ0ICJSQlQgRlggREFTSEJPQVJEIiAlUFlXJSAiJURBU0glIiAtLXBvcnQgODA4Mg0KZWNobyBEYXNoYm9hcmQgZGlueWFsYWthbi4gRW5naW5lIGJlcmphbGFuIERJIEpFTkRFTEEgSU5JIC0gbG9nIGhpZHVwIGRpIGJhd2FoLg0KZWNobyBKQU5HQU4gdHV0dXAgamVuZGVsYSBpbmkgc2VsYW1hIHRyYW
+>>"_rbt_3.b64" echo RpbmcuDQplY2hvLg0KJVBZJSAtdSBweXRob25cY29tbWFuZF9jZW50ZXIucHkNCmdvdG8gc2VsZXNhaQ0KDQo6c2VsZXNhaQ0KZWNoby4NCmVjaG8gU1RSQVRFR1kgMyBiZXJoZW50aS4gS2xpayAyeCBmaWxlIGluaSBsYWdpIHVudHVrIG1lbnlhbGFrYW4uDQplY2hvLg0KcGF1c2UNCmV4aXQgL2IgMA0K
+certutil -decode "_rbt_3.b64" "MULAI_STRATEGY_3.bat" >nul 2>nul
+if errorlevel 1 goto certfail
+if exist "_rbt_3.b64" del "_rbt_3.b64" >nul 2>nul
+if not exist "MULAI_STRATEGY_3.bat" goto certfail
+echo [OK] MULAI_STRATEGY_3.bat dipasang (byte-perfect)
 
 rem ====== MULAI_STRATEGY_4.bat ======
 if exist "MULAI_STRATEGY_4.bat" del "MULAI_STRATEGY_4.bat" >nul 2>nul
->>"MULAI_STRATEGY_4.bat" echo @echo off
->>"MULAI_STRATEGY_4.bat" echo setlocal
->>"MULAI_STRATEGY_4.bat" echo title RBT FX - STRATEGY 4
->>"MULAI_STRATEGY_4.bat" echo rem ================================================================
->>"MULAI_STRATEGY_4.bat" echo rem  MULAI STRATEGY 4 - FINAL v7
->>"MULAI_STRATEGY_4.bat" echo rem  Cari otomatis di: samping file ini, C:\RBT, Desktop,
->>"MULAI_STRATEGY_4.bat" echo rem  OneDrive Desktop, Documents, Downloads (nama folder bebas).
->>"MULAI_STRATEGY_4.bat" echo rem  Kalau tidak ketemu: cukup SERET folder strategy ke jendela ini
->>"MULAI_STRATEGY_4.bat" echo rem  - lokasi DIINGAT selamanya - berikutnya otomatis lagi.
->>"MULAI_STRATEGY_4.bat" echo rem ================================================================
->>"MULAI_STRATEGY_4.bat" echo set "DIR="
->>"MULAI_STRATEGY_4.bat" echo set "DIRF="
->>"MULAI_STRATEGY_4.bat" echo if exist "%%~dp0S4_LOKASI.txt" set /p DIR=<"%%~dp0S4_LOKASI.txt"
->>"MULAI_STRATEGY_4.bat" echo if defined DIR if exist "%%DIR%%\MULAI_SEMUA.bat" goto mulai
->>"MULAI_STRATEGY_4.bat" echo set "DIR="
->>"MULAI_STRATEGY_4.bat" echo if exist "%%~dp0MULAI_SEMUA.bat" set "DIR=%%~dp0"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%~dp0*Strategy-4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%~dp0*Strategy_4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%~dp0*Strategy 4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%~dp0*Strategy4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("C:\RBT\*Strategy-4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("C:\RBT\*Strategy_4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("C:\RBT\*Strategy 4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("C:\RBT\*Strategy4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy-4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy_4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy 4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy-4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy_4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy 4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy-4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy_4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy 4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy-4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy_4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy 4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo if defined DIR goto mulai
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%~dp0*Strategy-4*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("C:\RBT\*Strategy-4*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Desktop\*Strategy-4*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\OneDrive\Desktop\*Strategy-4*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Documents\*Strategy-4*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%USERPROFILE%%\Downloads\*Strategy-4*") do if not defined DIRF set "DIRF=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo if defined DIRF goto engine
->>"MULAI_STRATEGY_4.bat" echo echo [X] Folder STRATEGY 4 tidak ketemu otomatis.
->>"MULAI_STRATEGY_4.bat" echo echo.
->>"MULAI_STRATEGY_4.bat" echo echo ---- INFO UNTUK DIAGNOSIS (kalau mampir foto layar ini) ----
->>"MULAI_STRATEGY_4.bat" echo echo Profil Windows: %%USERPROFILE%%
->>"MULAI_STRATEGY_4.bat" echo dir /b "C:\RBT" 2>nul | findstr /I "strategy"
->>"MULAI_STRATEGY_4.bat" echo dir /b "%%USERPROFILE%%\Desktop" 2>nul | findstr /I "strategy"
->>"MULAI_STRATEGY_4.bat" echo dir /b "%%USERPROFILE%%\Downloads" 2>nul | findstr /I "strategy"
->>"MULAI_STRATEGY_4.bat" echo dir /b "%%~dp0" | findstr /I "strategy"
->>"MULAI_STRATEGY_4.bat" echo echo ---- AKHIR INFO ----
->>"MULAI_STRATEGY_4.bat" echo echo.
->>"MULAI_STRATEGY_4.bat" echo echo ====== CARA PASTI (10 detik) ======
->>"MULAI_STRATEGY_4.bat" echo echo 1. Buka File Explorer (ikon folder kuning di taskbar)
->>"MULAI_STRATEGY_4.bat" echo echo 2. Cari folder Sistem-Trading-Strategy-4
->>"MULAI_STRATEGY_4.bat" echo echo 3. SERET folder itu pakai mouse ke JENDELA HITAM INI
->>"MULAI_STRATEGY_4.bat" echo echo 4. Lepaskan di dalam jendela ini, lalu tekan Enter
->>"MULAI_STRATEGY_4.bat" echo echo.
->>"MULAI_STRATEGY_4.bat" echo set /p "LOK=Seret folder ke sini lalu tekan Enter: "
->>"MULAI_STRATEGY_4.bat" echo set "LOK=%%LOK:"=%%"
->>"MULAI_STRATEGY_4.bat" echo if not defined LOK goto gagal_input
->>"MULAI_STRATEGY_4.bat" echo for /d %%%%D in ("%%LOK%%\*Strategy-4*") do if exist "%%%%D\MULAI_SEMUA.bat" if not defined DIR set "DIR=%%%%D"
->>"MULAI_STRATEGY_4.bat" echo if exist "%%LOK%%\Sistem-Trading-Strategy-4\MULAI_SEMUA.bat" set "DIR=%%LOK%%\Sistem-Trading-Strategy-4"
->>"MULAI_STRATEGY_4.bat" echo if exist "%%LOK%%\MULAI_SEMUA.bat" set "DIR=%%LOK%%"
->>"MULAI_STRATEGY_4.bat" echo if not defined DIR goto input_salah
->>"MULAI_STRATEGY_4.bat" echo >"%%~dp0S4_LOKASI.txt" echo %%LOK%%
->>"MULAI_STRATEGY_4.bat" echo echo [OK] Lokasi disimpan: %%DIR%%
->>"MULAI_STRATEGY_4.bat" echo goto mulai
->>"MULAI_STRATEGY_4.bat" echo.
->>"MULAI_STRATEGY_4.bat" echo :input_salah
->>"MULAI_STRATEGY_4.bat" echo echo [X] Di folder yang diseret tidak ada MULAI_SEMUA.bat.
->>"MULAI_STRATEGY_4.bat" echo echo Kemungkinan yang diseret folder induk atau folder salah.
->>"MULAI_STRATEGY_4.bat" echo echo Seret folder yang DI DALAMNYA terlihat MULAI_SEMUA.bat.
->>"MULAI_STRATEGY_4.bat" echo echo.
->>"MULAI_STRATEGY_4.bat" echo pause
->>"MULAI_STRATEGY_4.bat" echo exit /b 1
->>"MULAI_STRATEGY_4.bat" echo.
->>"MULAI_STRATEGY_4.bat" echo :gagal_input
->>"MULAI_STRATEGY_4.bat" echo echo Tidak ada input. Klik 2x file ini lagi untuk mencoba.
->>"MULAI_STRATEGY_4.bat" echo echo.
->>"MULAI_STRATEGY_4.bat" echo pause
->>"MULAI_STRATEGY_4.bat" echo exit /b 1
->>"MULAI_STRATEGY_4.bat" echo.
->>"MULAI_STRATEGY_4.bat" echo :mulai
->>"MULAI_STRATEGY_4.bat" echo cd /d "%%DIR%%"
->>"MULAI_STRATEGY_4.bat" echo echo Menyalakan STRATEGY 4 di %%DIR%% ...
->>"MULAI_STRATEGY_4.bat" echo call "MULAI_SEMUA.bat"
->>"MULAI_STRATEGY_4.bat" echo goto selesai
->>"MULAI_STRATEGY_4.bat" echo.
->>"MULAI_STRATEGY_4.bat" echo :engine
->>"MULAI_STRATEGY_4.bat" echo cd /d "%%DIRF%%"
->>"MULAI_STRATEGY_4.bat" echo echo MULAI_SEMUA.bat belum ada di folder itu - engine dinyalakan langsung.
->>"MULAI_STRATEGY_4.bat" echo :startdirect
->>"MULAI_STRATEGY_4.bat" echo set "PY="
->>"MULAI_STRATEGY_4.bat" echo python --version >nul 2>nul
->>"MULAI_STRATEGY_4.bat" echo if not errorlevel 1 set "PY=python"
->>"MULAI_STRATEGY_4.bat" echo if defined PY goto pyok
->>"MULAI_STRATEGY_4.bat" echo py -3 --version >nul 2>nul
->>"MULAI_STRATEGY_4.bat" echo if not errorlevel 1 set "PY=py -3"
->>"MULAI_STRATEGY_4.bat" echo if defined PY goto pyok
->>"MULAI_STRATEGY_4.bat" echo echo [X] Python tidak ketemu di VPS ini.
->>"MULAI_STRATEGY_4.bat" echo echo Buka folder %%CD%% lalu klik 2x MULAI_SEMUA.bat di dalamnya.
->>"MULAI_STRATEGY_4.bat" echo echo.
->>"MULAI_STRATEGY_4.bat" echo pause
->>"MULAI_STRATEGY_4.bat" echo exit /b 1
->>"MULAI_STRATEGY_4.bat" echo.
->>"MULAI_STRATEGY_4.bat" echo :pyok
->>"MULAI_STRATEGY_4.bat" echo set "DASH=python\cc_tkdashboard.py"
->>"MULAI_STRATEGY_4.bat" echo %%PY%% -c "import PySide6" >nul 2>nul
->>"MULAI_STRATEGY_4.bat" echo if errorlevel 1 goto dashgo
->>"MULAI_STRATEGY_4.bat" echo set "DASH=python\cc_qtdashboard.py"
->>"MULAI_STRATEGY_4.bat" echo :dashgo
->>"MULAI_STRATEGY_4.bat" echo set "PYW=%%PY%%"
->>"MULAI_STRATEGY_4.bat" echo for %%%%P in (%%PY%%) do if exist "%%%%~dpPpythonw.exe" set "PYW=%%%%~dpPpythonw.exe"
->>"MULAI_STRATEGY_4.bat" echo start "RBT FX DASHBOARD" %%PYW%% "%%DASH%%" --port 8082
->>"MULAI_STRATEGY_4.bat" echo echo Dashboard dinyalakan. Engine berjalan DI JENDELA INI - log hidup di bawah.
->>"MULAI_STRATEGY_4.bat" echo echo JANGAN tutup jendela ini selama trading.
->>"MULAI_STRATEGY_4.bat" echo echo.
->>"MULAI_STRATEGY_4.bat" echo %%PY%% -u python\command_center.py
->>"MULAI_STRATEGY_4.bat" echo goto selesai
->>"MULAI_STRATEGY_4.bat" echo.
->>"MULAI_STRATEGY_4.bat" echo :selesai
->>"MULAI_STRATEGY_4.bat" echo echo.
->>"MULAI_STRATEGY_4.bat" echo echo STRATEGY 4 berhenti. Klik 2x file ini lagi untuk menyalakan.
->>"MULAI_STRATEGY_4.bat" echo echo.
->>"MULAI_STRATEGY_4.bat" echo pause
->>"MULAI_STRATEGY_4.bat" echo exit /b 0
->>"MULAI_STRATEGY_4.bat" echo.
-if exist "MULAI_STRATEGY_4.bat" echo [OK] MULAI_STRATEGY_4.bat dibuat
+if exist "_rbt_4.b64" del "_rbt_4.b64" >nul 2>nul
+>>"_rbt_4.b64" echo QGVjaG8gb2ZmDQpzZXRsb2NhbA0KdGl0bGUgUkJUIEZYIC0gU1RSQVRFR1kgNA0KcmVtID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCnJlbSAgTVVMQUkgU1RSQVRFR1kgNCAtIEZJTkFMIHY3DQpyZW0gIENhcmkgb3RvbWF0aXMgZGk6IHNhbXBpbmcgZmlsZS
+>>"_rbt_4.b64" echo BpbmksIEM6XFJCVCwgRGVza3RvcCwNCnJlbSAgT25lRHJpdmUgRGVza3RvcCwgRG9jdW1lbnRzLCBEb3dubG9hZHMgKG5hbWEgZm9sZGVyIGJlYmFzKS4NCnJlbSAgS2FsYXUgdGlkYWsga2V0ZW11OiBjdWt1cCBTRVJFVCBmb2xkZXIgc3RyYXRlZ3kga2UgamVuZGVsYSBpbmkNCnJlbSAgLSBsb2thc2kgRElJTkdBVCBzZWxhbWFu
+>>"_rbt_4.b64" echo eWEgLSBiZXJpa3V0bnlhIG90b21hdGlzIGxhZ2kuDQpyZW0gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0Kc2V0ICJESVI9Ig0Kc2V0ICJESVJGPSINCmlmIGV4aXN0ICIlfmRwMFM0X0xPS0FTSS50eHQiIHNldCAvcCBESVI9PCIlfmRwMFM0X0xPS0FTSS50eH
+>>"_rbt_4.b64" echo QiDQppZiBkZWZpbmVkIERJUiBpZiBleGlzdCAiJURJUiVcTVVMQUlfU0VNVUEuYmF0IiBnb3RvIG11bGFpDQpzZXQgIkRJUj0iDQppZiBleGlzdCAiJX5kcDBNVUxBSV9TRU1VQS5iYXQiIHNldCAiRElSPSV+ZHAwIg0KZm9yIC9kICUlRCBpbiAoIiV+ZHAwKlN0cmF0ZWd5LTQqIikgZG8gaWYgZXhpc3QgIiUlRFxNVUxBSV9TRU1V
+>>"_rbt_4.b64" echo QS5iYXQiIGlmIG5vdCBkZWZpbmVkIERJUiBzZXQgIkRJUj0lJUQiDQpmb3IgL2QgJSVEIGluICgiJX5kcDAqU3RyYXRlZ3lfNCoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlfmRwMCpTdHJhdGVneSA0KiIpIGRvIGlmIG
+>>"_rbt_4.b64" echo V4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiV+ZHAwKlN0cmF0ZWd5NCoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCJDOlxSQlRc
+>>"_rbt_4.b64" echo KlN0cmF0ZWd5LTQqIikgZG8gaWYgZXhpc3QgIiUlRFxNVUxBSV9TRU1VQS5iYXQiIGlmIG5vdCBkZWZpbmVkIERJUiBzZXQgIkRJUj0lJUQiDQpmb3IgL2QgJSVEIGluICgiQzpcUkJUXCpTdHJhdGVneV80KiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg
+>>"_rbt_4.b64" echo 0KZm9yIC9kICUlRCBpbiAoIkM6XFJCVFwqU3RyYXRlZ3kgNCoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCJDOlxSQlRcKlN0cmF0ZWd5NCoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRl
+>>"_rbt_4.b64" echo ZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERlc2t0b3BcKlN0cmF0ZWd5LTQqIikgZG8gaWYgZXhpc3QgIiUlRFxNVUxBSV9TRU1VQS5iYXQiIGlmIG5vdCBkZWZpbmVkIERJUiBzZXQgIkRJUj0lJUQiDQpmb3IgL2QgJSVEIGluICgiJVVTRVJQUk9GSUxFJVxEZXNrdG9wXCpTdH
+>>"_rbt_4.b64" echo JhdGVneV80KiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRGVza3RvcFwqU3RyYXRlZ3kgNCoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNl
+>>"_rbt_4.b64" echo dCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERlc2t0b3BcKlN0cmF0ZWd5NCoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXE9uZURyaXZlXERlc2t0b3BcKlN0cmF0ZW
+>>"_rbt_4.b64" echo d5LTQqIikgZG8gaWYgZXhpc3QgIiUlRFxNVUxBSV9TRU1VQS5iYXQiIGlmIG5vdCBkZWZpbmVkIERJUiBzZXQgIkRJUj0lJUQiDQpmb3IgL2QgJSVEIGluICgiJVVTRVJQUk9GSUxFJVxPbmVEcml2ZVxEZXNrdG9wXCpTdHJhdGVneV80KiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBE
+>>"_rbt_4.b64" echo SVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcT25lRHJpdmVcRGVza3RvcFwqU3RyYXRlZ3kgNCoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXE9uZURyaXZlXE
+>>"_rbt_4.b64" echo Rlc2t0b3BcKlN0cmF0ZWd5NCoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERvY3VtZW50c1wqU3RyYXRlZ3ktNCoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRl
+>>"_rbt_4.b64" echo ZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERvY3VtZW50c1wqU3RyYXRlZ3lfNCoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERvY3VtZW50c1
+>>"_rbt_4.b64" echo wqU3RyYXRlZ3kgNCoiKSBkbyBpZiBleGlzdCAiJSVEXE1VTEFJX1NFTVVBLmJhdCIgaWYgbm90IGRlZmluZWQgRElSIHNldCAiRElSPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERvY3VtZW50c1wqU3RyYXRlZ3k0KiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBE
+>>"_rbt_4.b64" echo SVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRG93bmxvYWRzXCpTdHJhdGVneS00KiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRG93bmxvYWRzXCpTdHJhdG
+>>"_rbt_4.b64" echo VneV80KiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRG93bmxvYWRzXCpTdHJhdGVneSA0KiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0
+>>"_rbt_4.b64" echo ICJESVI9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRG93bmxvYWRzXCpTdHJhdGVneTQqIikgZG8gaWYgZXhpc3QgIiUlRFxNVUxBSV9TRU1VQS5iYXQiIGlmIG5vdCBkZWZpbmVkIERJUiBzZXQgIkRJUj0lJUQiDQppZiBkZWZpbmVkIERJUiBnb3RvIG11bGFpDQpmb3IgL2QgJSVEIGluICgiJX5kcDAqU3RyYX
+>>"_rbt_4.b64" echo RlZ3ktNCoiKSBkbyBpZiBub3QgZGVmaW5lZCBESVJGIHNldCAiRElSRj0lJUQiDQpmb3IgL2QgJSVEIGluICgiQzpcUkJUXCpTdHJhdGVneS00KiIpIGRvIGlmIG5vdCBkZWZpbmVkIERJUkYgc2V0ICJESVJGPSUlRCINCmZvciAvZCAlJUQgaW4gKCIlVVNFUlBST0ZJTEUlXERlc2t0b3BcKlN0cmF0ZWd5LTQqIikgZG8gaWYgbm90
+>>"_rbt_4.b64" echo IGRlZmluZWQgRElSRiBzZXQgIkRJUkY9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcT25lRHJpdmVcRGVza3RvcFwqU3RyYXRlZ3ktNCoiKSBkbyBpZiBub3QgZGVmaW5lZCBESVJGIHNldCAiRElSRj0lJUQiDQpmb3IgL2QgJSVEIGluICgiJVVTRVJQUk9GSUxFJVxEb2N1bWVudHNcKlN0cmF0ZWd5LTQqIikgZG
+>>"_rbt_4.b64" echo 8gaWYgbm90IGRlZmluZWQgRElSRiBzZXQgIkRJUkY9JSVEIg0KZm9yIC9kICUlRCBpbiAoIiVVU0VSUFJPRklMRSVcRG93bmxvYWRzXCpTdHJhdGVneS00KiIpIGRvIGlmIG5vdCBkZWZpbmVkIERJUkYgc2V0ICJESVJGPSUlRCINCmlmIGRlZmluZWQgRElSRiBnb3RvIGVuZ2luZQ0KZWNobyBbWF0gRm9sZGVyIFNUUkFURUdZIDQg
+>>"_rbt_4.b64" echo dGlkYWsga2V0ZW11IG90b21hdGlzLg0KZWNoby4NCmVjaG8gLS0tLSBJTkZPIFVOVFVLIERJQUdOT1NJUyAoa2FsYXUgbWFtcGlyIGZvdG8gbGF5YXIgaW5pKSAtLS0tDQplY2hvIFByb2ZpbCBXaW5kb3dzOiAlVVNFUlBST0ZJTEUlDQpkaXIgL2IgIkM6XFJCVCIgMj5udWwgfCBmaW5kc3RyIC9JICJzdHJhdGVneSINCmRpciAvYi
+>>"_rbt_4.b64" echo AiJVVTRVJQUk9GSUxFJVxEZXNrdG9wIiAyPm51bCB8IGZpbmRzdHIgL0kgInN0cmF0ZWd5Ig0KZGlyIC9iICIlVVNFUlBST0ZJTEUlXERvd25sb2FkcyIgMj5udWwgfCBmaW5kc3RyIC9JICJzdHJhdGVneSINCmRpciAvYiAiJX5kcDAuIiB8IGZpbmRzdHIgL0kgInN0cmF0ZWd5Ig0KZWNobyAtLS0tIEFLSElSIElORk8gLS0tLQ0K
+>>"_rbt_4.b64" echo ZWNoby4NCmVjaG8gPT09PT09IENBUkEgUEFTVEkgKDEwIGRldGlrKSA9PT09PT0NCmVjaG8gMS4gQnVrYSBGaWxlIEV4cGxvcmVyIChpa29uIGZvbGRlciBrdW5pbmcgZGkgdGFza2JhcikNCmVjaG8gMi4gQ2FyaSBmb2xkZXIgU2lzdGVtLVRyYWRpbmctU3RyYXRlZ3ktNA0KZWNobyAzLiBTRVJFVCBmb2xkZXIgaXR1IHBha2FpIG
+>>"_rbt_4.b64" echo 1vdXNlIGtlIEpFTkRFTEEgSElUQU0gSU5JDQplY2hvIDQuIExlcGFza2FuIGRpIGRhbGFtIGplbmRlbGEgaW5pLCBsYWx1IHRla2FuIEVudGVyDQplY2hvLg0Kc2V0IC9wICJMT0s9U2VyZXQgZm9sZGVyIGtlIHNpbmkgbGFsdSB0ZWthbiBFbnRlcjogIg0Kc2V0ICJMT0s9JUxPSzoiPSUiDQppZiBub3QgZGVmaW5lZCBMT0sgZ290
+>>"_rbt_4.b64" echo byBnYWdhbF9pbnB1dA0KZm9yIC9kICUlRCBpbiAoIiVMT0slXCpTdHJhdGVneS00KiIpIGRvIGlmIGV4aXN0ICIlJURcTVVMQUlfU0VNVUEuYmF0IiBpZiBub3QgZGVmaW5lZCBESVIgc2V0ICJESVI9JSVEIg0KaWYgZXhpc3QgIiVMT0slXFNpc3RlbS1UcmFkaW5nLVN0cmF0ZWd5LTRcTVVMQUlfU0VNVUEuYmF0IiBzZXQgIkRJUj
+>>"_rbt_4.b64" echo 0lTE9LJVxTaXN0ZW0tVHJhZGluZy1TdHJhdGVneS00Ig0KaWYgZXhpc3QgIiVMT0slXE1VTEFJX1NFTVVBLmJhdCIgc2V0ICJESVI9JUxPSyUiDQppZiBub3QgZGVmaW5lZCBESVIgZ290byBpbnB1dF9zYWxhaA0KPiIlfmRwMFM0X0xPS0FTSS50eHQiIGVjaG8gJUxPSyUNCmVjaG8gW09LXSBMb2thc2kgZGlzaW1wYW46ICVESVIl
+>>"_rbt_4.b64" echo DQpnb3RvIG11bGFpDQoNCjppbnB1dF9zYWxhaA0KZWNobyBbWF0gRGkgZm9sZGVyIHlhbmcgZGlzZXJldCB0aWRhayBhZGEgTVVMQUlfU0VNVUEuYmF0Lg0KZWNobyBLZW11bmdraW5hbiB5YW5nIGRpc2VyZXQgZm9sZGVyIGluZHVrIGF0YXUgZm9sZGVyIHNhbGFoLg0KZWNobyBTZXJldCBmb2xkZXIgeWFuZyBESSBEQUxBTU5ZQS
+>>"_rbt_4.b64" echo B0ZXJsaWhhdCBNVUxBSV9TRU1VQS5iYXQuDQplY2hvLg0KcGF1c2UNCmV4aXQgL2IgMQ0KDQo6Z2FnYWxfaW5wdXQNCmVjaG8gVGlkYWsgYWRhIGlucHV0LiBLbGlrIDJ4IGZpbGUgaW5pIGxhZ2kgdW50dWsgbWVuY29iYS4NCmVjaG8uDQpwYXVzZQ0KZXhpdCAvYiAxDQoNCjptdWxhaQ0KY2QgL2QgIiVESVIlIg0KZWNobyBNZW55
+>>"_rbt_4.b64" echo YWxha2FuIFNUUkFURUdZIDQgZGkgJURJUiUgLi4uDQpjYWxsICJNVUxBSV9TRU1VQS5iYXQiDQpnb3RvIHNlbGVzYWkNCg0KOmVuZ2luZQ0KY2QgL2QgIiVESVJGJSINCmVjaG8gTVVMQUlfU0VNVUEuYmF0IGJlbHVtIGFkYSBkaSBmb2xkZXIgaXR1IC0gZW5naW5lIGRpbnlhbGFrYW4gbGFuZ3N1bmcuDQo6c3RhcnRkaXJlY3QNCn
+>>"_rbt_4.b64" echo NldCAiUFk9Ig0KcHl0aG9uIC0tdmVyc2lvbiA+bnVsIDI+bnVsDQppZiBub3QgZXJyb3JsZXZlbCAxIHNldCAiUFk9cHl0aG9uIg0KaWYgZGVmaW5lZCBQWSBnb3RvIHB5b2sNCnB5IC0zIC0tdmVyc2lvbiA+bnVsIDI+bnVsDQppZiBub3QgZXJyb3JsZXZlbCAxIHNldCAiUFk9cHkgLTMiDQppZiBkZWZpbmVkIFBZIGdvdG8gcHlv
+>>"_rbt_4.b64" echo aw0KZWNobyBbWF0gUHl0aG9uIHRpZGFrIGtldGVtdSBkaSBWUFMgaW5pLg0KZWNobyBCdWthIGZvbGRlciAlQ0QlIGxhbHUga2xpayAyeCBNVUxBSV9TRU1VQS5iYXQgZGkgZGFsYW1ueWEuDQplY2hvLg0KcGF1c2UNCmV4aXQgL2IgMQ0KDQo6cHlvaw0Kc2V0ICJEQVNIPXB5dGhvblxjY190a2Rhc2hib2FyZC5weSINCiVQWSUgLW
+>>"_rbt_4.b64" echo MgImltcG9ydCBQeVNpZGU2IiA+bnVsIDI+bnVsDQppZiBlcnJvcmxldmVsIDEgZ290byBkYXNoZ28NCnNldCAiREFTSD1weXRob25cY2NfcXRkYXNoYm9hcmQucHkiDQo6ZGFzaGdvDQpzZXQgIlBZVz0lUFklIg0KZm9yICUlUCBpbiAoJVBZJSkgZG8gaWYgZXhpc3QgIiUlfmRwUHB5dGhvbncuZXhlIiBzZXQgIlBZVz0lJX5kcFBw
+>>"_rbt_4.b64" echo eXRob253LmV4ZSINCnN0YXJ0ICJSQlQgRlggREFTSEJPQVJEIiAlUFlXJSAiJURBU0glIiAtLXBvcnQgODA4Mg0KZWNobyBEYXNoYm9hcmQgZGlueWFsYWthbi4gRW5naW5lIGJlcmphbGFuIERJIEpFTkRFTEEgSU5JIC0gbG9nIGhpZHVwIGRpIGJhd2FoLg0KZWNobyBKQU5HQU4gdHV0dXAgamVuZGVsYSBpbmkgc2VsYW1hIHRyYW
+>>"_rbt_4.b64" echo RpbmcuDQplY2hvLg0KJVBZJSAtdSBweXRob25cY29tbWFuZF9jZW50ZXIucHkNCmdvdG8gc2VsZXNhaQ0KDQo6c2VsZXNhaQ0KZWNoby4NCmVjaG8gU1RSQVRFR1kgNCBiZXJoZW50aS4gS2xpayAyeCBmaWxlIGluaSBsYWdpIHVudHVrIG1lbnlhbGFrYW4uDQplY2hvLg0KcGF1c2UNCmV4aXQgL2IgMA0K
+certutil -decode "_rbt_4.b64" "MULAI_STRATEGY_4.bat" >nul 2>nul
+if errorlevel 1 goto certfail
+if exist "_rbt_4.b64" del "_rbt_4.b64" >nul 2>nul
+if not exist "MULAI_STRATEGY_4.bat" goto certfail
+echo [OK] MULAI_STRATEGY_4.bat dipasang (byte-perfect)
 
+rem ====== RBT_FX_STRATEGY4.bat ======
+if exist "RBT_FX_STRATEGY4.bat" del "RBT_FX_STRATEGY4.bat" >nul 2>nul
+if exist "_rbt_R4.b64" del "_rbt_R4.b64" >nul 2>nul
+>>"_rbt_R4.b64" echo QGVjaG8gb2ZmDQpzZXRsb2NhbA0KdGl0bGUgUkJUIEZYIC0gU1RSQVRFR1kgNCAodXBkYXRlIGNlcGF0ICsgbXVsYWkpDQpjZCAvZCAiJX5kcDAiDQpzZXQgIlRPS0VOPUdBTlRJX1RPS0VOX0FOREEiDQppZiBleGlzdCAiJX5kcDBUT0tFTi50eHQiIHNldCAvcCBUT0tFTj08IiV+ZHAwVE9LRU4udHh0Ig0Kc2V0ICJSRVBPPVNpc3
+>>"_rbt_R4.b64" echo RlbS1UcmFkaW5nLVN0cmF0ZWd5LTQtU05SLUVNQTEzLUVNQTIxIg0KZWNobyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09DQplY2hvICAgIFJCVCBGWCAtIFNUUkFURUdZIDQ6IFVQREFURSBDRVBBVCArIE1VTEFJIFNFTVVBDQplY2hvID09PT09PT09PT09PT09
+>>"_rbt_R4.b64" echo PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCmVjaG8gWzEvMl0gVXBkYXRlIGRhcmkgR2l0SHViICglUkVQTyUpIC4uLg0Kc2V0ICJVVVJMPWh0dHBzOi8vY29kZWxvYWQuZ2l0aHViLmNvbS8lUkVQTyUvemlwL3JlZnMvaGVhZHMvbWFpbiINCmlmIGV4aXN0ICJfcmJ0X3VwZC56aXAiIG
+>>"_rbt_R4.b64" echo RlbCAiX3JidF91cGQuemlwIiA+bnVsIDI+bnVsDQp3aGVyZSBjdXJsID5udWwgMj5udWwNCmlmIGVycm9ybGV2ZWwgMSBnb3RvIHVwZF9wcw0KY3VybCAtTCAtLXJldHJ5IDIgLS1zc2wtbm8tcmV2b2tlIC0tc2lsZW50IC1IICJBdXRob3JpemF0aW9uOiBCZWFyZXIgJVRPS0VOJSIgLW8gIl9yYnRfdXBkLnppcCIgIiVVVVJMJSIN
+>>"_rbt_R4.b64" echo CmdvdG8gdXBkX2Noaw0KOnVwZF9wcw0KcG93ZXJzaGVsbCAtTm9Qcm9maWxlIC1Db21tYW5kICJ0cnl7W05ldC5TZXJ2aWNlUG9pbnRNYW5hZ2VyXTo6U2VjdXJpdHlQcm90b2NvbD1bTmV0LlNlY3VyaXR5UHJvdG9jb2xUeXBlXTo6VGxzMTI7SW52b2tlLVdlYlJlcXVlc3QgLVVzZUJhc2ljUGFyc2luZyAtSGVhZGVycyBAe0F1dG
+>>"_rbt_R4.b64" echo hvcml6YXRpb249J0JlYXJlciAlVE9LRU4lJ30gLVVyaSAnJVVVUkwlJyAtT3V0RmlsZSAnX3JidF91cGQuemlwJ31jYXRjaHtleGl0IDF9Ig0KOnVwZF9jaGsNCmlmIG5vdCBleGlzdCAiX3JidF91cGQuemlwIiBnb3RvIHVwZF9za2lwDQpmb3IgJSVGIGluIChfcmJ0X3VwZC56aXApIGRvIGlmICUlfnpGIExTUyA1MDAwMCBnb3Rv
+>>"_rbt_R4.b64" echo IHVwZF9za2lwDQpwb3dlcnNoZWxsIC1Ob1Byb2ZpbGUgLUNvbW1hbmQgIkV4cGFuZC1BcmNoaXZlIC1Gb3JjZSAtUGF0aCAnX3JidF91cGQuemlwJyAtRGVzdGluYXRpb25QYXRoICdfcmJ0X3VwZCciDQpzZXQgIlVTUkM9Ig0KaWYgZXhpc3QgIl9yYnRfdXBkXHB5dGhvblxjb21tYW5kX2NlbnRlci5weSIgc2V0ICJVU1JDPV9yYn
+>>"_rbt_R4.b64" echo RfdXBkIg0KZm9yIC9kICUlRCBpbiAoX3JidF91cGRcKikgZG8gaWYgbm90IGRlZmluZWQgVVNSQyBpZiBleGlzdCAiJSVEXHB5dGhvblxjb21tYW5kX2NlbnRlci5weSIgc2V0ICJVU1JDPSUlRCINCmlmIGRlZmluZWQgVVNSQyByb2JvY29weSAiJVVTUkMlIiAuIC9FIC9ORkwgL05ETCAvTkpIIC9OSlMgL05QID5udWwNCjp1cGRf
+>>"_rbt_R4.b64" echo Y2xlYW4NCmlmIGV4aXN0ICJfcmJ0X3VwZC56aXAiIGRlbCAiX3JidF91cGQuemlwIiA+bnVsIDI+bnVsDQppZiBleGlzdCAiX3JidF91cGQiIHJtZGlyIC9TIC9RICJfcmJ0X3VwZCIgPm51bCAyPm51bA0KZ290byB1cGRfZG9uZQ0KOnVwZF9za2lwDQplY2hvICAgIFVwZGF0ZSBkaWxld2F0aSAoaW50ZXJuZXQvdG9rZW4gYmVsdW
+>>"_rbt_R4.b64" echo 0gc2lhcCkgLSBsYW5qdXQgbXVsYWkuDQo6dXBkX2RvbmUNCmVjaG8gWzIvMl0gTXVsYWkgU1RSQVRFR1kgNCAuLi4NCmNhbGwgIiV+ZHAwTVVMQUlfU0VNVUEuYmF0Ig0K
+certutil -decode "_rbt_R4.b64" "RBT_FX_STRATEGY4.bat" >nul 2>nul
+if errorlevel 1 goto certfail
+if exist "_rbt_R4.b64" del "_rbt_R4.b64" >nul 2>nul
+if not exist "RBT_FX_STRATEGY4.bat" goto certfail
+echo [OK] RBT_FX_STRATEGY4.bat dipasang (byte-perfect)
 
-rem ---- verifikasi ukuran file ----
-set "BAD="
-for %%F in ("MULAI_STRATEGY_1.bat" "MULAI_STRATEGY_2.bat" "MULAI_STRATEGY_3.bat" "MULAI_STRATEGY_4.bat") do if %%~zF LSS 800 set "BAD=%%~F"
-if defined BAD goto gagal
-echo [OK] 4 file bat sudah dibuat dan dicek: utuh.
-echo.
-
-rem ---- salin juga ke C:\RBT dan ke dalam tiap folder strategy ----
-if /I "%~dp0"=="C:\RBT\" goto salin
-if exist "C:\RBT\" (
-  copy /Y "MULAI_STRATEGY_*.bat" "C:\RBT\" >nul
-  echo [OK] disalin juga ke C:\RBT
-)
-:salin
+rem ---- salin ke dalam tiap folder strategy yang ada ----
 if exist "C:\RBT\Sistem-Trading-Strategy-1\" copy /Y "MULAI_STRATEGY_1.bat" "C:\RBT\Sistem-Trading-Strategy-1\" >nul
 if exist "C:\RBT\Sistem-Trading-Strategy-2\" copy /Y "MULAI_STRATEGY_2.bat" "C:\RBT\Sistem-Trading-Strategy-2\" >nul
 if exist "C:\RBT\Sistem-Trading-Strategy-3\" copy /Y "MULAI_STRATEGY_3.bat" "C:\RBT\Sistem-Trading-Strategy-3\" >nul
 if exist "C:\RBT\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21\" copy /Y "MULAI_STRATEGY_4.bat" "C:\RBT\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21\" >nul
+if exist "C:\RBT\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21\" copy /Y "RBT_FX_STRATEGY4.bat" "C:\RBT\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21\" >nul
 if exist "C:\RBT\Sistem-Trading-Strategy-4\" copy /Y "MULAI_STRATEGY_4.bat" "C:\RBT\Sistem-Trading-Strategy-4\" >nul
-echo [OK] salinan ditaruh juga di dalam tiap folder strategy yang ketemu.
+echo [OK] salinan ditaruh di dalam tiap folder strategy yang ketemu.
 echo.
 echo ================================================================
-echo    SELESAI!
-echo    Sekarang klik 2x MULAI_STRATEGY_1.bat - atau 2 / 3 / 4 -
+echo    SELESAI! Klik 2x MULAI_STRATEGY_1.bat - atau 2 / 3 / 4 -
 echo    untuk menyalakan strategy pilihan Anda.
 echo ================================================================
 echo.
 pause
 exit /b 0
 
-:gagal
-echo [X] Ada file yang gagal dibuat: %BAD%
-echo     FOTO LAYAR ini lalu kirim ke chat untuk bantuan.
+:certfail
+echo [X] certutil gagal menulis file - Windows terlalu lama atau antivirus
+echo     memblokir. FOTO LAYAR ini lalu kirim ke chat.
 echo.
 pause
 exit /b 1

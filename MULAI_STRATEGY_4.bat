@@ -53,7 +53,7 @@ echo Profil Windows: %USERPROFILE%
 dir /b "C:\RBT" 2>nul | findstr /I "strategy"
 dir /b "%USERPROFILE%\Desktop" 2>nul | findstr /I "strategy"
 dir /b "%USERPROFILE%\Downloads" 2>nul | findstr /I "strategy"
-dir /b "%~dp0" | findstr /I "strategy"
+dir /b "%~dp0." | findstr /I "strategy"
 echo ---- AKHIR INFO ----
 echo.
 echo ====== CARA PASTI (10 detik) ======
