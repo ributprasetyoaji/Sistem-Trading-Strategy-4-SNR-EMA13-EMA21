@@ -104,7 +104,7 @@ def test_qt_panel_lot_manual_dan_post_port_benar():
     # panel selalu terlihat
     assert "LOT MANUAL:" in qt
     assert "self.cmb_syms" in qt and "self.ent_lot" in qt
-    assert 'QPushButton("ISI LOT")' in qt
+    assert 'QPushButton("ISI LOT LALU ENTER")' in qt
     assert "def _apply_lot" in qt and "def _set_lot_info" in qt
     assert "self.sig.lot.connect(self._set_lot_info)" in qt
     assert "lot = Signal(str, str)" in qt

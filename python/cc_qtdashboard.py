@@ -1554,7 +1554,7 @@ class Dash(QWidget):
             "#f0b429;border-radius:4px;padding:2px 6px;font-size:8pt;}")
         self.ent_lot.returnPressed.connect(self._apply_lot)
         lotrow.addWidget(self.ent_lot)
-        btn_lot = QPushButton("ISI LOT")
+        btn_lot = QPushButton("ISI LOT LALU ENTER")
         btn_lot.setObjectName("tabbtn")
         btn_lot.setCursor(Qt.PointingHandCursor)
         btn_lot.clicked.connect(self._apply_lot)

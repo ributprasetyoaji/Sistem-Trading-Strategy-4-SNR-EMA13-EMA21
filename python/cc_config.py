@@ -8,7 +8,7 @@ from __future__ import annotations
 import json
 import os
 
-CC_VERSION = "4.39"
+CC_VERSION = "4.40"
 
 DEFAULTS = {
     # ---- HISTORY CLOUD (v3.88, permintaan user): backup/restore cache
