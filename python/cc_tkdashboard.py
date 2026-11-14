@@ -45,7 +45,7 @@ def _rbt_self_exec(delay=1.5):
         _exe = _sys.executable or "pythonw"
         _os.execv(_exe, [_exe, _os.path.abspath(_sys.argv[0])]
                   + list(_sys.argv[1:]))
-    _th.Thread(target=_go, daemon=True).start()
+    threading.Thread(target=_go, daemon=True).start()
 
 
 AMBER = "#ffc857"; VIO = "#b78cff"; TX = "#dcffee"; DIM = "#5d9678"

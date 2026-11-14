@@ -219,6 +219,23 @@ class CommandCenter:
         self._paged_try = {}         # anti-spam paging broker per pair
         self._scan_fail = {}         # hitung gagal ambil data per pair
         self.pair_sw = _load_pair_sw()   # v4.34: switch ON/OFF per pair
+        # v4.43 (user): START = SEMUA OFF -- file state yang tersisa
+        # (mis. BTCUSD nyala dari sesi lama) dibersihkan saat boot.
+        # Set "pairs_start_all_off": false di cc_config.json utk
+        # mempertahankan switch antar restart.
+        if self.cfg.get("pairs_start_all_off", True) and self.pair_sw:
+            _sisa = sorted(self.pair_sw.keys())
+            self.pair_sw.clear()
+            try:
+                os.makedirs("data", exist_ok=True)
+                _tmp = _pair_sw_path() + ".tmp"
+                with open(_tmp, "w", encoding="utf-8") as _f:
+                    json.dump({}, _f)
+                os.replace(_tmp, _pair_sw_path())
+                self.log("INFO", "START BERSIH: SEMUA OFF -- state lama "
+                         "dibersihkan (%s)" % ", ".join(_sisa))
+            except Exception as _e:
+                self.log("WARN", "start bersih gagal: %s" % _e)
         self.pair_lot = _load_pair_lot()  # v4.37: lot manual per pair
         _on = sorted(self.pair_sw.keys())
         self.log("INFO", "SWITCH PAIR: %d ON dari %d (default OFF)" %
@@ -2219,10 +2236,10 @@ class CommandCenter:
 
     # ----------------------------------------------------------------- loop --
     def request_restart(self, delay=1.2):
-        """v%s REFRESH TANPA BAT (permintaan user): engine mengganti
-        dirinya dgn proses baru (os.execv) -- jendela console & port
-        TETAP, kode terbaru dari disk langsung hidup.  Dipanggil dari
-        tombol UPDATE dashboard setelah self-update selesai.""" % ver
+        """v4.43 FIX FATAL: docstring lama memakai %% ver -> NameError
+        SAAT DIPANGGIL, dan pemanggilnya AUTO-UPDATE -> update terunduh
+        tapi engine TIDAK PERNAH restart (exception ditelan) -> VPS
+        terus jalan kode lama.  Sekarang bersih: restart jalan lagi."""
         try:
             self.emit_log("UPDATE", "engine dimulai ulang dalam %.1f dtk "
                           "(jendela ini tetap jalan)..." % float(delay))
