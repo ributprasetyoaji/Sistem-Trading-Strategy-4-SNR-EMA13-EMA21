@@ -82,6 +82,11 @@ DEFAULTS = {
                 "GBPJPY", "BTCUSD", "ETHUSD", "SOLUSD", "XRPUSD",
                 "LTCUSD", "NAS100", "US30", "GER40", "US500",
                 "XPTUSD", "USOIL"],
+    "symbols_force_include": ["BTCUSD", "ETHUSD", "SOLUSD", "XRPUSD",
+                              "LTCUSD", "XAUUSD", "XAGUSD"],
+                                      # S4 (user): crypto + gold/silver
+                                      #   PAKSA ADA walau cc_config.json
+                                      #   di VPS menimpa "symbols"
     "symbol_alternates": {            # nama symbol beda-beda tiap broker;
         # akhiran "m" = akun Standard Exness (mis. USTECm, XAUUSDm)
         "XAUUSD": ["XAUUSD", "GOLD", "XAUUSDm", "GOLDm", "GOLD.a", "XAUUSD.a"],

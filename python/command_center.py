@@ -70,6 +70,18 @@ def _trim_csv(path, max_bytes=5 * 1024 * 1024, keep=2000):
         pass
 
 
+def _merge_symbols(wants, force):
+    """S4 (user): gabung daftar simbol dgn PAKSA-INCLUDED (crypto +
+    gold/silver) -- walau cc_config.json di VPS menimpa "symbols"
+    dgn daftar lama, pair penting ini TETAP discan.
+    Urutan: daftar config dulu, tambahan dibelakang, tanpa duplikat."""
+    out = list(wants or [])
+    for s in (force or []):
+        if s and s not in out:
+            out.append(s)
+    return out
+
+
 class CommandCenter:
     def __init__(self, cfg: CCConfig, log=print):
         self.cfg = cfg
@@ -223,6 +235,12 @@ class CommandCenter:
         self.risk = RiskGuard(self.cfg, self.broker, log=self._adapt_log)
         self._last_close_ts = time.time()   # riwayat sebelum start tidak dihitung
         self._resolve_symbols()
+        _cr = ",".join(s for s in self.resolved
+                       if s.startswith(("BTC", "ETH", "SOL", "XRP", "LTC"))) or "-"
+        _mt = ",".join(s for s in self.resolved
+                       if s.startswith(("XAU", "XAG", "XPT"))) or "-"
+        self.emit_log("INFO", "PAIR AKTIF %d | crypto: %s | gold/silver: %s"
+                      % (len(self.resolved), _cr, _mt))
         if self.broker.is_sim and self.cfg.get("sim_force_signals", True):
             if not self.s2_on:
                 self.broker.seed_demo_positions()
@@ -233,7 +251,8 @@ class CommandCenter:
 
     def _resolve_symbols(self):
         self.resolved = {}
-        for want in self.cfg.get("symbols", []):
+        for want in _merge_symbols(self.cfg.get("symbols", []),
+                                   self.cfg.get("symbols_force_include")):
             got = self.broker.resolve_symbol(want)
             if got:
                 self.resolved[want] = got
