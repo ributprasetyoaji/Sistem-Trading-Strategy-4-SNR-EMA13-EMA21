@@ -431,7 +431,7 @@ grid-template-areas:"scan" "chart" "conf" "log" "pos"}
 <main>
 <div class="topbar">
   <div class="logo"><svg class="crown" viewBox="0 0 32 24" width="38" height="28" aria-hidden="true"><defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd75e"/><stop offset="1" stop-color="#d99900"/></linearGradient></defs><path d="M2 19 L2 8 L9.5 13.5 L16 2.5 L22.5 13.5 L30 8 L30 19 Z" fill="url(#cg)" stroke="#ffe08a" stroke-width="1"/><rect x="2" y="19.5" width="28" height="3" rx="1" fill="#d99900"/></svg><span class="brand glitch">RBT FX</span><span class="cur">▊</span>
-    <small>TRADING ALGO SYSTEM</small></div>
+    <small>TRADING ALGO SYSTEM <b id="uiver" style="color:#5d9678;font-weight:700"></b></small></div>
   <div class="chips">
     <div class="chip grn"><span class="ci">⬢</span><span class="ct"><small>PYTHON ENGINE</small><b id="c-engine">-ONLINE</b></span></div>
     <div id="hb-alert" style="display:none;background:#7a1f1f;color:#ffd9d9;border:1px solid #ff6b6b;border-radius:10px;padding:8px 12px;margin:8px 0;font:600 13px system-ui">
@@ -744,6 +744,9 @@ if(s.error){$('statusline').textContent=s.error==='auth'?
  'AKSES DITOLAK — LOGIN ULANG (refresh halaman, masukkan password)':'ENGINE ERROR';
 $('statusline').style.color='var(--red)';return;}
 $('c-engine').textContent='-ONLINE v'+s.version;
+if(window.__ev===undefined){window.__ev=s.version;}
+else if(window.__ev!==s.version){location.reload();return;}
+var _uv=$('uiver');if(_uv){_uv.textContent=' \u00b7 UI-2 v'+s.version;}
 var hb=$('hb-alert');if(hb){if(s.engine_stale){hb.style.display='block';$('hb-age').textContent=Math.round((s.hb_age||0)/60)+' menit lalu';}else{hb.style.display='none';}}
 const mw=$('c-mt5w');
 $('c-mt5s').textContent='MTS ('+(s.account.server||'BROKER')+')';
@@ -867,6 +870,11 @@ $('c-upt').textContent=(up>=1440?Math.floor(up/1440)+'D ':'')+
  p2(Math.floor(up/60)%24)+':'+p2(up%60);
 $('c-ping').textContent=s.ping_ms+' ms';
 $('c-pairs').textContent=s.scanner.length;
+var _cnt={};s.scanner.forEach(function(r){var _c=catOf(r.symbol);_cnt[_c]=(_cnt[_c]||0)+1;});
+document.querySelectorAll('.tab').forEach(function(b){var _c=b.dataset.c;
+ var _n=_c==='ALL'?s.scanner.length:(_cnt[_c]||0);
+ if(!b.dataset.lb){b.dataset.lb=b.textContent;}
+ b.textContent=b.dataset.lb+' ('+_n+')';});
 $('c-loop').textContent=s.loop_ms+' ms';
 const halt=s.risk.manual_halt;
 $('halt').textContent=halt?'⏸ OFF':'⚡ ON';
