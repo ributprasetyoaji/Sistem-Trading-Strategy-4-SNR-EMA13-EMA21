@@ -217,6 +217,12 @@ class CommandCenter:
             self.broker.connect()
         self.risk = RiskGuard(self.cfg, self.broker, log=self._adapt_log)
         self._last_close_ts = time.time()   # riwayat sebelum start tidak dihitung
+        # S4 (user): SATU daftar simbol gabungan utk SEMUA pemakai
+        # (resolver, scanner-panel dashboard, dsb) - force include
+        # crypto + gold/silver selalu masuk walau cc_config.json VPS
+        # menimpa "symbols" dgn daftar lama.
+        self.wants = _merge_symbols(self.cfg.get("symbols", []),
+                                    self.cfg.get("symbols_force_include"))
         self._resolve_symbols()
         _cr = ",".join(s for s in self.resolved
                        if s.startswith(("BTC", "ETH", "SOL", "XRP", "LTC"))) or "-"
@@ -234,8 +240,7 @@ class CommandCenter:
 
     def _resolve_symbols(self):
         self.resolved = {}
-        for want in _merge_symbols(self.cfg.get("symbols", []),
-                                   self.cfg.get("symbols_force_include")):
+        for want in self.wants:
             got = self.broker.resolve_symbol(want)
             if got:
                 self.resolved[want] = got
@@ -1779,7 +1784,9 @@ class CommandCenter:
                           float(daily.get("day_start") or 0.0))
         # heartbeat berkala, alert market news -- semua anti-blokir.
         scanner = []
-        for want in self.cfg.get("symbols", []):
+        for want in self.wants:            # S4: pakai daftar gabungan
+                                           #   (XAUUSD/XAGUSD/crypto selalu ada)
+
             res = self.scan.get(want)
             if not res:
                 continue
