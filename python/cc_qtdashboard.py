@@ -25,6 +25,7 @@ try:
                                    QVBoxLayout, QHBoxLayout, QGridLayout,
                                    QTableWidget, QTableWidgetItem, QTextEdit,
                                    QHeaderView, QPushButton, QLineEdit,
+                                   QInputDialog,
                                    QGraphicsDropShadowEffect)
 except ImportError:  # pragma: no cover
     print("PySide6 belum terpasang. Jalankan: pip install PySide6-Essentials")
@@ -91,6 +92,11 @@ _SW_ON = ("QPushButton{background:#0d3b22;color:#3ddc84;"
 _SW_OFF = ("QPushButton{background:#3b0d14;color:#ff6b7a;"
            "border:1px solid #ff4d5e;border-radius:4px;"
            "font-size:7pt;font-weight:800;padding:1px 6px;}")
+_LOT_QSS = ("QPushButton{background:rgba(240,180,41,0.10);color:#ffd270;"
+            "border:1px solid #f0b429;border-radius:4px;"
+            "font-size:7pt;font-weight:800;padding:1px 6px;}"
+            "QPushButton:disabled{background:#0a0f1e;color:#8a92b8;"
+            "border:1px solid #243057;}")
 
 def cat_of(sym):
     s0 = (sym or "").upper()
@@ -271,6 +277,11 @@ class EngineClient(object):
         """v4.34: toggle switch ON/OFF per pair di engine."""
         return self._post(port, "/api/pair_switch",
                           {"symbol": sym, "on": bool(on)})
+
+    def pair_lot(self, port, sym, lot):
+        """v4.37: set lot manual per pair (0 = AUTO)."""
+        return self._post(port, "/api/pair_lot",
+                          {"symbol": sym, "lot": float(lot)})
 
     def status(self, port):
         body, code = self._get(port, "/api/status")
@@ -1275,6 +1286,7 @@ class Dash(QWidget):
         self.need_auth = False
         self.sel_sym = None
         self._sw_map = {}   # v4.34: symbol -> bool switch
+        self._lot_map = {}  # v4.37: symbol -> float lot manual
         self.tab = "ALL"
         self.tape_segs = []
         self.eq_hist = []
@@ -1486,7 +1498,7 @@ class Dash(QWidget):
         # v3.57: kolom pengisi (stretch) di akhir -> STATUS nempel TREND
         cols = [("#", 26), ("SYMBOL", 86), ("PRICE", 90), ("SPREAD", 56),
                 ("REGIME", 86), ("SIGNAL", 60), ("SCORE", 52), ("TREND", 50),
-                ("STATUS", 90), ("SW", 40), ("", 24)]
+                ("STATUS", 90), ("SW", 40), ("LOT", 56), ("", 24)]
         self.tv = QTableWidget(0, len(cols))
         self.tv.setHorizontalHeaderLabels([c for c, _ in cols])
         self.tv.verticalHeader().setVisible(False)
@@ -1757,6 +1769,34 @@ class Dash(QWidget):
             except Exception:
                 pass
 
+    def _edit_lot(self, sym, cur, btn=None):
+        """v4.37 (user): dialog isi lot manual utk pair ini."""
+        val, ok = QInputDialog.getDouble(
+            self, "LOT " + str(sym),
+            "Isi lot MANUAL untuk %s\n(0 = AUTO, pakai kalkulasi risiko):"
+            % str(sym),
+            value=float(cur or 0.0), min=0.0, max=500.0, decimals=2)
+        if not ok:
+            return
+        self._lot_map[sym] = val
+        if btn is not None:
+            try:
+                btn.setText(("%g" % val) if val > 0 else "AUTO")
+            except Exception:
+                pass
+        self.sel_sym = sym
+        threading.Thread(target=self._lot_bg, args=(sym, val),
+                         daemon=True).start()
+
+    def _lot_bg(self, sym, lot):
+        for p in self.ports:
+            try:
+                body, code = self.client.pair_lot(p, sym, lot)
+                if code == 200:
+                    return
+            except Exception:
+                pass
+
     def _halt(self):
         threading.Thread(target=self._halt_bg, daemon=True).start()
 
@@ -2012,12 +2052,25 @@ class Dash(QWidget):
             reg = (r.get("regime") or "-").split(" ")[0]
             swv = "ON" if r.get("sw") else "OFF"
             self._sw_map[r.get("symbol")] = bool(r.get("sw"))
+            ulot = float(r.get("lot") or 0.0)
+            self._lot_map[r.get("symbol")] = ulot
+            lotv = ("%g" % ulot) if ulot > 0 else "AUTO"
             vals = ("%02d" % i, r.get("symbol"),
                     fmt(r.get("price"), r.get("digits", 2)), r.get("spread"),
-                    reg, sig, "%.0f%%" % sc, str(tb) + "%", stag, swv)
+                    reg, sig, "%.0f%%" % sc, str(tb) + "%", stag, swv, lotv)
             r0 = self.tv.rowCount()
             self.tv.insertRow(r0)
             for c0, v0 in enumerate(vals):
+                if c0 == 10:
+                    # v4.37 (user): tombol LOT -- klik = dialog isi lot
+                    lotbtn = QPushButton(str(v0))
+                    lotbtn.setStyleSheet(_LOT_QSS)
+                    lotbtn.setCursor(Qt.PointingHandCursor)
+                    lotbtn.clicked.connect(
+                        lambda _c=False, s=r.get("symbol"),
+                        u=ulot, w=lotbtn: self._edit_lot(s, u, w))
+                    self.tv.setCellWidget(r0, 10, lotbtn)
+                    continue
                 if c0 == 9:
                     # v4.36 (user): tombol SW dgn BORDER -- ON hijau,
                     # OFF merah; klik tombol = toggle langsung

@@ -1,0 +1,117 @@
+"""v4.37 (user): MENU LOT MANUAL per pair di samping kolom SW.
+Klik tombol LOT -> isi lot -> pair ON ditradingkan pakai lot itu
+(menimpa kalkulasi risiko); 0/ kosong = AUTO. Persisten."""
+import json
+import os
+import sys
+import threading
+import urllib.request
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "python"))
+import command_center as CC  # noqa: E402
+from cc_dashboard import make_server  # noqa: E402
+
+
+def test_set_get_persist(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    assert CC._load_pair_lot() == {}
+    ns = types_ns()
+    v = CC.CommandCenter.set_pair_lot(ns, "xauusd", 0.05)
+    assert v == 0.05 and ns.pair_lot == {"XAUUSD": 0.05}
+    assert CC._load_pair_lot() == {"XAUUSD": 0.05}
+    # clamp & hapus
+    CC.CommandCenter.set_pair_lot(ns, "XAUUSD", 9999)
+    assert ns.pair_lot["XAUUSD"] <= 500
+    CC.CommandCenter.set_pair_lot(ns, "XAUUSD", 0)
+    assert ns.pair_lot == {}
+    assert CC._load_pair_lot() == {}
+    assert not os.path.exists("data/pair_lot.json.tmp")
+
+
+def types_ns():
+    import types
+    return types.SimpleNamespace(pair_lot={}, emit_log=lambda t, m: None)
+
+
+def test_pair_lot_of():
+    ns = types_ns()
+    ns.pair_lot = {"XAUUSD": 0.05}
+    assert CC.CommandCenter.pair_lot_of(ns, "XAUUSD") == 0.05
+    assert CC.CommandCenter.pair_lot_of(ns, "xauusd") == 0.05
+    assert CC.CommandCenter.pair_lot_of(ns, "EURUSD") == 0.0
+
+
+def test_override_dua_jalur_entry_di_source():
+    src = open(os.path.join(os.path.dirname(__file__), "..", "python",
+                            "command_center.py"), encoding="utf-8").read()
+    # kedua jalur entry pakai lot manual
+    assert src.count('_ulot = self.pair_lot_of(') == 2
+    assert src.count("LOT MANUAL %.2f (menimpa kalkulasi)") == 2
+    # lot_why diinisialisasi (anti NameError saat guard awal memblokir)
+    assert src.count("lot_why = \"\"") >= 2
+    # status rows membawa lot
+    assert 'lot=float(self.pair_lot.get(' in src
+
+
+def test_status_rows_lot_dan_endpoint_live():
+    class FakeCC:
+        version = "4.37-test"
+
+        def __init__(self):
+            self.pair_lot = {}
+
+        def get_status(self):
+            return {"version": self.version,
+                    "scanner": [{"symbol": "XAUUSD", "status": "OFF",
+                                 "score": 0.0, "price": 3850.5,
+                                 "spread": 168, "signal": "-", "trend_pct": 0,
+                                 "digits": 2, "sw": False}],
+                    "positions": [], "mode": "SIMULASI",
+                    "account": {"login": 0, "server": "T"}}
+
+        def set_pair_lot(self, sym, lot):
+            lot = float(lot or 0)
+            if lot > 0:
+                self.pair_lot[sym] = lot
+            return lot
+
+    cc = FakeCC()
+    srv = make_server(cc, 0, "")
+    port = srv.server_address[1]
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    try:
+        req = urllib.request.Request(
+            "http://127.0.0.1:%d/api/pair_lot" % port,
+            data=json.dumps({"symbol": "xauusd", "lot": 0.07}).encode(),
+            headers={"Content-Type": "application/json"})
+        js = json.load(urllib.request.urlopen(req, timeout=5))
+        assert js == {"ok": True, "symbol": "XAUUSD", "lot": 0.07}
+        # AUTO (0)
+        req = urllib.request.Request(
+            "http://127.0.0.1:%d/api/pair_lot" % port,
+            data=json.dumps({"symbol": "XAUUSD", "lot": 0}).encode(),
+            headers={"Content-Type": "application/json"})
+        js = json.load(urllib.request.urlopen(req, timeout=5))
+        assert js == {"ok": True, "symbol": "XAUUSD", "lot": 0.0}
+    finally:
+        srv.shutdown()
+        srv.server_close()
+
+
+def test_ui_qt_tk_web_kolom_lot():
+    py = os.path.join(os.path.dirname(__file__), "..", "python")
+    qt = open(os.path.join(py, "cc_qtdashboard.py"), encoding="utf-8").read()
+    assert '("LOT", 56)' in qt
+    assert "setCellWidget(r0, 10, lotbtn)" in qt
+    assert "def _edit_lot" in qt and "QInputDialog.getDouble" in qt
+    assert "def pair_lot" in qt
+    assert "#f0b429" in qt                      # border amber LOT
+    tk = open(os.path.join(py, "cc_tkdashboard.py"), encoding="utf-8").read()
+    assert '("lot", "LOT", 50)' in tk
+    assert 'col == "#11"' in tk
+    assert "def pair_lot" in tk
+    web = open(os.path.join(py, "cc_dashboard.py"), encoding="utf-8").read()
+    assert web.count("api/pair_lot") >= 2
+    assert ".lotbtn" in web and "data-lot" in web
+    assert "(r.lot>0?r.lot:'AUTO')" in web
+    assert 'colspan="11"' in web

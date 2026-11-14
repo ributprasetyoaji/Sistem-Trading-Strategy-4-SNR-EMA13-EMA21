@@ -138,7 +138,7 @@ def test_endpoint_post_pair_switch_live():
 def test_status_scanner_memakai_pair_on():
     src = open(os.path.join(os.path.dirname(__file__), "..", "python",
                             "command_center.py"), encoding="utf-8").read()
-    assert 'dict(r0, sw=self.pair_on(r0.get("symbol")))' in src
+    assert 'sw=self.pair_on(r0.get("symbol"))' in src
     assert "_off_row(want, data)" in src
     assert "self.pair_sw.get(want, False)" in src
 
@@ -162,5 +162,5 @@ def test_ui_qt_tk_web_kolom_sw():
     assert "swbtn" in web and "data-sw" in web
     assert ".swbtn.off" in web                   # border merah web
     assert "(r.sw?' on':' off')" in web
-    assert 'colspan="10"' in web
+    assert 'colspan="11"' in web
     assert "JSON.stringify({symbol:sym,on:on})" in web

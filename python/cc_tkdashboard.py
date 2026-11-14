@@ -280,6 +280,11 @@ class EngineClient(object):
         return self._post(port, "/api/pair_switch",
                           {"symbol": sym, "on": bool(on)})
 
+    def pair_lot(self, port, sym, lot):
+        """v4.37: set lot manual per pair (0 = AUTO)."""
+        return self._post(port, "/api/pair_lot",
+                          {"symbol": sym, "lot": float(lot)})
+
     def status(self, port):
         body, code = self._get(port, "/api/status")
         if code != 200:
@@ -338,6 +343,7 @@ class Dash(object):
         self.need_auth = False
         self.sel_sym = None
         self._sw_map = {}   # v4.34: symbol -> bool switch
+        self._lot_map = {}  # v4.37: symbol -> float lot manual
         self.tab = "ALL"
         self.tape_segs = []
         self.tape_x = 0
@@ -528,12 +534,12 @@ class Dash(object):
         self._paint_tabs()
         # v3.57: kolom pengisi (stretch) di akhir -> STATUS nempel TREND
         cols = ("no", "sym", "px", "spr", "reg", "sig", "sco", "tre", "st",
-                "sw", "fill")
+                "sw", "lot", "fill")
         heads = [("no", "#", 24), ("sym", "SYMBOL", 86), ("px", "PRICE", 90),
                  ("spr", "SPREAD", 56), ("reg", "REGIME", 86),
                  ("sig", "SIGNAL", 60), ("sco", "SCORE", 52),
                  ("tre", "TREND", 50), ("st", "STATUS", 90),
-                 ("sw", "SW", 40), ("fill", "", 24)]
+                 ("sw", "SW", 40), ("lot", "LOT", 50), ("fill", "", 24)]
         self.tv = ttk.Treeview(p, columns=cols, show="headings", height=4)
         for c, t, w in heads:
             self.tv.heading(c, text=t)
@@ -874,6 +880,36 @@ class Dash(object):
                 pass
             threading.Thread(target=self._sw_bg, args=(iid, not cur),
                              daemon=True).start()
+        elif col == "#11" and iid:
+            # v4.37 (user): kolom LOT -> dialog isi lot manual
+            cur = float(self._lot_map.get(iid, 0) or 0)
+            v = simpledialog.askstring(
+                "LOT " + str(iid),
+                "Isi lot MANUAL untuk %s (0/kosong = AUTO):" % str(iid),
+                initialvalue=("%.2f" % cur) if cur else "0",
+                parent=self.root)
+            if v is None:
+                return
+            try:
+                fv = float(str(v).strip().replace(",", "."))
+            except ValueError:
+                return
+            self._lot_map[iid] = fv
+            try:
+                self.tv.set(iid, "lot", ("%g" % fv) if fv > 0 else "AUTO")
+            except Exception:
+                pass
+            threading.Thread(target=self._lot_bg, args=(iid, fv),
+                             daemon=True).start()
+
+    def _lot_bg(self, sym, lot):
+        for p in self.ports:
+            try:
+                body, code = self.client.pair_lot(p, sym, lot)
+                if code == 200:
+                    return
+            except Exception:
+                pass
 
     def _sw_bg(self, sym, on):
         for p in self.ports:
@@ -1098,10 +1134,14 @@ class Dash(object):
             reg = (r.get("regime") or "-").split(" ")[0]
             swv = "ON" if r.get("sw") else "OFF"
             self._sw_map[r.get("symbol")] = bool(r.get("sw"))
+            ulot = float(r.get("lot") or 0.0)
+            self._lot_map[r.get("symbol")] = ulot
+            lotv = ("%g" % ulot) if ulot > 0 else "AUTO"
             self.tv.insert("", "end", iid=r.get("symbol"), values=(
                 "%02d" % i, r.get("symbol"), fmt(r.get("price"),
                                                  r.get("digits", 2)),
-                r.get("spread"), reg, sig, sco, str(tb) + "%", stag, swv),
+                r.get("spread"), reg, sig, sco, str(tb) + "%", stag, swv,
+                lotv),
                 tags=(stag, "r1" if i % 2 else "r0"))
         if self.sel_sym and self.tv.exists(self.sel_sym):
             self.tv.selection_set(self.sel_sym)

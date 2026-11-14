@@ -113,6 +113,31 @@ def _load_pair_sw():
     return {}
 
 
+def _pair_lot_path():
+    return os.path.join("data", "pair_lot.json")
+
+
+def _load_pair_lot():
+    """v4.37: lot MANUAL per pair (persisten). {} / 0 = AUTO (kalkulasi
+    risiko); nilai > 0 = lot tetap dari user untuk pair itu."""
+    try:
+        with open(_pair_lot_path(), encoding="utf-8") as f:
+            d = json.load(f)
+        if isinstance(d, dict):
+            out = {}
+            for k, v in d.items():
+                try:
+                    fv = float(v)
+                except (TypeError, ValueError):
+                    continue
+                if fv > 0:
+                    out[str(k).upper()] = fv
+            return out
+    except Exception:
+        pass
+    return {}
+
+
 def _off_row(want, data=None):
     """v4.34 (user): baris scanner utk pair yang di-OFF-kan lewat switch
     kolom SW -- tidak dianalisa, tidak di-tradingkan, tetap tampil."""
@@ -163,6 +188,7 @@ class CommandCenter:
         self._paged_try = {}         # anti-spam paging broker per pair
         self._scan_fail = {}         # hitung gagal ambil data per pair
         self.pair_sw = _load_pair_sw()   # v4.34: switch ON/OFF per pair
+        self.pair_lot = _load_pair_lot()  # v4.37: lot manual per pair
         self.log("INFO", "SWITCH PAIR: %d ON dari %d (default OFF)" %
                  (len(self.pair_sw), len(getattr(self, "wants", []) or [])))
         self._scan_warn_ts = {}      # anti-spam WARN per pair (5 mnt)
@@ -712,6 +738,40 @@ class CommandCenter:
         except Exception as e:
             self.emit_log("WARN", "pair_switch save gagal: %s" % e)
 
+    def pair_lot_of(self, want):
+        """v4.37: lot manual utk pair ini -- 0/None = AUTO."""
+        try:
+            v = float(self.pair_lot.get(str(want or "").upper(), 0) or 0)
+        except (TypeError, ValueError):
+            return 0.0
+        return v if v > 0 else 0.0
+
+    def set_pair_lot(self, want, lot):
+        """v4.37 (user): isi lot manual per pair. lot<=0 = AUTO lagi.
+        Persist di data/pair_lot.json (dilindungi robocopy /XF)."""
+        want = str(want or "").upper()
+        try:
+            lot = float(lot)
+        except (TypeError, ValueError):
+            lot = 0.0
+        if lot > 0:
+            lot = max(0.01, min(lot, 500.0))
+            self.pair_lot[want] = lot
+        else:
+            lot = 0.0
+            self.pair_lot.pop(want, None)
+        try:
+            os.makedirs("data", exist_ok=True)
+            _tmp = _pair_lot_path() + ".tmp"
+            with open(_tmp, "w", encoding="utf-8") as _f:
+                json.dump(self.pair_lot, _f)
+            os.replace(_tmp, _pair_lot_path())
+            self.emit_log("INFO", "LOT %s = %s"
+                          % (want, ("%.2f MANUAL" % lot) if lot else "AUTO"))
+        except Exception as e:
+            self.emit_log("WARN", "pair_lot save gagal: %s" % e)
+        return lot
+
     def scan_all(self):
         n_ok = 0
         for want, sym in list(self.resolved.items()):
@@ -896,11 +956,21 @@ class CommandCenter:
             g_ok, g_why = self.risk.can_open(res["symbol"], bot_positions)
         cur, rate = self.account_usd_rate()
         lot = 0.0
+        lot_why = ""
         if g_ok:
             lot, lot_why = self.risk.calc_lot(res["symbol"], info, res["sl_points"],
                                               cur, rate)
             if lot <= 0:
                 g_ok, g_why = False, lot_why
+        # v4.37 (user): LOT MANUAL per pair -- menimpa kalkulasi risiko;
+        # blokir khusus lot<=0 dibolehkan lewat (guard lain tetap jalan)
+        _ulot = self.pair_lot_of(res["symbol"])
+        if _ulot:
+            if not g_ok and lot <= 0 and lot_why and g_why == lot_why:
+                g_ok, g_why = True, ""
+            self.emit_log("INFO", "%s: LOT MANUAL %.2f (menimpa kalkulasi)"
+                          % (res["symbol"], _ulot))
+            lot = _ulot
         if not g_ok:
             res["status"] = "BLOCKED"
             res["block_why"] = g_why
@@ -1095,6 +1165,7 @@ class CommandCenter:
             g_ok, g_why = self.risk.can_open(want, bot_positions)
         cur, rate = self.account_usd_rate()
         lot = 0.0
+        lot_why = ""
         if plan:
             lot = plan["lot"]          # lot hasil kalibrasi pip (BTC)
         else:
@@ -1118,6 +1189,15 @@ class CommandCenter:
                               "-> dinaikkan ke %.2f (v4.22, tanpa "
                               "skip)" % (want, float(lot), _ml))
                 lot = _ml
+        # v4.37 (user): LOT MANUAL per pair -- menimpa lot plan/kalkulasi;
+        # blokir khusus lot<=0 dibolehkan lewat (guard lain tetap jalan)
+        _ulot = self.pair_lot_of(want)
+        if _ulot:
+            if not g_ok and lot <= 0 and lot_why and g_why == lot_why:
+                g_ok, g_why = True, ""
+            self.emit_log("INFO", "%s: LOT MANUAL %.2f (menimpa kalkulasi)"
+                          % (want, _ulot))
+            lot = _ulot
         if not g_ok:
             res["status"] = "BLOCKED"
             res["block_why"] = g_why
@@ -2030,7 +2110,11 @@ class CommandCenter:
                      "consec_losses": self.risk.consec_losses,
                      "pause_until": self.risk.pause_until,
                      "trade_on": trade_on},
-            "scanner": [dict(r0, sw=self.pair_on(r0.get("symbol")))
+            "scanner": [dict(r0,
+                             sw=self.pair_on(r0.get("symbol")),
+                             lot=float(self.pair_lot.get(
+                                 str(r0.get("symbol", "")).upper(),
+                                 0) or 0))
                         for r0 in scanner],
             "confluence": confluence,
             "positions": [{"ticket": p["ticket"], "symbol": p["symbol"],
