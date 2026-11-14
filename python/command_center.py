@@ -2335,6 +2335,37 @@ def main():
     th = threading.Thread(target=srv.serve_forever, daemon=True)
     th.start()
     print("Dashboard: http://localhost:%d  (biarkan jendela ini terbuka)" % port)
+    # ---- AUTO-UPDATE OTOMATIS (tanpa klik apa pun): engine cek
+    # GitHub berkala (cc_selfupdate: hanya file python/, state/data/
+    # bat TIDAK pernah disentuh) dan restart sendiri bila ada versi baru.
+    def _auto_update_loop():
+        try:
+            import cc_selfupdate as _su
+        except Exception:
+            return
+        mins = float(cfg.get("auto_update_min", 120.0) or 0.0)
+        if mins <= 0:
+            return
+        time.sleep(90)                 # biarkan engine stabil dulu
+        while cc.running:
+            try:
+                files, err = _su.run()
+                if files:
+                    cc.log("UPDATE", "AUTO-UPDATE: %d file baru dari "
+                           "GitHub -- engine di-restart otomatis"
+                           % len(files))
+                    time.sleep(2.0)
+                    cc.request_restart(delay=1.0)
+                    return
+                # err (tanpa token/offline) -> diam, coba lagi nanti
+            except Exception:
+                pass
+            for _ in range(int(mins * 12)):
+                if not cc.running:
+                    return
+                time.sleep(5.0)
+    threading.Thread(target=_auto_update_loop, daemon=True).start()
+
     try:
         cc.run()
     finally:

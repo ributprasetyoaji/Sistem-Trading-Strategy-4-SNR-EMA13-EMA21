@@ -52,6 +52,10 @@ DEFAULTS = {
                                  "DOGE", "ADA", "XLM", "BCH"],
     },
     # ---- DASHBOARD ----
+    "auto_update_min": 120.0,      # AUTO-UPDATE: cek GitHub
+                                      #   tiap N menit (0=off);
+                                      #   ada versi baru -> engine
+                                      #   restart OTOMATIS tanpa klik
     "dashboard_port": 8082,          # S2: port TERPISAH dari Strategy 1 (8080); buka http://localhost:8081 di browser VPS
     "dashboard_password": "",        # v3.19: SANDI login dashboard. ISI ini
                                       #   (mis. "KunciKuat123") kalau dashboard

@@ -16,7 +16,7 @@ import os
 import re
 import urllib.request
 
-REPO = "ributprasetyoaji/Sistem-Trading-Strategy-3"
+REPO = "ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21"
 BRANCH = "main"
 ALLOW_PREFIX = ("python/",)
 ALLOW_FILES = ("requirements.txt",)
@@ -64,6 +64,7 @@ def resolve_token(root="."):
     if tok:
         return tok
     for f in (os.path.join(root, "github_token.txt"),
+              os.path.join(root, "TOKEN.txt"),
               os.path.join(root, "data", "gh_token.txt")):
         try:
             if os.path.exists(f):
