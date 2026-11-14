@@ -1781,6 +1781,7 @@ class Dash(QWidget):
         it = self.tv.item(row, 1)
         if it:
             self.sel_sym = it.text()
+            self._sync_lot_panel(it.text())   # v4.39: panel ikut pair
             if self.snap:
                 self._apply(self.snap)
 
@@ -1789,6 +1790,7 @@ class Dash(QWidget):
         merah), lalu kirim ke engine (snapshot berikut menyegarkan)."""
         self._sw_map[sym] = bool(on)
         self.sel_sym = sym
+        self._sync_lot_panel(sym)   # v4.39: panel ikut pair yang diklik
         if btn is not None:
             try:
                 btn.setText("ON" if on else "OFF")
@@ -1797,6 +1799,23 @@ class Dash(QWidget):
                 pass
         threading.Thread(target=self._sw_bg, args=(sym, bool(on)),
                          daemon=True).start()
+
+    def _sync_lot_panel(self, sym):
+        """v4.39 (user): klik pair di tabel -> panel LOT MANUAL otomatis
+        pindah ke pair itu (tak perlu cari di dropdown lagi); isian lot
+        terisi nilai pair tersebut (kosong = AUTO)."""
+        sym = str(sym or "").upper()
+        try:
+            idx = self.cmb_syms.findText(sym)
+            if idx >= 0:
+                self.cmb_syms.setCurrentIndex(idx)
+        except Exception:
+            pass
+        try:
+            lot = float(self._lot_map.get(sym, 0) or 0)
+            self.ent_lot.setText(("%g" % lot) if lot > 0 else "")
+        except Exception:
+            pass
 
     def _set_lot_info(self, txt, col):
         """v4.38: feedback panel LOT (thread-safe via sig.lot)."""
@@ -1865,6 +1884,7 @@ class Dash(QWidget):
 
     def _edit_lot(self, sym, cur, btn=None):
         """v4.37 (user): dialog isi lot manual utk pair ini."""
+        self._sync_lot_panel(sym)   # v4.39: panel ikut pair yang diklik
         val, ok = QInputDialog.getDouble(
             self, "LOT " + str(sym),
             "Isi lot MANUAL untuk %s\n(0 = AUTO, pakai kalkulasi risiko):"

@@ -114,6 +114,18 @@ def test_qt_panel_lot_manual_dan_post_port_benar():
     assert "[self.active_port] if self.active_port else []" in qt
 
 
+def test_klik_pair_menyinkronkan_panel_lot():
+    qt = open(os.path.join(os.path.dirname(__file__), "..", "python",
+                           "cc_qtdashboard.py"), encoding="utf-8").read()
+    assert "def _sync_lot_panel" in qt
+    assert "self.cmb_syms.findText(sym)" in qt
+    # dipanggil dari: klik baris biasa, toggle SW, klik tombol LOT tabel
+    assert qt.count("self._sync_lot_panel(") == 3   # klik baris + SW + LOT
+    assert "panel ikut pair" in qt
+    # isian lot terisi nilai pair (kosong = AUTO)
+    assert 'self.ent_lot.setText(("%g" % lot) if lot > 0 else "")' in qt
+
+
 def test_fallback_get_endpoint_di_server():
     web = open(os.path.join(os.path.dirname(__file__), "..", "python",
                             "cc_dashboard.py"), encoding="utf-8").read()
