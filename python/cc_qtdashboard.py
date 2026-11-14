@@ -25,7 +25,7 @@ try:
                                    QVBoxLayout, QHBoxLayout, QGridLayout,
                                    QTableWidget, QTableWidgetItem, QTextEdit,
                                    QHeaderView, QPushButton, QLineEdit,
-                                   QInputDialog,
+                                   QInputDialog, QComboBox,
                                    QGraphicsDropShadowEffect)
 except ImportError:  # pragma: no cover
     print("PySide6 belum terpasang. Jalankan: pip install PySide6-Essentials")
@@ -331,6 +331,7 @@ class EngineClient(object):
 
 class Sig(QObject):
     data = Signal(dict)
+    lot = Signal(str, str)   # v4.38: pesan feedback set lot/switch
 
 
 # -------------------------------------------------- widget custom -----------
@@ -1299,6 +1300,7 @@ class Dash(QWidget):
         self.setWindowTitle("RBT FX :: TRADING ALGO SYSTEM")
         self.sig = Sig()
         self.sig.data.connect(self._on_data)
+        self.sig.lot.connect(self._set_lot_info)
         self._build()
         self.thr = threading.Thread(target=self._poll_loop, daemon=True)
         self.thr.start()
@@ -1526,6 +1528,42 @@ class Dash(QWidget):
         # v3.87 (user): globe berputar DIPINDAH ke dalam ring gauge
         # (dulu overlay tabel) -- lihat class Gauge.__init__
         pl.addWidget(self.tv)
+        # v4.38 (user): panel LOT MANUAL -- selalu terlihat, isi lot
+        # TANPA bergantung tombol di tabel (pilih pair -> tulis lot ->
+        # ISI LOT).  Feedback sukses/gagal langsung di sebelahnya.
+        lotrow = QHBoxLayout()
+        lotrow.setSpacing(5)
+        lb_lm = QLabel("LOT MANUAL:")
+        lb_lm.setFont(sans(7, True))
+        lb_lm.setStyleSheet("color:%s;font-size:7pt;font-weight:bold;"
+                            "background:transparent;" % GOLD)
+        lotrow.addWidget(lb_lm)
+        self.cmb_syms = QComboBox()
+        self.cmb_syms.setMinimumWidth(110)
+        self.cmb_syms.setStyleSheet(
+            "QComboBox{background:#0a0f1e;color:#e8c574;border:1px solid "
+            "#243057;border-radius:4px;padding:2px 6px;font-size:8pt;}"
+            "QComboBox QAbstractItemView{background:#0a0f1e;"
+            "color:#e8c574;}")
+        lotrow.addWidget(self.cmb_syms)
+        self.ent_lot = QLineEdit()
+        self.ent_lot.setPlaceholderText("0.05  (0=AUTO)")
+        self.ent_lot.setFixedWidth(110)
+        self.ent_lot.setStyleSheet(
+            "QLineEdit{background:#0a0f1e;color:#ffd270;border:1px solid "
+            "#f0b429;border-radius:4px;padding:2px 6px;font-size:8pt;}")
+        self.ent_lot.returnPressed.connect(self._apply_lot)
+        lotrow.addWidget(self.ent_lot)
+        btn_lot = QPushButton("ISI LOT")
+        btn_lot.setObjectName("tabbtn")
+        btn_lot.setCursor(Qt.PointingHandCursor)
+        btn_lot.clicked.connect(self._apply_lot)
+        lotrow.addWidget(btn_lot)
+        self.lb_lot_info = QLabel("")
+        self.lb_lot_info.setFont(mono(7))
+        lotrow.addWidget(self.lb_lot_info)
+        lotrow.addStretch(1)
+        pl.addLayout(lotrow)
         left.addWidget(p)
 
         # ---- 2. CONFLUENCE ----
@@ -1760,14 +1798,70 @@ class Dash(QWidget):
         threading.Thread(target=self._sw_bg, args=(sym, bool(on)),
                          daemon=True).start()
 
+    def _set_lot_info(self, txt, col):
+        """v4.38: feedback panel LOT (thread-safe via sig.lot)."""
+        try:
+            self.lb_lot_info.setText(str(txt))
+            self.lb_lot_info.setStyleSheet(
+                "color:%s;font-size:7pt;font-weight:bold;"
+                "background:transparent;" % col)
+        except Exception:
+            pass
+
+    def _apply_lot_panel(self, s):
+        syms = []
+        for r0 in (s.get("scanner") or []):
+            s0 = str(r0.get("symbol") or "")
+            if s0 and s0 not in syms:
+                syms.append(s0)
+        cur = self.cmb_syms.currentText()
+        self.cmb_syms.blockSignals(True)
+        self.cmb_syms.clear()
+        self.cmb_syms.addItems(syms)
+        if cur in syms:
+            self.cmb_syms.setCurrentText(cur)
+        self.cmb_syms.blockSignals(False)
+
+    def _apply_lot(self):
+        """v4.38 (user): tombol ISI LOT di panel -- selalu bisa dipakai."""
+        sym = str(self.cmb_syms.currentText() or "").strip().upper()
+        if not sym:
+            self._set_lot_info("PILIH PAIR DULU", RED)
+            return
+        txt = str(self.ent_lot.text() or "").strip().replace(",", ".")
+        try:
+            lot = float(txt) if txt else 0.0
+        except ValueError:
+            self._set_lot_info("ANGKA TIDAK VALID", RED)
+            return
+        if lot < 0:
+            lot = 0.0
+        self._set_lot_info("MENGIRIM %s = %s ..."
+                           % (sym, ("%g" % lot) if lot > 0 else "AUTO"),
+                           "#f0b429")
+        self.sel_sym = sym
+        threading.Thread(target=self._lot_bg, args=(sym, lot),
+                         daemon=True).start()
+
+    def _post_ports(self):
+        """v4.38: port engine UTAMA = yang terbukti hidup (active_port),
+        sisanya cadangan -- POST tidak lagi salah sasaran."""
+        pts = ([self.active_port] if self.active_port else []) + \
+              [p for p in self.ports if p != self.active_port]
+        return pts
+
     def _sw_bg(self, sym, on):
-        for p in self.ports:
+        for p in self._post_ports():
             try:
                 body, code = self.client.pair_switch(p, sym, on)
                 if code == 200:
+                    self.sig.lot.emit(
+                        "SWITCH %s = %s TERSIMPAN" % (sym, "ON" if on
+                                                      else "OFF"), GRN)
                     return
             except Exception:
                 pass
+        self.sig.lot.emit("GAGAL %s -- engine tidak merespons" % sym, RED)
 
     def _edit_lot(self, sym, cur, btn=None):
         """v4.37 (user): dialog isi lot manual utk pair ini."""
@@ -1789,13 +1883,18 @@ class Dash(QWidget):
                          daemon=True).start()
 
     def _lot_bg(self, sym, lot):
-        for p in self.ports:
+        for p in self._post_ports():
             try:
                 body, code = self.client.pair_lot(p, sym, lot)
                 if code == 200:
+                    self.sig.lot.emit(
+                        "%s = %s TERSIMPAN" % (sym, ("%g" % lot) if lot > 0
+                                               else "AUTO"), GRN)
                     return
             except Exception:
                 pass
+        self.sig.lot.emit("GAGAL %s -- engine tidak merespons "
+                          "(cek jendela engine)" % sym, RED)
 
     def _halt(self):
         threading.Thread(target=self._halt_bg, daemon=True).start()
@@ -2091,6 +2190,7 @@ class Dash(QWidget):
             keep.append(r.get("symbol"))
         if self.sel_sym and self.sel_sym in keep:
             self.tv.selectRow(keep.index(self.sel_sym))
+        self._apply_lot_panel(s)
 
         # confluence + chart
         self._apply_cf(s)

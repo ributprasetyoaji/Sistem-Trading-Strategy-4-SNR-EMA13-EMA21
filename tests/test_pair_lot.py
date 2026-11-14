@@ -98,6 +98,29 @@ def test_status_rows_lot_dan_endpoint_live():
         srv.server_close()
 
 
+def test_qt_panel_lot_manual_dan_post_port_benar():
+    qt = open(os.path.join(os.path.dirname(__file__), "..", "python",
+                           "cc_qtdashboard.py"), encoding="utf-8").read()
+    # panel selalu terlihat
+    assert "LOT MANUAL:" in qt
+    assert "self.cmb_syms" in qt and "self.ent_lot" in qt
+    assert 'QPushButton("ISI LOT")' in qt
+    assert "def _apply_lot" in qt and "def _set_lot_info" in qt
+    assert "self.sig.lot.connect(self._set_lot_info)" in qt
+    assert "lot = Signal(str, str)" in qt
+    # POST tidak salah sasaran: active_port dulu
+    assert "def _post_ports" in qt
+    assert qt.count("for p in self._post_ports():") == 2   # sw + lot
+    assert "[self.active_port] if self.active_port else []" in qt
+
+
+def test_fallback_get_endpoint_di_server():
+    web = open(os.path.join(os.path.dirname(__file__), "..", "python",
+                            "cc_dashboard.py"), encoding="utf-8").read()
+    assert 'startswith("/api/pair_lot?")' in web
+    assert 'startswith("/api/pair_switch?")' in web
+
+
 def test_ui_qt_tk_web_kolom_lot():
     py = os.path.join(os.path.dirname(__file__), "..", "python")
     qt = open(os.path.join(py, "cc_qtdashboard.py"), encoding="utf-8").read()

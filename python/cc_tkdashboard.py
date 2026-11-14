@@ -903,7 +903,7 @@ class Dash(object):
                              daemon=True).start()
 
     def _lot_bg(self, sym, lot):
-        for p in self.ports:
+        for p in self._post_ports():
             try:
                 body, code = self.client.pair_lot(p, sym, lot)
                 if code == 200:
@@ -911,8 +911,14 @@ class Dash(object):
             except Exception:
                 pass
 
+    def _post_ports(self):
+        """v4.38: port engine UTAMA dulu (active_port), sisanya cadangan."""
+        pts = ([self.active_port] if self.active_port else []) + \
+              [p for p in self.ports if p != self.active_port]
+        return pts
+
     def _sw_bg(self, sym, on):
-        for p in self.ports:
+        for p in self._post_ports():
             try:
                 body, code = self.client.pair_switch(p, sym, on)
                 if code == 200:

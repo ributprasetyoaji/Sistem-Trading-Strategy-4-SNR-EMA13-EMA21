@@ -1013,6 +1013,45 @@ def make_handler(cc, password=""):
                     st = {"error": str(e)}
                 self._send(200, json.dumps(st, default=json_default),
                            "application/json")
+            elif self.path.startswith("/api/pair_lot?"):
+                # v4.38: fallback GET -- /api/pair_lot?symbol=X&lot=0.05
+                if not self._authed():
+                    self._send(401, '{"error":"auth"}', "application/json")
+                    return
+                try:
+                    q = parse_qs(self.path.split("?", 1)[1])
+                    sym = str((q.get("symbol") or [""])[0]).upper()
+                    lot = float((q.get("lot") or ["0"])[0] or 0)
+                    if not sym:
+                        raise ValueError("symbol kosong")
+                    lot = cc.set_pair_lot(sym, lot)
+                    self._send(200, json.dumps(
+                        {"ok": True, "symbol": sym, "lot": lot}),
+                        "application/json")
+                except Exception as e:
+                    self._send(400, json.dumps({"ok": False,
+                                                "error": str(e)}),
+                               "application/json")
+            elif self.path.startswith("/api/pair_switch?"):
+                # v4.38: fallback GET -- /api/pair_switch?symbol=X&on=1
+                if not self._authed():
+                    self._send(401, '{"error":"auth"}', "application/json")
+                    return
+                try:
+                    q = parse_qs(self.path.split("?", 1)[1])
+                    sym = str((q.get("symbol") or [""])[0]).upper()
+                    on = str((q.get("on") or ["0"])[0]) in ("1", "true",
+                                                            "ON", "on")
+                    if not sym:
+                        raise ValueError("symbol kosong")
+                    cc.set_pair_switch(sym, on)
+                    self._send(200, json.dumps(
+                        {"ok": True, "symbol": sym, "sw": on}),
+                        "application/json")
+                except Exception as e:
+                    self._send(400, json.dumps({"ok": False,
+                                                "error": str(e)}),
+                               "application/json")
             elif self.path == "/api/selfcheck":
                 # v4.32: bukti ground-truth tanpa JS (bisa difoto):
                 # jumlah pair per kategori + daftar simbol mentah
