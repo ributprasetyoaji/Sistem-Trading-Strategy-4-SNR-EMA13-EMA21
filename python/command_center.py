@@ -87,9 +87,11 @@ def _no_data_row(want):
     broker tidak match / terminal belum siap) - WAJIB tetap tampil
     di dashboard (gold/silver tidak boleh 'hilang' dari panel)."""
     return {"symbol": want, "price": 0.0, "digits": 2, "spread": 0,
-            "regime": "-", "signal": "-", "score": 0.0, "trend_pct": 0.0,
+            "regime": "-", "regime_dir": "-", "side": "-",
+            "signal": "-", "score": 0.0, "trend_pct": 0.0,
             "status": "NO-DATA", "sniper_why": "menunggu data pair ini",
             "block_why": "", "sl": 0.0, "tp": 0.0, "sl_points": 0,
+            "sl_price": 0.0, "tp_price": 0.0,
             "components": {}, "components_buy": {}, "components_sell": {},
             "ohlc": []}
 
@@ -1868,6 +1870,11 @@ class CommandCenter:
                 # TIDAK di-skip: pair wajib TAMPIL walau belum ada data
                 scanner.append(_no_data_row(want))
                 continue
+            if res.get("status") == "OFF":
+                # v4.35: baris OFF sudah bentuk tampilan lengkap --
+                # JANGAN masuk cabang normal (akses kunci langsung -> crash)
+                scanner.append(dict(res))
+                continue
             info = res.get("info") or {}
             has_pos = any(p["symbol"] == self.resolved.get(want, want) for p in pos)
             if res.get("strategy") == "S2":
@@ -1919,15 +1926,20 @@ class CommandCenter:
                 "symbol": want, "price": res["price"],
                 "digits": info.get("digits", 2),
                 "spread": info.get("spread_points", 0),
-                "regime": res["regime"] + ("" if res["regime_dir"] == "-" else " " + res["regime_dir"]),
-                "signal": res["side"] if res["score"] >= self.cfg.get("min_score", 70) * 0.85 else "-",
+                "regime": str(res.get("regime", "-")) +
+                          ("" if res.get("regime_dir", "-") == "-"
+                           else " " + str(res.get("regime_dir", "-"))),
+                "signal": res.get("side", "-")
+                          if res.get("score", 0) >=
+                          self.cfg.get("min_score", 70) * 0.85 else "-",
                 "score": res["score"], "trend_pct": res["components"].get("trend", 50),
                 "status": status,
                 "sniper_why": res.get("sniper_why", ""),
                 "block_why": res.get("block_why", ""),
-                "sl": res["sl_price"], "tp": res["tp_price"],
-                "sl_points": int(res["sl_points"]),
-                "components": res["components"],
+                "sl": res.get("sl_price", 0.0),
+                "tp": res.get("tp_price", 0.0),
+                "sl_points": int(res.get("sl_points", 0)),
+                "components": res.get("components", {}),
                 "components_buy": res["components_buy"],
                 "components_sell": res["components_sell"],
                 "ohlc": res.get("ohlc", [])[-60:],
@@ -1938,8 +1950,11 @@ class CommandCenter:
                    scanner[0] if scanner else None)
         confluence = None
         if top:
-            comps = [{"name": n, "key": k, "value": top["components_buy"][k],
-                      "value_sell": top["components_sell"][k]}
+            comps = [{"name": n, "key": k,
+                      "value": float(top.get("components_buy", {})
+                                     .get(k, 0.0) or 0.0),
+                      "value_sell": float(top.get("components_sell", {})
+                                          .get(k, 0.0) or 0.0)}
                      for k, n in cc_scanner.COMPONENT_NAMES]
             confluence = {"symbol": top["symbol"], "side": top["signal"],
                           "score": top["score"], "components": comps,
