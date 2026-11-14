@@ -7,7 +7,7 @@ rem  - PROGRAM ada di dalam file ini (self-extract, tanpa curl)
 rem  - Python belum ada? UNDUH + INSTALL OTOMATIS dari repo Anda
 rem    (installer resmi python.org yang sudah disimpan di repo)
 rem  - pandas belum ada? UNDUH 12 paket dari repo Anda, install
-rem    OFFLINE. Dashboard = browser web (tanpa jendela GUI tambahan).
+rem    OFFLINE. DASHBOARD UTAMA = jendela Qt PySide di layar VPS.
 rem  - Semua unduhan pakai certutil/PowerShell/bitsadmin - BUKAN curl
 rem  - Tidak ada token, tidak ada pertanyaan, sampai dashboard nyala
 rem ================================================================
@@ -1148,6 +1148,22 @@ if errorlevel 1 goto dep_gagal
 :dep_core_ok
 echo     Dependency core (pandas/numpy/requests/websockets) OK.
 
+rem ---- [2c] PySide6 (dashboard) + MetaTrader5 ----
+%PY% -c "import PySide6" >nul 2>nul
+if not errorlevel 1 goto dep_ui_ok
+echo     PySide6 belum ada - mengunduh dan memasang (diam-diam) ...
+%PY% -m pip install -q --disable-pip-version-check PySide6
+%PY% -c "import PySide6" >nul 2>nul
+if not errorlevel 1 goto dep_ui_ok
+%PY% -m pip install --disable-pip-version-check PySide6
+%PY% -c "import PySide6" >nul 2>nul
+if not errorlevel 1 goto dep_ui_ok
+%PY% -m pip install --user --disable-pip-version-check PySide6
+%PY% -c "import PySide6" >nul 2>nul
+if not errorlevel 1 goto dep_ui_ok
+echo [X] PySide6 gagal dipasang - dashboard tidak bisa dibuka.
+goto selesai_ui_gagal
+:dep_ui_ok
 %PY% -c "import MetaTrader5" >nul 2>nul
 if not errorlevel 1 goto dep_mt5_ok
 %PY% -m pip install -q --disable-pip-version-check MetaTrader5
@@ -1171,47 +1187,48 @@ if defined USRC robocopy "%USRC%\python" "%APP%\python" /E /XF cc_state.json cc_
 if exist "%UZIP%" del "%UZIP%" >nul 2>nul
 if exist "%UDIR%" rmdir /s /q "%UDIR%" >nul 2>nul
 
-rem ---- [4] Bersihkan proses lama lalu nyalakan ENGINE ----
+rem ---- [4] Bersihkan proses lama lalu nyalakan ENGINE + DASHBOARD QT ----
 echo [3/3] Menyalakan STRATEGY 4 ...
 for /f "tokens=5" %%p in ('netstat -aon ^| findstr ":8082" ^| findstr "LISTENING"') do taskkill /F /PID %%p >nul 2>&1
 powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 8082 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }" >nul 2>&1
 wmic process where "CommandLine like '%%command_center.py%%'" delete >nul 2>&1
 wmic process where "CommandLine like '%%cc_qtdashboard%%' or CommandLine like '%%cc_tkdashboard%%'" delete >nul 2>&1
-rem ---- engine DETACHED (pythonw): console boleh ditutup, engine tetap hidup ----
+rem ---- engine DETACHED (pythonw): jendela boleh ditutup, engine tetap hidup ----
 set "PYW="
 for /f "delims=" %%W in ('where pythonw 2^>nul') do if not defined PYW set "PYW=%%W"
 if not defined PYW set "PYW=%PY%"
 cd /d "%APP%"
 start "RBT FX ENGINE" %PYW% -u python\command_center.py
 
-rem ---- tunggu web dashboard hidup di port 8082 (3 cobaan) ----
+rem ---- tunggu data engine siap (GUI Qt mengambil data dari situ) ----
 %PY% -c "import socket,sys;s=socket.socket();s.settimeout(2);sys.exit(0 if s.connect_ex(('127.0.0.1',8082))==0 else 1)" >nul 2>nul
-if not errorlevel 1 goto web_ok
+if not errorlevel 1 goto eng_ok
 timeout /t 3 /nobreak >nul 2>nul
 %PY% -c "import socket,sys;s=socket.socket();s.settimeout(2);sys.exit(0 if s.connect_ex(('127.0.0.1',8082))==0 else 1)" >nul 2>nul
-if not errorlevel 1 goto web_ok
+if not errorlevel 1 goto eng_ok
 timeout /t 3 /nobreak >nul 2>nul
 %PY% -c "import socket,sys;s=socket.socket();s.settimeout(2);sys.exit(0 if s.connect_ex(('127.0.0.1',8082))==0 else 1)" >nul 2>nul
-if not errorlevel 1 goto web_ok
-echo [!] Port 8082 belum merespons - tunggu 10 dtk lalu buka browser manual.
-goto web_info
-:web_ok
-echo [OK] STRATEGY 4 JALAN - dashboard AKTIF di http://localhost:8082
-:web_info
-echo ---------------------------------------------------------------
-echo  DASHBOARD:
-echo  - Browser terbuka OTOMATIS (8 dtk) ke http://localhost:8082
-echo  - Kalau tidak: buka browser di VPS, ketik alamat itu
-echo  - Dari PC rumah: http://IP-PUBLIK-VPS:8082 (bukan 192.168.x.x)
-echo  - Engine berjalan DI LATAR BELAKANG - jendela ini BOLEH ditutup
-echo  - Mau matikan engine: buka Task Manager, akhiri pythonw.exe
-echo ---------------------------------------------------------------
-%PY% -c "import requests;print('     IP publik VPS ini: http://'+requests.get('https://api.ipify.org',timeout=8).text+':8082')" >nul 2>nul
-%PY% -c "import threading,webbrowser;threading.Timer(8.0,lambda:webbrowser.open('http://localhost:8082')).start()" >nul 2>nul
+if not errorlevel 1 goto eng_ok
+echo [!] Data engine belum siap - dashboard Qt akan menyambung sendiri.
+goto eng_info
+:eng_ok
+echo [OK] Engine STRATEGY 4 berjalan (data siap).
+:eng_info
+rem ---- DASHBOARD UTAMA: jendela Qt (PySide) ----
+start "RBT FX DASHBOARD" %PYW% "python\cc_qtdashboard.py" --port 8082
+echo [OK] Dashboard Qt (PySide) dibuka di layar VPS.
+echo Engine berjalan DI LATAR BELAKANG - jendela ini BOLEH ditutup.
+echo Mau matikan semua: Task Manager - akhiri pythonw.exe
 echo.
 echo SELESAI - STRATEGY 4 berjalan. Boleh tutup jendela ini.
 timeout /t 10 /nobreak >nul 2>nul
 exit /b 0
+
+:selesai_ui_gagal
+echo     Cek internet VPS lalu klik 2x file ini lagi.
+echo     (Program tetap terpasang - tidak perlu install ulang.)
+pause
+exit /b 1
 
 :payload_gagal
 echo [X] Gagal memasang program dari payload - download ulang file ini.
