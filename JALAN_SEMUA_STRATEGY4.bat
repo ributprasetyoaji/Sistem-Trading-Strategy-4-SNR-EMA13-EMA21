@@ -1198,7 +1198,8 @@ set "PYW="
 for /f "delims=" %%W in ('where pythonw 2^>nul') do if not defined PYW set "PYW=%%W"
 if not defined PYW set "PYW=%PY%"
 cd /d "%APP%"
-start "RBT FX ENGINE" %PYW% -u python\command_center.py
+start "RBT FX ENGINE" /MIN "%PY%" -u python\command_center.py
+echo     Engine dinyalakan - console minimized: RBT FX ENGINE di taskbar.
 
 rem ---- tunggu data engine siap (GUI Qt mengambil data dari situ) ----
 %PY% -c "import socket,sys;s=socket.socket();s.settimeout(2);sys.exit(0 if s.connect_ex(('127.0.0.1',8082))==0 else 1)" >nul 2>nul
@@ -1207,9 +1208,14 @@ timeout /t 3 /nobreak >nul 2>nul
 %PY% -c "import socket,sys;s=socket.socket();s.settimeout(2);sys.exit(0 if s.connect_ex(('127.0.0.1',8082))==0 else 1)" >nul 2>nul
 if not errorlevel 1 goto eng_ok
 timeout /t 3 /nobreak >nul 2>nul
+timeout /t 3 /nobreak >nul 2>nul
 %PY% -c "import socket,sys;s=socket.socket();s.settimeout(2);sys.exit(0 if s.connect_ex(('127.0.0.1',8082))==0 else 1)" >nul 2>nul
 if not errorlevel 1 goto eng_ok
-echo [!] Data engine belum siap - dashboard Qt akan menyambung sendiri.
+%PY% -c "import socket,sys;s=socket.socket();s.settimeout(2);sys.exit(0 if s.connect_ex(('127.0.0.1',8082))==0 else 1)" >nul 2>nul
+if not errorlevel 1 goto eng_ok
+echo [!] Data engine belum siap - dashboard Qt tetap dibuka.
+echo     Kalau dashboard bilang OFFLINE: klik jendela RBT FX ENGINE
+echo     di taskbar utk melihat pesan error engine.
 goto eng_info
 :eng_ok
 echo [OK] Engine STRATEGY 4 berjalan (data siap).
