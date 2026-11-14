@@ -124,7 +124,9 @@ class CommandCenter:
         self.candidates = {}   # want -> {'t','side','score'}: sinyal M15 yang
                                #   MASIH BERLAKU; M1 menahan sampai momen pas
         # ---- STRATEGY 2 (port EA v6.05): state pending HOLD + ATR trail ----
-        self.s2_on = bool(self.cfg.get("s3"))
+        # S4 (user): template KOSONG -> selalu dievaluasi (selalu WAIT)
+        # sampai user mengisi logic entry baru di cc_strategy3.py.
+        self.s2_on = True
         self.s2k = cc_strategy2.s2_cfg(self.cfg) if self.s2_on else {}
         self.s2state = cc_strategy2.Strategy2State(
             os.path.join("data", "s3_state.json"))
@@ -134,27 +136,8 @@ class CommandCenter:
         self._s3_hist_try = {}
         self._s3_cloud_try = {}
         self.s2_started = time.time()
-        if self.s2_on:
-            _rr_b = float(self.cfg.get("tp_rr", 0.0) or 0.0)
-            _md_b = str(self.cfg.get("tp_mode", "close") or
-                        "close").strip().lower()
-            _tp_b = ("TP RR 1:%.1f (%s)" % (_rr_b, _md_b) if _rr_b > 0
-                     else "TP uang %.0f USD (%s)"
-                     % (float(self.cfg.get("tp_money_usd", 0.0) or 0.0),
-                        _md_b))
-            self.emit_log("ENGINE", "RBT FX ATR MOMENTUM aktif | SL %.2fxATR M5 | "
-                          "protect %.2f->%.2f | trail %.2f->%.2f step %.2f | "
-                          "%s | max %d pair | cooldown %d mnt | "
-                          "max daily loss: OFF (v4.31)"
-                          % (self.s2k.get("sl_atr", 0.80),
-                             self.s2k.get("protect_start", 0.85),
-                             self.s2k.get("protect_lock", 0.30),
-                             self.s2k.get("trail_start", 1.25),
-                             self.s2k.get("trail_first_lock", 1.20),
-                             self.s2k.get("trail_step", 0.05),
-                             _tp_b,
-                             int(self.s2k.get("max_baskets", 3)),
-                             int(self.s2k.get("cooldown_min", 10))))
+        self.emit_log("ENGINE", "STRATEGY 4: TEMPLATE KOSONG - entry/logic/"
+                      "filter menunggu diisi (semua pair akan WAIT)")
         self._signal_csv_init()
 
     # ------------------------------------------------------------------ log --

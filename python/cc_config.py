@@ -206,59 +206,10 @@ DEFAULTS = {
     "money_trail_enabled": False,     # OFF di S2 (SL dikelola ATR trail)
     "basket_tp_enabled": False,       # OFF di S2 (tidak ada TP profit di EA)
     "smart_exit_enabled": False,      # OFF di S2
-    "s3": {  # ===== PARAMETER RBT FINGERPRINT TRADING SYSTEM (blueprint v1)
-        "ema_fast": 13, "ema_slow": 21, "atr_period": 14,
-        "regime_ema_sep_min_atr": 0.10,   # H1 regime: separasi EMA min (xATR)
-        "regime_slope_lookback": 6,
-        "zone_swing_strength": 3,         # pivot kiri+kanan M15
-        "zone_width_atr": 0.50,           # lebar zona = 0.5 x ATR M15
-        "zone_max_age_bars": 200,
-        "zone_touch_min_exit_atr": 0.60,  # jarak keluar utk hitung kunjungan baru
-        "zone_max_priority_interactions": 3,
-        "zone_max_attempts": 2,           # re-entry maks per zona (blueprint s.35)
-        "zone_min_strength": 55.0,
-        "zone_oppose_buffer_atr": 0.30,   # buffer TP sebelum zona lawan
-        "zone_invalidate_atr": 0.25,
-        "fp_sequence_len": 5,             # fingerprint 5 candle (blueprint s.9)
-        "fp_similarity_candidate": 80.0,  # ambang similarity (BUKAN probabilitas)
-        "fp_min_sample_size": 12,         # sampel historis minimal
-        "fp_history_bars": 12000,         # jendela DB fingerprint (bar M15)
-        "hist_bars": 35040,               # TARGET RIWAYAT DALAM: 35040 bar
-                                          #   M15 ~ 1 tahun; 105000 ~ 3 tahun;
-                                          #   AUTO berhenti saat broker habis
-        "hist_batch": 1500,               # bar per halaman (MT4 bridge)
-        "hist_max_sec": 10.0,             # anggaran waktu per percobaan/pair
-        "hist_refresh_hours": 6.0,        # interval lanjutkan/refresh cache
-        "fp_outcome_horizon": 24,         # bar utk ukur outcome (+2R sebelum -1R)
-        "fp_r_atr": 1.0,
-        "min_setup_score": 70.0,
-        "w_zone": 30.0, "w_structure": 20.0, "w_ema": 15.0,
-        "w_fingerprint": 25.0, "w_regime": 10.0,
-        "m5_min_body_atr": 0.60,          # displacement M5 (body/ATR)
-        "m1_trigger_bars": 12,
-        "m1_break_atr": 0.15,
-        "sl_structure_buffer_atr": 0.35,  # SL = struktur +/- buffer ATR
-        "min_sl_atr_ratio": 0.45,         # breathing room minimal (blueprint s.15)
-        "max_sl_atr_ratio": 2.5,
-        "base_rr": 2.0,                   # target dasar 1:2 (bukan TP final)
-        "max_entry_distance_atr": 1.00,   # NO-CHASE (blueprint s.29)
-        "setup_expiration_bars": 8,       # setup hangus jika tak tereksekusi
-        "max_baskets": 5,                 # MAKS 5 posisi (batas, bukan target)
-        "bep_trigger_r": 1.0,             # +1R -> SL ke BEP+ (blueprint s.32)
-        "bep_buffer_r": 0.10,             # BEP+ buffer (spread+komisi+kecil)
-        "trail_trigger_r": 2.0,           # +2R -> trailing aktif (blueprint s.33)
-        "trail_back_r": 1.0,              # trailing = peak - 1R (ratchet)
-        "trail_hard_cap_r": 10.0,         # pengaman TP jauh (0 = tanpa TP broker)
-        "cooldown_min": 10,
-        "max_total_open_risk_pct": 15.25, # v4.14: 5 x 3% + toleransi
-                                          #   normalisasi lot (dulu 2.75)
-        "risk_per_trade_percent": 3.0,    # v4.14: ikut risk_pct 3%
-        "warmup_sec": 20,    # v4.23: entry cepat stlh reload (dulu 150)
-        "spread_points": {"XAUUSD": 250, "XAGUSD": 50, "BTCUSD": 2500,
-                          "USTEC": 150, "US100": 150, "NAS100": 150},
-        "spread_points_default": 2500,
-        "sl_atr": 1.2,                    # fallback risiko trail (x ATR M5)
-  },
+    "s3": {  # ===== PARAMETER STRATEGY 4 DIKOSONGKAN (user isi baru) =====
+             # taruh parameter angka strategi baru di sini, contoh:
+             #   "ema_fast": 13, "ema_slow": 21, "snr_strength": 3
+             },
     "tp_r": 1.0,                      # (tidak dipakai S2; TP=0 dari ATR spec)
     "tp_body_pos": 0.4,               # v3.16: posisi TP di BATANG lilin SNR
                                       #   0=tepi batang sisi-dekat, 0.5=tengah

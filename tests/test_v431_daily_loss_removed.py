@@ -84,4 +84,4 @@ def test_sumber_kode_keras_dan_display_nol():
                             "command_center.py"),
                encoding="utf-8").read()
     assert '"daily_loss_limit": 0.0}' in eng         # api/status nol
-    assert "max daily loss: OFF" in eng              # log startup
+    assert "TEMPLATE KOSONG" in eng                  # log startup S4
