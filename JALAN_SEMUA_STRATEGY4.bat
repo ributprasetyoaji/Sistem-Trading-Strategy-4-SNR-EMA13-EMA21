@@ -1182,13 +1182,51 @@ for /f "tokens=5" %%p in ('netstat -aon ^| findstr ":8082" ^| findstr "LISTENING
 powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 8082 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }" >nul 2>&1
 wmic process where "CommandLine like '%%cc_qtdashboard%%' or CommandLine like '%%cc_tkdashboard%%'" delete >nul 2>&1
 set "DASH=python\cc_tkdashboard.py"
-%PY% -c "import PySide6" >nul 2>nul
-if not errorlevel 1 set "DASH=python\cc_qtdashboard.py"
-set "PYW=%PY%"
-for %%P in (%PY%) do if exist "%%~dpPpythonw.exe" set "PYW=%%~dpPpythonw.exe"
+%PY% -c "import PySide6; from PySide6 import QtWidgets" >nul 2>nul
+if errorlevel 1 goto dash_tk
+set "DASH=python\cc_qtdashboard.py"
+goto dash_ok
+:dash_tk
+%PY% -c "import tkinter" >nul 2>nul
+if not errorlevel 1 goto dash_tk_ok
+echo [!] PySide6 dan tkinter tidak tersedia - pakai dashboard WEB saja.
+goto dash_ok
+:dash_tk_ok
+echo     PySide6 tidak ada - memakai dashboard Tk bawaan Python.
+:dash_ok
+rem ---- pythonw (dashboard tanpa console ekstra); kalau tidak ada, python ----
+set "PYW="
+for /f "delims=" %%W in ('where pythonw 2^>nul') do if not defined PYW set "PYW=%%W"
+if not defined PYW set "PYW=%PY%"
 cd /d "%APP%"
 start "RBT FX DASHBOARD" %PYW% "%DASH%" --port 8082
-echo Dashboard web/port 8082 dinyalakan. Engine berjalan DI JENDELA INI.
+
+rem ---- tunggu web dashboard engine hidup di port 8082 (3 cobaan) ----
+%PY% -c "import socket,sys;s=socket.socket();s.settimeout(2);sys.exit(0 if s.connect_ex(('127.0.0.1',8082))==0 else 1)" >nul 2>nul
+if not errorlevel 1 goto web_ok
+timeout /t 3 /nobreak >nul 2>nul
+%PY% -c "import socket,sys;s=socket.socket();s.settimeout(2);sys.exit(0 if s.connect_ex(('127.0.0.1',8082))==0 else 1)" >nul 2>nul
+if not errorlevel 1 goto web_ok
+timeout /t 3 /nobreak >nul 2>nul
+%PY% -c "import socket,sys;s=socket.socket();s.settimeout(2);sys.exit(0 if s.connect_ex(('127.0.0.1',8082))==0 else 1)" >nul 2>nul
+if not errorlevel 1 goto web_ok
+echo [!] Port 8082 belum merespons - engine web mungkin masih start.
+goto web_info
+:web_ok
+echo [OK] Dashboard web AKTIF di http://localhost:8082
+:web_info
+echo ---------------------------------------------------------------
+echo  CARA BUKA DASHBOARD:
+echo  1. Di VPS: browser terbuka OTOMATIS (8 dtk) ke http://localhost:8082
+echo     Kalau tidak terbuka, buka browser di VPS, ketik alamat itu.
+echo  2. Dari PC rumah: http://IP-PUBLIK-VPS:8082
+echo     (192.168.99.99 = IP internal, tidak bisa dipakai dari luar)
+echo ---------------------------------------------------------------
+rem ---- tampilkan IP publik VPS (info akses dari rumah) ----
+%PY% -c "import requests;print('     IP publik VPS ini: http://'+requests.get('https://api.ipify.org',timeout=8).text+':8082')" >nul 2>nul
+rem ---- buka browser otomatis 8 dtk setelah engine start ----
+%PY% -c "import threading,webbrowser;threading.Timer(8.0,lambda:webbrowser.open('http://localhost:8082')).start()" >nul 2>nul
+echo Dashboard dinyalakan. Engine berjalan DI JENDELA INI.
 echo JANGAN tutup jendela ini selama trading.
 %PY% -u python\command_center.py
 goto selesai
@@ -1215,6 +1253,10 @@ pause
 exit /b 1
 
 :selesai
+echo.
+echo STRATEGY 4 berhenti. Klik 2x file ini lagi untuk menyalakan.
+pause
+exit /b 0
 echo.
 echo STRATEGY 4 berhenti. Klik 2x file ini lagi untuk menyalakan.
 pause
