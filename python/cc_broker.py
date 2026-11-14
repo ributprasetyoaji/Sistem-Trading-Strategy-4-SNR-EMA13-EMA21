@@ -156,36 +156,106 @@ def rates_to_py(r):
 SYMBOL_SUFFIXES = ["", "m", "c", "z", "i", "pro", ".a", ".c", ".m", ".pro",
                    ".standard", ".raw", "#", "-ecn"]
 
+# S4 (user): NAMA BROKER OTOMATIS UTK SEMUA PAIR -- alias generik bawaan
+# (dipakai utk pair mana pun tanpa perlu daftar alternate manual; daftar
+#  symbol_alternates di config tetap MENANG bila ada = override user).
+ALIAS_BUILTIN = {
+    "XAUUSD": ["GOLD", "XAU/USD", "XAUUSD#", "GC"],
+    "XAGUSD": ["SILVER", "XAG/USD", "XAGUSD#", "SI"],
+    "XPTUSD": ["PLATINUM", "XPT/USD"],
+    "XPDUSD": ["PALLADIUM", "XPD/USD"],
+    "BTCUSD": ["BTC/USD", "BTCUSDT", "XBTUSD", "BITCOIN", "BTC"],
+    "ETHUSD": ["ETH/USD", "ETHUSDT", "ETHEREUM", "ETH"],
+    "SOLUSD": ["SOL/USD", "SOLUSDT", "SOLANA"],
+    "XRPUSD": ["XRP/USD", "XRPUSDT", "RIPPLE"],
+    "LTCUSD": ["LTC/USD", "LTCUSDT", "LITECOIN"],
+    "DOGEUSD": ["DOGE/USD", "DOGEUSDT", "DOGECOIN"],
+    "ADAUSD": ["ADA/USD", "ADAUSDT", "CARDANO"],
+    "BCHUSD": ["BCH/USD", "BCHUSDT"],
+    "USOIL": ["WTI", "CRUDE", "XTIUSD", "USOIL.c", "OIL"],
+    "UKOIL": ["BRENT", "XBRUSD", "UKOIL.c"],
+    "NAS100": ["USTEC", "US100", "NDX100", "NASDAQ", "NDX"],
+    "US500": ["SPX", "SP500", "US500.c", "S&P500"],
+    "US30": ["DOW", "DJI30", "WALLSTREET", "WS30", "USA30", "DJI"],
+    "GER40": ["DE40", "DAX", "DAX40", "GER30", "GERTEC40"],
+    "FRA40": ["CAC40", "FRA40.c"],
+    "UK100": ["FTSE", "FTSE100"],
+    "EU50": ["STOXX50", "EUR50"],
+    "JP225": ["NIKKEI", "NIKKEI225", "JPN225"],
+    "HK50": ["HSI", "HANGSENG"],
+    "AUS200": ["ASX200", "AU200"],
+    "US2000": ["RUSSELL", "RUSSELL2000"],
+    "SWI20": ["SWISS20", "SMI20"],
+    "ESP35": ["IBEX35", "SPAIN35"],
+    "ITA40": ["FTSEMIB", "ITALY40"],
+    "NETH25": ["AEX25", "NETHERLANDS25"],
+    "SGP30": ["STRAITS", "SING30"],
+    "CHN50": ["CHINAA50", "CNC50"],
+    "EURUSD": ["EUR/USD"],
+    "GBPUSD": ["GBP/USD"],
+    "USDJPY": ["USD/JPY"],
+    "USDCHF": ["USD/CHF"],
+    "USDCAD": ["USD/CAD"],
+    "AUDUSD": ["AUD/USD"],
+    "NZDUSD": ["NZD/USD"],
+    "EURJPY": ["EUR/JPY"],
+    "GBPJPY": ["GBP/JPY"],
+}
+
+
+def _norm(s):
+    """Hilangkan semua non-alphanumeric (GOLD.A->GOLDA, BTC/USD->BTCUSD)."""
+    return "".join(ch for ch in str(s).upper() if ch.isalnum())
+
 
 def match_symbol(want, alts, names, suffixes=SYMBOL_SUFFIXES):
     """Cocokkan nama pair dgn daftar nama symbol broker (fungsi murni, uji-able).
 
-    Urutan prioritas:
+    S4 (user): OTOMATIS utk SEMUA pair.  Urutan prioritas:
       1. persis sama            (USTEC == USTEC)
       2. persis + akhiran       (USTEC -> USTECm, akun Standard Exness)
-      3. diawali nama alternat  (NAS100 -> NAS100.a)
-      4. mengandung nama        (paling longgar)
+      3. ternormalisasi sama    (BTCUSD == BTC/USD, tanpa tanda baca)
+      4. diawali nama alternat  (NAS100 -> NAS100.a, GOLD -> GOLD.a)
+      5. mengandung nama        (paling longgar)
+    Nama terpendek dipilih saat seri (paling kanonik, deterministik).
     Return nama ASLI di broker, atau "" kalau tidak ada.
     """
+    cands = []
+    for a in (alts or []):
+        if a and a not in cands:
+            cands.append(a)
     up = {n.upper(): n for n in names}
-    for a in alts:
-        if a.upper() in up:
-            return up[a.upper()]
-    for a in alts:
+    # 1. persis
+    for a in cands:
+        if str(a).upper() in up:
+            return up[str(a).upper()]
+    # 2. + akhiran
+    for a in cands:
         for suf in suffixes:
             c = (str(a) + suf).upper()
             if c in up:
                 return up[c]
-    for a in alts:
-        au = str(a).upper()
-        for n in sorted(names):          # sorted -> hasil deterministik
-            if n.upper().startswith(au):
-                return n
-    for a in alts:
-        au = str(a).upper()
-        for n in sorted(names):
-            if au in n.upper():
-                return n
+    # 3. ternormalisasi (abaikan tanda baca)
+    norm = {_norm(n): n for n in names}
+    for a in cands:
+        hit = norm.get(_norm(a))
+        if hit:
+            return hit
+    # 4. diawali  5. mengandung (terpendek menang -> paling kanonik)
+    for minlen_pass in (4, 5):
+        best = None
+        for a in cands:
+            au = _norm(a)
+            if not au:
+                continue
+            for n in names:
+                nu = _norm(n)
+                if (minlen_pass == 4 and nu.startswith(au)) or \
+                        (minlen_pass == 5 and au in nu):
+                    if best is None or len(n) < len(best):
+                        best = n
+        if best:
+            return best
     return ""
 
 
@@ -400,8 +470,12 @@ class MT5Broker:
 
     # -- symbol -------------------------------------------------------------
     def resolve_symbol(self, want: str) -> str:
-        """Cari nama symbol di broker (NAS100=USTEC/USTECm di Exness dll)."""
-        alts = self.cfg.get("symbol_alternates", {}).get(want, [want])
+        """Cari nama symbol di broker -- S4 OTOMATIS utk semua pair:
+        alternates config (override user) + ALIAS_BUILTIN generik."""
+        cfg_alts = (self.cfg.get("symbol_alternates", {}) or {}).get(want) or []
+        alts = [want] + [a for a in cfg_alts if a != want] \
+            + [a for a in ALIAS_BUILTIN.get(want, []) if a not in cfg_alts
+               and a != want]
         try:
             allsyms = mt5.symbols_get() or []
         except Exception:
