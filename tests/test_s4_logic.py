@@ -242,6 +242,164 @@ def test_penolakan_wick_sell_tanpa_nunggu_3_bar():
     assert "penolakan" in r[3]
 
 
+def _wick_uptrend_data(info=None):
+    """Data wick BUY (hammer) utk uji rantai filter."""
+    up = [90 + 0.5 * i for i in range(11)]
+    h0 = [95.0] * 3
+    dip = [93.2, 92.8, 93.0]
+    up2 = [94.5 + 0.55 * i for i in range(10)]
+    h1 = [100.0] * 4
+    cl = up + h0 + dip + up2 + h1 + [97.6, 97.0, 98.9]
+    lo = ([x - 0.12 for x in (up + h0 + dip + up2 + h1)] +
+          [97.3, 96.8, 96.5])
+    hi = ([x + 0.12 for x in (up + h0 + dip + up2 + h1)] +
+          [98.2, 97.8, 99.1])
+    b = _wick_bars(cl, lo, hi)
+    return {"m15": b,
+            "m5": _bars([100 + 0.3 * i for i in range(40)]),
+            "m1": _bars([100.0] * 40),
+            "info": info or _info(98.95)}
+
+
+def test_wick_tetap_wajib_lolosi_filter():
+    """v4.48 (user): entry BUY/SELL -- APAPUN jalannya (struktural atau
+    wick) -- TETAP WAJIB LOLOS SEMUA FILTER.  Jalur wick hanya gerbang
+    struktur ke-4; bias -> ADX -> M5 dicek SEBELUM wick, dan saat
+    eksekusi semua di-re-check dgn data fresh."""
+    # [1] bias netral (stack EMA dirusak) -> wick tak pernah dicapai
+    k2 = dict(K)
+    k2["ema_fast"] = 1
+    k2["ema_slow"] = 1                      # EMA13==EMA21 -> stack netral
+    r = S.evaluate("XAUUSD", _wick_uptrend_data(), k2, None)
+    assert r["status"] == "WAIT" and "bias" in r["why"]
+    # [2] ADX lemah -> WAIT (wick valid pun ditolak)
+    k3 = dict(K)
+    k3["adx_min"] = 99.0
+    r2 = S.evaluate("XAUUSD", _wick_uptrend_data(), k3, None)
+    assert r2["status"] == "WAIT" and "ADX" in r2["why"]
+    # [3] M5 kontra -> WAIT
+    d3 = _wick_uptrend_data()
+    d3["m5"] = _bars([130 - 0.3 * i for i in range(40)])
+    r3 = S.evaluate("XAUUSD", d3, K, None)
+    assert r3["status"] == "WAIT" and "M5" in r3["why"]
+    # [4] semua filter lolos -> READY (jalur wick) dgn paket eksekusi
+    r4 = S.evaluate("XAUUSD", _wick_uptrend_data(), K, None)
+    assert r4["status"] == "READY" and r4["exec"]["sig"] == "BUY"
+    assert "penolakan" in r4["why"]
+    # [5] saat eksekusi bias berbalik (data fresh) -> RE-CHECK MENOLAK
+    dn15 = _bars([130 - 0.4 * i for i in range(60)])
+    ok, why, _, _, _ = S.validate_execution(
+        "XAUUSD", r4, {"m15": dn15, "m5": r4["exec"] and
+                       _wick_uptrend_data()["m5"]}, 98.9, 99.0, K, None)
+    assert ok is False and "bias" in why
+
+
+def test_wick_pipeline_penuh_hingga_order():
+    """v4.48: sinyal wick -> pipeline eksekusi ASLI (_try_execute_s2)
+    -> order TERKIRIM hanya karena SEMUA filter lolos; SL = ujung
+    pullback, TP = RR 1:1 dari harga eksekusi (validate asli, tanpa
+    monkeypatch).  Max baskets penuh -> order DITOLAK."""
+    import types as _t
+
+    class _St(object):
+        def cooldown_until(self, want):
+            return 0.0
+
+        def clear(self, want):
+            pass
+
+        def save(self):
+            pass
+
+        def __getattr__(self, name):
+            return lambda *a, **k: None
+
+    class _Risk(object):
+        def can_open(self, sym, pos):
+            return True, ""
+
+        def note_open(self, sym):
+            pass
+
+        def calc_lot(self, sym, info, sl_points, cur, rate):
+            return 0.01, "fake-min"
+
+    class _Br(object):
+        def __init__(self):
+            self.orders = []
+
+        def symbol_tick(self, sym):
+            return {"bid": 98.95, "ask": 99.05}
+
+        def symbol_info(self, sym):
+            return _wick_uptrend_data()["info"]
+
+        def order_send(self, sym, side, lot, sl, tp, comment=""):
+            self.orders.append({"sym": sym, "side": side, "lot": lot,
+                                "sl": sl, "tp": tp})
+            return _t.SimpleNamespace(ok=True, comment="OK", ticket=1)
+
+    def _ns(br, positions=None):
+        ns = _t.SimpleNamespace()
+        ns.cfg = {"bars_m5": 200, "bars_m1": 120, "min_score": 70,
+                  "max_baskets": 3, "warmup_sec": 20,
+                  "min_entry_lot": 0.04, "sl_money_usd": 0.0,
+                  "tp_money_usd": 0.0, "tp_rr": 0.0, "tp1_rr": 0.0,
+                  "tp2_rr": 0.0, "tp_mode": "close",
+                  "tp_broker_hard": False, "tp_min_rr_net": 0.6}
+        ns.resolved = {"XAUUSD": "XAUUSD"}
+        ns.broker = br
+        ns.risk = _Risk()
+        ns.s2state = _St()
+        ns.s2_started = time.time() - 10000
+        ns.s2k = K
+        ns.s2_on = True
+        ns.scan = {}
+        ns.candidates = {"XAUUSD": {"t": time.time(), "side": "BUY"}}
+        ns._scan_fail = {}
+        ns._scan_warn_ts = {}
+        ns._scan_allfail = 0
+        ns.pair_sw = {"XAUUSD": True}
+        ns.pair_lot = {}
+        ns._s2_hold_memo = {}
+        ns.emit_log = lambda tag, msg: None
+        ns._write_signal = lambda *a, **k: None
+        ns.account_usd_rate = lambda: ("USD", 1.0)
+        data = _wick_uptrend_data()
+        ns._fetch_data = lambda want, sym: data      # data fresh = sama
+        ns._market_guard_block = lambda s, r: False
+        ns.pair_lot_of = lambda want: \
+            CC.CommandCenter.pair_lot_of(ns, want)
+        return ns
+
+    res = S.evaluate("XAUUSD", _wick_uptrend_data(), K, None)
+    res["symbol"] = "XAUUSD"
+    assert res["status"] == "READY"
+    br = _Br()
+    CC.CommandCenter._try_execute_s2(_ns(br), res, [])
+    assert len(br.orders) == 1, "order harus terkirim (semua filter lolos)"
+    o = br.orders[0]
+    assert o["side"] == "BUY" and abs(o["lot"] - 0.01) < 1e-9
+    assert abs(o["sl"] - 96.5) < 0.2                # SL = ujung pullback
+    # tp_broker_hard=false (config live) -> order tp=0 = TP VIRTUAL;
+    # TP RR 1:1 dikelola engine (tangga TP / s4_exit / trailing)
+    assert o["tp"] == 0.0
+    dist = abs(res["exec"]["price"] - o["sl"])
+    assert dist > 0 and res["exec"]["tp"] != 0      # RR internal terpasang
+    assert res["status"] == "TRADING"
+    # negatif: max baskets penuh (3 posisi bot) -> order DITOLAK
+    res2 = S.evaluate("XAUUSD", _wick_uptrend_data(), K, None)
+    res2["symbol"] = "XAUUSD"
+    br2 = _Br()
+    pos = [{"symbol": "A%d" % i, "manual": False} for i in range(3)]
+    CC.CommandCenter._try_execute_s2(_ns(br2), res2, pos)
+    assert br2.orders == []                         # filter menolak
+    # kontrak engine: max baskets = sinyal DITAHAN menunggu slot
+    # (_hold_keep -> HOLD_WAIT), TIDAK pernah jadi order
+    assert res2["status"] == "HOLD_WAIT"
+    assert "MAX_BASKETS" in res2["why"]
+
+
 def test_tanpa_penolakan_tidak_entry_early():
     """v4.48: bar terakhir TIDAK menolak (close di setengah bawah bar,
     tidak menjauh dari ujung) -> jalur wick tidak entry.  Jalur
