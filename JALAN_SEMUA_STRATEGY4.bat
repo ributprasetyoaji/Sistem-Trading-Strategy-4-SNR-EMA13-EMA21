@@ -1195,7 +1195,16 @@ mkdir "%APP%\python\PySide6" >nul 2>nul
 >>"%APP%\python\PySide6\__init__.py" echo __version__ = getattr(_p2, "__version__", "5.15.2")
 >"%APP%\python\PySide6\QtCore.py" echo from PySide2.QtCore import *
 >"%APP%\python\PySide6\QtGui.py" echo from PySide2.QtGui import *
+>>"%APP%\python\PySide6\QtGui.py" echo try:
+>>"%APP%\python\PySide6\QtGui.py" echo     QGuiApplication.exec = QGuiApplication.exec_
+>>"%APP%\python\PySide6\QtGui.py" echo except Exception:
+>>"%APP%\python\PySide6\QtGui.py" echo     pass
 >"%APP%\python\PySide6\QtWidgets.py" echo from PySide2.QtWidgets import *
+>>"%APP%\python\PySide6\QtWidgets.py" echo try:
+>>"%APP%\python\PySide6\QtWidgets.py" echo     QApplication.exec = QApplication.exec_
+>>"%APP%\python\PySide6\QtWidgets.py" echo     QCoreApplication.exec = QCoreApplication.exec_
+>>"%APP%\python\PySide6\QtWidgets.py" echo except Exception:
+>>"%APP%\python\PySide6\QtWidgets.py" echo     pass
 %PY% -c "import sys;sys.path.insert(0,'%APP%\python');import PySide6.QtWidgets" >nul 2>nul
 if not errorlevel 1 goto ui_ok
 echo     Jembatan gagal - dashboard dipakai lewat Tk bawaan Python.
