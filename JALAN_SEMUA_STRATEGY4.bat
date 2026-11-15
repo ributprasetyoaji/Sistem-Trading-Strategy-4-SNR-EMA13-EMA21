@@ -1195,7 +1195,8 @@ wmic process where "CommandLine like '%%command_center.py%%'" delete >nul 2>&1
 wmic process where "CommandLine like '%%cc_qtdashboard%%' or CommandLine like '%%cc_tkdashboard%%'" delete >nul 2>&1
 rem ---- engine DETACHED (pythonw): jendela boleh ditutup, engine tetap hidup ----
 set "PYW="
-for /f "delims=" %%W in ('where pythonw 2^>nul') do if not defined PYW set "PYW=%%W"
+rem ---- pythonw HARUS sejajar python valid (ukuran >100KB, bukan stub) ----
+for /f "delims=" %%W in ('where python 2^>nul') do if not defined PYW if %%~zW GTR 100000 if exist "%%~dpWpythonw.exe" set "PYW=%%~dpWpythonw.exe"
 if not defined PYW set "PYW=%PY%"
 cd /d "%APP%"
 start "RBT FX ENGINE" /MIN "%PY%" -u python\command_center.py
@@ -1223,8 +1224,12 @@ echo [OK] Engine STRATEGY 4 berjalan (data siap).
 rem ---- DASHBOARD UTAMA: jendela Qt (PySide) ----
 start "RBT FX DASHBOARD" %PYW% "python\cc_qtdashboard.py" --port 8082
 echo [OK] Dashboard Qt (PySide) dibuka di layar VPS.
+rem ---- WATCHDOG: kalau dashboard tidak hidup 8 dtk -> start mode console ----
+timeout /t 8 /nobreak >nul 2>nul
+tasklist | findstr /I "pythonw.exe" >nul 2>nul || start "RBT FX DASHBOARD" %PY% "python\cc_qtdashboard.py" --port 8082
+tasklist | findstr /I "pythonw.exe" >nul 2>nul || echo [!] Dashboard dipakai lewat mode console (pythonw tidak hidup).
 echo Engine berjalan DI LATAR BELAKANG - jendela ini BOLEH ditutup.
-echo Mau matikan semua: Task Manager - akhiri pythonw.exe
+echo Mau matikan semua: Task Manager - akhiri python.exe dan pythonw.exe
 echo.
 echo SELESAI - STRATEGY 4 berjalan. Boleh tutup jendela ini.
 timeout /t 10 /nobreak >nul 2>nul
