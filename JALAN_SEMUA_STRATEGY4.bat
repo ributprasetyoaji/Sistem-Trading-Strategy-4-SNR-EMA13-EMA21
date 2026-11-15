@@ -1,18 +1,13 @@
 @echo off
 setlocal EnableExtensions
 title RBT FX - STRATEGY 4 (ALL-IN-ONE)
-rem ================================================================
-rem  JALAN_SEMUA_STRATEGY4 - 1 FILE LANGSUNG MENJALANKAN SEMUA
-rem  - PROGRAM ada di dalam file ini (self-extract, tanpa curl)
-rem  - Python belum ada? UNDUH + INSTALL OTOMATIS dari repo Anda
-rem    (installer resmi python.org yang sudah disimpan di repo)
-rem  - pandas belum ada? UNDUH 12 paket dari repo Anda, install
-rem    OFFLINE. DASHBOARD UTAMA = jendela Qt PySide di layar VPS.
-rem  - Semua unduhan pakai certutil/PowerShell/bitsadmin - BUKAN curl
-rem  - Tidak ada token, tidak ada pertanyaan, sampai dashboard nyala
-rem ================================================================
+rem ==============================================================
+rem  1 FILE -> PASANG PROGRAM + PYTHON + DEPENDENCY + DASHBOARD
+rem  DASHBOARD: jendela Qt (PySide6 di Win10+, PySide2+JEMBATAN di
+rem  Win7/8/8.1/Server2008R2-2012R2). Tanpa pertanyaan apa pun.
+rem  Semua unduhan: certutil/PowerShell/bitsadmin (bukan curl).
+rem ==============================================================
 cd /d "%~dp0"
-
 rem ---- [1] PASANG PROGRAM dari payload di dalam file ini ----
 set "APP=C:\RBT\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21"
 mkdir "%APP%\python" >nul 2>nul
@@ -1060,7 +1055,7 @@ if exist "_rp38.b64" del "_rp38.b64" >nul 2>nul
 if not exist "%APP%\python\command_center.py" goto payload_gagal
 echo [OK] Program lengkap terpasang.
 
-rem ---- [2] PYTHON OTOMATIS (installer dari repo Anda sendiri) ----
+rem ---- [2] PYTHON OTOMATIS (installer dari repo sendiri) ----
 echo [2/3] Cek Python dan dependency (auto-install kalau perlu) ...
 set "PY="
 python --version >nul 2>nul
@@ -1071,16 +1066,17 @@ if not errorlevel 1 set "PY=py -3"
 if defined PY goto py_have
 echo     Python belum ada - mengunduh installer dari repo GitHub Anda ...
 echo       cara 1: certutil (bawaan Windows) ...
-if exist "%TEMP%\_rbt_py.exe" goto py_unduh_ok
-echo       cara 2: PowerShell (tanpa banner progres) ...
-if exist "%TEMP%\_rbt_py.exe" goto py_unduh_ok
-echo       cara 3: bitsadmin ...
-:py_unduh_ok
 if exist "%TEMP%\_rbt_py.exe" del "%TEMP%\_rbt_py.exe" >nul 2>nul
 certutil -urlcache -split -f "https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/python-3.8.10-amd64.exe" "%TEMP%\_rbt_py.exe" >nul 2>nul
-if not exist "%TEMP%\_rbt_py.exe" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/python-3.8.10-amd64.exe' -OutFile '%TEMP%\_rbt_py.exe'}catch{exit 1}" >nul 2>nul
-if not exist "%TEMP%\_rbt_py.exe" bitsadmin /transfer rbtpy "https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/python-3.8.10-amd64.exe" "%TEMP%\_rbt_py.exe" >nul 2>nul
-if not exist "%TEMP%\_rbt_py.exe" goto py_gagal
+if exist "%TEMP%\_rbt_py.exe" goto py_inst
+echo       cara 2: PowerShell (tanpa banner progres) ...
+powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';$ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/python-3.8.10-amd64.exe' -OutFile '%TEMP%\_rbt_py.exe'}catch{exit 1}" >nul 2>nul
+if exist "%TEMP%\_rbt_py.exe" goto py_inst
+echo       cara 3: bitsadmin ...
+bitsadmin /transfer rbtpy "https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/python-3.8.10-amd64.exe" "%TEMP%\_rbt_py.exe" >nul 2>nul
+if exist "%TEMP%\_rbt_py.exe" goto py_inst
+goto py_gagal
+:py_inst
 for %%F in ("%TEMP%\_rbt_py.exe") do if %%~zF LSS 10000000 del "%TEMP%\_rbt_py.exe" >nul 2>nul
 if not exist "%TEMP%\_rbt_py.exe" goto py_gagal
 echo     Install Python 3.8 diam-diam (tunggu 2-4 menit) ...
@@ -1093,8 +1089,6 @@ if defined PY goto py_have
 py -3 --version >nul 2>nul
 if not errorlevel 1 set "PY=py -3"
 if defined PY goto py_have
-echo     Installer repo sudah dijalankan tapi python belum terdeteksi.
-echo     Coba tutup jendela ini lalu klik 2x file ini lagi.
 goto py_gagal
 :py_have
 %PY% -m pip --version >nul 2>nul
@@ -1102,36 +1096,47 @@ if not errorlevel 1 goto pip_ok
 %PY% -m ensurepip --upgrade >nul 2>nul
 :pip_ok
 
-rem ---- [2b] DEPENDENCY CORE: pandas dll dari REPO ANDA (offline) ----
+rem ---- [3] DEPENDENCY CORE dari WHEELS REPO SENDIRI (offline) ----
 %PY% -c "import pandas" >nul 2>nul
 if not errorlevel 1 goto dep_core_ok
 echo     pandas belum ada - mengunduh 12 paket dari repo GitHub Anda ...
-echo       (certutil dulu, lalu PowerShell kalau perlu - mohon tunggu)
 mkdir "%APP%\_wheels" >nul 2>nul
 certutil -urlcache -split -f "https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/certifi-2026.10.23-py3-none-any.whl" "%APP%\_wheels\certifi-2026.10.23-py3-none-any.whl" >nul 2>nul
-if not exist "%APP%\_wheels\certifi-2026.10.23-py3-none-any.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/certifi-2026.10.23-py3-none-any.whl' -OutFile 'certifi-2026.10.23-py3-none-any.whl'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\certifi-2026.10.23-py3-none-any.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';$ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/certifi-2026.10.23-py3-none-any.whl' -OutFile 'certifi-2026.10.23-py3-none-any.whl.'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\certifi-2026.10.23-py3-none-any.whl" if exist "certifi-2026.10.23-py3-none-any.whl." move "certifi-2026.10.23-py3-none-any.whl." "%APP%\_wheels\certifi-2026.10.23-py3-none-any.whl" >nul 2>nul
 certutil -urlcache -split -f "https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/charset_normalizer-3.5.2-cp37-abi3-win_amd64.whl" "%APP%\_wheels\charset_normalizer-3.5.2-cp37-abi3-win_amd64.whl" >nul 2>nul
-if not exist "%APP%\_wheels\charset_normalizer-3.5.2-cp37-abi3-win_amd64.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/charset_normalizer-3.5.2-cp37-abi3-win_amd64.whl' -OutFile 'charset_normalizer-3.5.2-cp37-abi3-win_amd64.whl'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\charset_normalizer-3.5.2-cp37-abi3-win_amd64.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';$ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/charset_normalizer-3.5.2-cp37-abi3-win_amd64.whl' -OutFile 'charset_normalizer-3.5.2-cp37-abi3-win_amd64.whl.'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\charset_normalizer-3.5.2-cp37-abi3-win_amd64.whl" if exist "charset_normalizer-3.5.2-cp37-abi3-win_amd64.whl." move "charset_normalizer-3.5.2-cp37-abi3-win_amd64.whl." "%APP%\_wheels\charset_normalizer-3.5.2-cp37-abi3-win_amd64.whl" >nul 2>nul
 certutil -urlcache -split -f "https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/idna-3.15-py3-none-any.whl" "%APP%\_wheels\idna-3.15-py3-none-any.whl" >nul 2>nul
-if not exist "%APP%\_wheels\idna-3.15-py3-none-any.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/idna-3.15-py3-none-any.whl' -OutFile 'idna-3.15-py3-none-any.whl'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\idna-3.15-py3-none-any.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';$ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/idna-3.15-py3-none-any.whl' -OutFile 'idna-3.15-py3-none-any.whl.'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\idna-3.15-py3-none-any.whl" if exist "idna-3.15-py3-none-any.whl." move "idna-3.15-py3-none-any.whl." "%APP%\_wheels\idna-3.15-py3-none-any.whl" >nul 2>nul
 certutil -urlcache -split -f "https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/numpy-1.24.4-cp38-cp38-win_amd64.whl" "%APP%\_wheels\numpy-1.24.4-cp38-cp38-win_amd64.whl" >nul 2>nul
-if not exist "%APP%\_wheels\numpy-1.24.4-cp38-cp38-win_amd64.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/numpy-1.24.4-cp38-cp38-win_amd64.whl' -OutFile 'numpy-1.24.4-cp38-cp38-win_amd64.whl'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\numpy-1.24.4-cp38-cp38-win_amd64.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';$ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/numpy-1.24.4-cp38-cp38-win_amd64.whl' -OutFile 'numpy-1.24.4-cp38-cp38-win_amd64.whl.'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\numpy-1.24.4-cp38-cp38-win_amd64.whl" if exist "numpy-1.24.4-cp38-cp38-win_amd64.whl." move "numpy-1.24.4-cp38-cp38-win_amd64.whl." "%APP%\_wheels\numpy-1.24.4-cp38-cp38-win_amd64.whl" >nul 2>nul
 certutil -urlcache -split -f "https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/pandas-2.0.3-cp38-cp38-win_amd64.whl" "%APP%\_wheels\pandas-2.0.3-cp38-cp38-win_amd64.whl" >nul 2>nul
-if not exist "%APP%\_wheels\pandas-2.0.3-cp38-cp38-win_amd64.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/pandas-2.0.3-cp38-cp38-win_amd64.whl' -OutFile 'pandas-2.0.3-cp38-cp38-win_amd64.whl'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\pandas-2.0.3-cp38-cp38-win_amd64.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';$ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/pandas-2.0.3-cp38-cp38-win_amd64.whl' -OutFile 'pandas-2.0.3-cp38-cp38-win_amd64.whl.'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\pandas-2.0.3-cp38-cp38-win_amd64.whl" if exist "pandas-2.0.3-cp38-cp38-win_amd64.whl." move "pandas-2.0.3-cp38-cp38-win_amd64.whl." "%APP%\_wheels\pandas-2.0.3-cp38-cp38-win_amd64.whl" >nul 2>nul
 certutil -urlcache -split -f "https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/python_dateutil-3.0.0-py2.py3-none-any.whl" "%APP%\_wheels\python_dateutil-3.0.0-py2.py3-none-any.whl" >nul 2>nul
-if not exist "%APP%\_wheels\python_dateutil-3.0.0-py2.py3-none-any.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/python_dateutil-3.0.0-py2.py3-none-any.whl' -OutFile 'python_dateutil-3.0.0-py2.py3-none-any.whl'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\python_dateutil-3.0.0-py2.py3-none-any.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';$ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/python_dateutil-3.0.0-py2.py3-none-any.whl' -OutFile 'python_dateutil-3.0.0-py2.py3-none-any.whl.'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\python_dateutil-3.0.0-py2.py3-none-any.whl" if exist "python_dateutil-3.0.0-py2.py3-none-any.whl." move "python_dateutil-3.0.0-py2.py3-none-any.whl." "%APP%\_wheels\python_dateutil-3.0.0-py2.py3-none-any.whl" >nul 2>nul
 certutil -urlcache -split -f "https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/pytz-2026.6-py2.py3-none-any.whl" "%APP%\_wheels\pytz-2026.6-py2.py3-none-any.whl" >nul 2>nul
-if not exist "%APP%\_wheels\pytz-2026.6-py2.py3-none-any.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/pytz-2026.6-py2.py3-none-any.whl' -OutFile 'pytz-2026.6-py2.py3-none-any.whl'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\pytz-2026.6-py2.py3-none-any.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';$ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/pytz-2026.6-py2.py3-none-any.whl' -OutFile 'pytz-2026.6-py2.py3-none-any.whl.'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\pytz-2026.6-py2.py3-none-any.whl" if exist "pytz-2026.6-py2.py3-none-any.whl." move "pytz-2026.6-py2.py3-none-any.whl." "%APP%\_wheels\pytz-2026.6-py2.py3-none-any.whl" >nul 2>nul
 certutil -urlcache -split -f "https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/requests-2.31.0-py3-none-any.whl" "%APP%\_wheels\requests-2.31.0-py3-none-any.whl" >nul 2>nul
-if not exist "%APP%\_wheels\requests-2.31.0-py3-none-any.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/requests-2.31.0-py3-none-any.whl' -OutFile 'requests-2.31.0-py3-none-any.whl'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\requests-2.31.0-py3-none-any.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';$ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/requests-2.31.0-py3-none-any.whl' -OutFile 'requests-2.31.0-py3-none-any.whl.'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\requests-2.31.0-py3-none-any.whl" if exist "requests-2.31.0-py3-none-any.whl." move "requests-2.31.0-py3-none-any.whl." "%APP%\_wheels\requests-2.31.0-py3-none-any.whl" >nul 2>nul
 certutil -urlcache -split -f "https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/six-1.17.0-py2.py3-none-any.whl" "%APP%\_wheels\six-1.17.0-py2.py3-none-any.whl" >nul 2>nul
-if not exist "%APP%\_wheels\six-1.17.0-py2.py3-none-any.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/six-1.17.0-py2.py3-none-any.whl' -OutFile 'six-1.17.0-py2.py3-none-any.whl'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\six-1.17.0-py2.py3-none-any.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';$ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/six-1.17.0-py2.py3-none-any.whl' -OutFile 'six-1.17.0-py2.py3-none-any.whl.'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\six-1.17.0-py2.py3-none-any.whl" if exist "six-1.17.0-py2.py3-none-any.whl." move "six-1.17.0-py2.py3-none-any.whl." "%APP%\_wheels\six-1.17.0-py2.py3-none-any.whl" >nul 2>nul
 certutil -urlcache -split -f "https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/tzdata-2026.6-py2.py3-none-any.whl" "%APP%\_wheels\tzdata-2026.6-py2.py3-none-any.whl" >nul 2>nul
-if not exist "%APP%\_wheels\tzdata-2026.6-py2.py3-none-any.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/tzdata-2026.6-py2.py3-none-any.whl' -OutFile 'tzdata-2026.6-py2.py3-none-any.whl'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\tzdata-2026.6-py2.py3-none-any.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';$ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/tzdata-2026.6-py2.py3-none-any.whl' -OutFile 'tzdata-2026.6-py2.py3-none-any.whl.'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\tzdata-2026.6-py2.py3-none-any.whl" if exist "tzdata-2026.6-py2.py3-none-any.whl." move "tzdata-2026.6-py2.py3-none-any.whl." "%APP%\_wheels\tzdata-2026.6-py2.py3-none-any.whl" >nul 2>nul
 certutil -urlcache -split -f "https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/urllib3-1.26.18-py2.py3-none-any.whl" "%APP%\_wheels\urllib3-1.26.18-py2.py3-none-any.whl" >nul 2>nul
-if not exist "%APP%\_wheels\urllib3-1.26.18-py2.py3-none-any.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/urllib3-1.26.18-py2.py3-none-any.whl' -OutFile 'urllib3-1.26.18-py2.py3-none-any.whl'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\urllib3-1.26.18-py2.py3-none-any.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';$ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/urllib3-1.26.18-py2.py3-none-any.whl' -OutFile 'urllib3-1.26.18-py2.py3-none-any.whl.'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\urllib3-1.26.18-py2.py3-none-any.whl" if exist "urllib3-1.26.18-py2.py3-none-any.whl." move "urllib3-1.26.18-py2.py3-none-any.whl." "%APP%\_wheels\urllib3-1.26.18-py2.py3-none-any.whl" >nul 2>nul
 certutil -urlcache -split -f "https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/websockets-12.0-cp38-cp38-win_amd64.whl" "%APP%\_wheels\websockets-12.0-cp38-cp38-win_amd64.whl" >nul 2>nul
-if not exist "%APP%\_wheels\websockets-12.0-cp38-cp38-win_amd64.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/websockets-12.0-cp38-cp38-win_amd64.whl' -OutFile 'websockets-12.0-cp38-cp38-win_amd64.whl'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\websockets-12.0-cp38-cp38-win_amd64.whl" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';$ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/main/redist/wheels/websockets-12.0-cp38-cp38-win_amd64.whl' -OutFile 'websockets-12.0-cp38-cp38-win_amd64.whl.'}catch{exit 1}" >nul 2>nul
+if not exist "%APP%\_wheels\websockets-12.0-cp38-cp38-win_amd64.whl" if exist "websockets-12.0-cp38-cp38-win_amd64.whl." move "websockets-12.0-cp38-cp38-win_amd64.whl." "%APP%\_wheels\websockets-12.0-cp38-cp38-win_amd64.whl" >nul 2>nul
 %PY% -m pip install -q --no-index --find-links "%APP%\_wheels" pandas numpy requests websockets
 %PY% -c "import pandas" >nul 2>nul
 if not errorlevel 1 goto dep_core_ok
@@ -1148,9 +1153,9 @@ if errorlevel 1 goto dep_gagal
 :dep_core_ok
 echo     Dependency core (pandas/numpy/requests/websockets) OK.
 
-rem ---- [2c] Dashboard Qt: PySide6 utk Win10/11, PySide2 utk Win7 ----
+rem ---- [4] DASHBOARD QT sesuai Windows ----
 set "QTVER=6"
-set "DASHGUI=qt"
+set "DASHGUI=tk"
 ver | findstr /C:"6.1" >nul 2>nul
 if not errorlevel 1 set "QTVER=5"
 ver | findstr /C:"6.2" >nul 2>nul
@@ -1160,120 +1165,116 @@ if not errorlevel 1 set "QTVER=5"
 if "%QTVER%"=="5" goto ui_py2
 echo     Memasang PySide6 (dashboard Qt) - cek dulu ...
 %PY% -c "import PySide6" >nul 2>nul
-if not errorlevel 1 goto dep_ui_qt
+if not errorlevel 1 goto ui_ok
 %PY% -m pip install -q --disable-pip-version-check PySide6
 %PY% -c "import PySide6" >nul 2>nul
-if not errorlevel 1 goto dep_ui_qt
-%PY% -m pip install --disable-pip-version-check PySide6
-%PY% -c "import PySide6" >nul 2>nul
-if not errorlevel 1 goto dep_ui_qt
+if not errorlevel 1 goto ui_ok
 echo     PySide6 tidak bisa jalan di Windows ini - mencoba PySide2 ...
 :ui_py2
-echo     Memasang PySide2 (Qt5, dukungan Windows 7) - mohon tunggu ...
+echo     Memasang PySide2 (Qt5, dukungan Windows 7 / Server 2012) ...
 %PY% -m pip install -q --disable-pip-version-check PySide2
-%PY% -c "import PySide2" >nul 2>nul
+%PY% -c "import PySide2.QtWidgets" >nul 2>nul
 if not errorlevel 1 goto ui_jembatan
 %PY% -m pip install --disable-pip-version-check PySide2
-%PY% -c "import PySide2" >nul 2>nul
+%PY% -c "import PySide2.QtWidgets" >nul 2>nul
 if not errorlevel 1 goto ui_jembatan
 echo [!] PySide tidak bisa jalan di Windows ini.
 goto ui_tk
 :ui_jembatan
-rem ---- JEMBATAN: file dashboard PySide6 jalan di atas PySide2 (Qt5) ----
+rem ---- JEMBATAN: file dashboard PySide6 jalan di atas PySide2 ----
 mkdir "%APP%\python\PySide6" >nul 2>nul
->"%APP%\python\PySide6\__init__.py" echo from PySide2 import QtCore, QtGui, QtWidgets
->>"%APP%\python\PySide6\__init__.py" echo __version__ = getattr(PySide2, "__version__", "5.15.2")
+>"%APP%\python\PySide6\__init__.py" echo import PySide2 as _p2
+>>"%APP%\python\PySide6\__init__.py" echo from PySide2.QtCore import *
+>>"%APP%\python\PySide6\__init__.py" echo from PySide2.QtGui import *
+>>"%APP%\python\PySide6\__init__.py" echo from PySide2.QtWidgets import *
+>>"%APP%\python\PySide6\__init__.py" echo __version__ = getattr(_p2, "__version__", "5.15.2")
 >"%APP%\python\PySide6\QtCore.py" echo from PySide2.QtCore import *
 >"%APP%\python\PySide6\QtGui.py" echo from PySide2.QtGui import *
 >"%APP%\python\PySide6\QtWidgets.py" echo from PySide2.QtWidgets import *
-%PY% -c "import sys;sys.path.insert(0,'%APP%\python');import PySide6" >nul 2>nul
-if not errorlevel 1 goto dep_ui_qt
+%PY% -c "import sys;sys.path.insert(0,'%APP%\python');import PySide6.QtWidgets" >nul 2>nul
+if not errorlevel 1 goto ui_ok
 echo     Jembatan gagal - dashboard dipakai lewat Tk bawaan Python.
 :ui_tk
 set "DASHGUI=tk"
 echo [!] Dashboard Qt tidak tersedia - memakai dashboard Tk bawaan.
-goto dep_mt5
-:dep_ui_qt
+goto ui_done
+:ui_ok
 set "DASHGUI=qt"
-:dep_mt5
+:ui_done
 %PY% -c "import MetaTrader5" >nul 2>nul
-if not errorlevel 1 goto dep_mt5_ok
+if not errorlevel 1 goto mt5_ok
 %PY% -m pip install -q --disable-pip-version-check MetaTrader5
-:dep_mt5_ok
+:mt5_ok
 
-rem ---- [3] Update opsional dari GitHub (gagal = pakai program lokal) ----
-echo (update opsional GitHub) (dilewati kalau tidak bisa) ...
+rem ---- [6] UPDATE OPSIONAL (gagal = pakai program lokal) ----
+echo     Cek update GitHub (dilewati kalau tidak bisa) ...
 set "UZIP=%TEMP%\_rbt_aio.zip"
 set "UDIR=%TEMP%\_rbt_aio"
 set "UURL=https://codeload.github.com/ributprasetyoaji/Sistem-Trading-Strategy-4-SNR-EMA13-EMA21/zip/refs/heads/main"
 if exist "%UZIP%" del "%UZIP%" >nul 2>nul
 if exist "%UDIR%" rmdir /s /q "%UDIR%" >nul 2>nul
 certutil -urlcache -split -f "%UURL%" "%UZIP%" >nul 2>nul
-if not exist "%UZIP%" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri '%UURL%' -OutFile '%UZIP%'}catch{exit 1}" >nul 2>nul
+if not exist "%UZIP%" powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';$ErrorActionPreference='Stop';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;Invoke-WebRequest -UseBasicParsing -Uri '%UURL%' -OutFile '%UZIP%'}catch{exit 1}" >nul 2>nul
 if not exist "%UZIP%" goto upd_skip
 for %%F in ("%UZIP%") do if %%~zF LSS 50000 goto upd_skip
-powershell -NoProfile -Command "try{Expand-Archive -Force -LiteralPath '%UZIP%' '%UDIR%'}catch{exit 1}" >nul 2>nul
-if exist "%UDIR%\%REPO_NAME%-main\python\command_center.py" set "USRC=%UDIR%\%REPO_NAME%-main"
-if defined USRC robocopy "%USRC%\python" "%APP%\python" /E /XF cc_state.json cc_day.json cc_status.json CC_SIGNAL.csv s2_state.json s3_state.json s3_journal.jsonl s3_hist_*.json cc_heartbeat.json pair_switch.json pair_lot.json /XD __pycache__ logs replay /NFL /NDL /NJH /NJS /NP >nul
+powershell -NoProfile -Command "try{$ProgressPreference='SilentlyContinue';Expand-Archive -Force -LiteralPath '%UZIP%' '%UDIR%'}catch{exit 1}" >nul 2>nul
+if exist "%UDIR%\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21-main\python\command_center.py" set "USRC=%UDIR%\Sistem-Trading-Strategy-4-SNR-EMA13-EMA21-main"
+if defined USRC robocopy "%USRC%\python" "%APP%\python" /E /XF cc_state.json cc_day.json cc_status.json CC_SIGNAL.csv s2_state.json s3_state.json s3_journal.jsonl s3_hist_*.json cc_heartbeat.json pair_switch.json pair_lot.json /XD __pycache__ logs replay PySide6 /NFL /NDL /NJH /NJS /NP >nul
 :upd_skip
 if exist "%UZIP%" del "%UZIP%" >nul 2>nul
 if exist "%UDIR%" rmdir /s /q "%UDIR%" >nul 2>nul
 
-rem ---- [4] Bersihkan proses lama lalu nyalakan ENGINE + DASHBOARD QT ----
+rem ---- [7] BERSIHKAN PROSES LAMA ----
 echo [3/3] Menyalakan STRATEGY 4 ...
 for /f "tokens=5" %%p in ('netstat -aon ^| findstr ":8082" ^| findstr "LISTENING"') do taskkill /F /PID %%p >nul 2>&1
 powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 8082 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }" >nul 2>&1
 wmic process where "CommandLine like '%%command_center.py%%'" delete >nul 2>&1
 wmic process where "CommandLine like '%%cc_qtdashboard%%' or CommandLine like '%%cc_tkdashboard%%'" delete >nul 2>&1
-rem ---- engine DETACHED (pythonw): jendela boleh ditutup, engine tetap hidup ----
-set "PYW="
-rem ---- pythonw HARUS sejajar python valid (ukuran >100KB, bukan stub) ----
-for /f "delims=" %%W in ('where python 2^>nul') do if not defined PYW if %%~zW GTR 100000 if exist "%%~dpWpythonw.exe" set "PYW=%%~dpWpythonw.exe"
-if not defined PYW set "PYW=%PY%"
+
+rem ---- [8] ENGINE: console minimized sendiri (stdout valid) ----
 cd /d "%APP%"
 start "RBT FX ENGINE" /MIN "%PY%" -u python\command_center.py
 echo     Engine dinyalakan - console minimized: RBT FX ENGINE di taskbar.
 
-rem ---- tunggu data engine siap (GUI Qt mengambil data dari situ) ----
+rem ---- [9] tunggu data engine (GUI Qt membaca dari situ) ----
 %PY% -c "import socket,sys;s=socket.socket();s.settimeout(2);sys.exit(0 if s.connect_ex(('127.0.0.1',8082))==0 else 1)" >nul 2>nul
 if not errorlevel 1 goto eng_ok
-timeout /t 3 /nobreak >nul 2>nul
+timeout /t 4 /nobreak >nul 2>nul
 %PY% -c "import socket,sys;s=socket.socket();s.settimeout(2);sys.exit(0 if s.connect_ex(('127.0.0.1',8082))==0 else 1)" >nul 2>nul
 if not errorlevel 1 goto eng_ok
-timeout /t 3 /nobreak >nul 2>nul
-timeout /t 3 /nobreak >nul 2>nul
+timeout /t 4 /nobreak >nul 2>nul
 %PY% -c "import socket,sys;s=socket.socket();s.settimeout(2);sys.exit(0 if s.connect_ex(('127.0.0.1',8082))==0 else 1)" >nul 2>nul
 if not errorlevel 1 goto eng_ok
+timeout /t 4 /nobreak >nul 2>nul
 %PY% -c "import socket,sys;s=socket.socket();s.settimeout(2);sys.exit(0 if s.connect_ex(('127.0.0.1',8082))==0 else 1)" >nul 2>nul
 if not errorlevel 1 goto eng_ok
-echo [!] Data engine belum siap - dashboard Qt tetap dibuka.
+echo [!] Data engine belum siap - dashboard tetap dibuka.
 echo     Kalau dashboard bilang OFFLINE: klik jendela RBT FX ENGINE
 echo     di taskbar utk melihat pesan error engine.
 goto eng_info
 :eng_ok
 echo [OK] Engine STRATEGY 4 berjalan (data siap).
 :eng_info
-rem ---- DASHBOARD UTAMA: jendela Qt (PySide6/PySide2) atau Tk ----
+
+rem ---- pythonw SEJAJAR python valid (>50KB, bukan stub Store) ----
+set "PYW="
+for /f "delims=" %%W in ('where python 2^>nul') do if not defined PYW if %%~zW GTR 50000 if exist "%%~dpWpythonw.exe" set "PYW=%%~dpWpythonw.exe"
+if not defined PYW set "PYW=%PY%"
 set "GUISCR=python\cc_qtdashboard.py"
 if "%DASHGUI%"=="tk" set "GUISCR=python\cc_tkdashboard.py"
 start "RBT FX DASHBOARD" %PYW% "%GUISCR%" --port 8082
 echo [OK] Dashboard dibuka di layar VPS.
-rem ---- WATCHDOG: kalau dashboard tidak hidup 8 dtk -> start mode console ----
+rem ---- WATCHDOG: dashboard tidak hidup 8 dtk -> start mode console ----
 timeout /t 8 /nobreak >nul 2>nul
 tasklist | findstr /I "pythonw.exe" >nul 2>nul || start "RBT FX DASHBOARD" %PY% "%GUISCR%" --port 8082
 tasklist | findstr /I "pythonw.exe" >nul 2>nul || echo [!] Dashboard dipakai lewat mode console (pythonw tidak hidup).
+
 echo Engine berjalan DI LATAR BELAKANG - jendela ini BOLEH ditutup.
 echo Mau matikan semua: Task Manager - akhiri python.exe dan pythonw.exe
 echo.
 echo SELESAI - STRATEGY 4 berjalan. Boleh tutup jendela ini.
 timeout /t 10 /nobreak >nul 2>nul
 exit /b 0
-
-:selesai_ui_gagal
-echo     Cek internet VPS lalu klik 2x file ini lagi.
-echo     (Program tetap terpasang - tidak perlu install ulang.)
-pause
-exit /b 1
 
 :payload_gagal
 echo [X] Gagal memasang program dari payload - download ulang file ini.
@@ -1282,8 +1283,7 @@ exit /b 1
 
 :py_gagal
 echo [X] Python tidak berhasil dipasang otomatis di VPS ini.
-echo     Installer sudah dicoba unduh dari repo Anda dengan 3 cara
-echo     (certutil, PowerShell, bitsadmin) - semuanya gagal.
+echo     3 cara unduh (certutil, PowerShell, bitsadmin) semua gagal.
 echo     Kemungkinan besar internet VPS bermasalah.
 echo     Cek internet VPS lalu klik 2x file ini lagi.
 pause
