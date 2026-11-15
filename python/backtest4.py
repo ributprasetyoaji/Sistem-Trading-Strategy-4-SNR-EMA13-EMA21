@@ -238,7 +238,11 @@ def replay_pair(m15, m5, k, warmup=WARMUP):
         if (sig == "BUY" and bias != "buy") or \
                 (sig == "SELL" and bias != "sell"):
             continue
-        entry = zone                                  # harga saat touch
+        # harga eksekusi nyata (v4.46): TIPE B (retest) = menyentuh titik
+        # zona -> entry = zona; TIPE A (HL/LH konfirmasi) = entry pada
+        # harga saat sinyal (live bar j), BUKAN zona (zona bisa jauh dari
+        # harga -- RR 1:1 live dihitung dari harga eksekusi, evaluate()).
+        entry = zone if "retest" in _why else h[j]
         dist = abs(entry - sl_px)
         if dist <= 0:
             continue

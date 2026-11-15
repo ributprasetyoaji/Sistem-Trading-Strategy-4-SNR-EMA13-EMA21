@@ -13,9 +13,12 @@ import backtest4 as bt4                                    # noqa: E402
 import cc_strategy3 as cs3                                 # noqa: E402
 
 
-def _sawtooth_bars(cycles=9, up=20, dn=4, up_step=0.6, dn_step=-0.3,
+def _sawtooth_bars(cycles=9, up=20, dn=7, up_step=0.6, dn_step=-0.9,
                    base=100.0):
-    """Uptrend HH/HL badan-candle: naik 20 bar, pullback 4 bar (kecil)."""
+    """Uptrend HH/HL badan-candle: naik 20 bar, pullback DALAM 7 bar
+    (v4.46: pullback harus kembali ke dalam struktur -- pola user: HH
+    -> turun membentuk HL -> konfirmasi -> entry; pullback dangkal
+    tidak pernah kembali ke zona -> tidak ada entry dgn logic baru)."""
     ts = []
     o, h, l, c = [], [], [], []
     px = base
@@ -108,4 +111,6 @@ def test_sinyal_entry_sama_dengan_evaluate_path():
     assert found, "tak ada bar dgn bias+ADX+touch BUY valid"
     j, st4 = found
     assert st4[1] > st4[2]          # zona HH di atas SL HL
-    assert st4[3].startswith("S4 touch HH")
+    # v4.46: kedua tipe entry sah (A: HL valid konfirmasi, B: retest
+    # zona HH lama setelah HH baru)
+    assert st4[3].startswith(("S4 HL valid", "S4 retest HH lama"))

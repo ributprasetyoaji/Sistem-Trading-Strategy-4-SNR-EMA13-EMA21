@@ -786,11 +786,30 @@ def body_pivots(bars, strength=3, max_pivots=24):
 
 
 def s4_structure(bars, k=None, live=None):
-    """(user) Entry touch zona: uptrend HH -> HL -> harga naik MENYENTUH
-    titik HH -> BUY (SL = titik HL); mirror utk SELL.
-    Zona yang sudah pernah kesentuh pada bar SELESAI -> tidak di-entry
-    ulang (menjadi zona HL/LH ke depan).  live = harga saat ini (opsional;
-    default close bar berjalan).  Return (sig, zone_px, sl_px, why)/None.
+    """(user v4.46) POLA SWING USER -- DUA TIPE ENTRY, mirror SELL penuh.
+
+    TIPE A -- "HL konfirmasi" (entry pertama siklus):
+      Uptrend membentuk zona HIGHER HIGH lalu turun membentuk HIGHER
+      LOW; setelah KONFIRMASI VALID terbentuk HL (pivot badan: HL >
+      semua low sebelumnya, semua bar selesai tetap di atas HL), dan
+      harga masih pullback DI DALAM struktur (di atas HL, belum
+      menyentuh zona HH) -> BUY.  SL = titik HL.  TP = RR 1:1.
+      Mirror SELL: LL -> LH valid terkonfirmasi -> SELL, SL = titik LH.
+
+    TIPE B -- "retest zona HH lama" (entry lanjutan, berulang):
+      Tren naik lagi membentuk zona HIGHER HIGH BARU (H2 > HH lama);
+      zona HH lama/sebelumnya kini MENJADI ZONA HIGHER LOW (support
+      baru); saat harga TURUN MENYENTUH titik tersebut -> BUY LAGI.
+      Touch harus touch PERTAMA sejak HH baru terbentuk (bar selesai
+      yang sudah menyentuh = zona dipakai, jangan entry molor).  SL di
+      bawah zona baru: zona - 0.5 x (HH lama - HL) -- SL persis di
+      titik touch = jarak nol (tak bisa dieksekusi).
+      Mirror SELL: LL baru terbentuk -> zona LL lama menjadi zona LH
+      (resistance baru) -> harga NAIK menyentuh titik itu -> SELL lagi.
+
+    Pivots = BADAN candle (permintaan user, bukan wick).  live = harga
+    saat ini (opsional; default close bar berjalan).
+    Return (sig, zone_px, sl_px, why) / None.
     """
     k = k or {}
     s = int(k.get("swing_strength", 3))
@@ -808,7 +827,7 @@ def s4_structure(bars, k=None, live=None):
         return None
     px = float(live) if live else c[-1]
 
-    # ---------- BUY: pv[-2]=HH (zona), pv[-1]=HL (SL) ----------
+    # ------ TIPE A (BUY): HH -> HL valid terkonfirmasi -> pullback ------
     if pv[-1][0] == "L" and pv[-2][0] == "H":
         H1_i, H1 = pv[-2][1], pv[-2][2]
         L1_i, L1 = pv[-1][1], pv[-1][2]
@@ -816,19 +835,41 @@ def s4_structure(bars, k=None, live=None):
         hs = [q[2] for q in prior if q[0] == "H"]
         ls = [q[2] for q in prior if q[0] == "L"]
         if hs and ls and H1 > max(hs) and L1 > max(ls):
-            # v4.44a: cek SEMUA bar selesai (n-1) -- dulu n-s sehingga
-            # s bar terakhir sebelum live tidak diperiksa -> re-entry
-            # zona yang baru saja kesentuh
+            # konfirmasi HL: semua bar selesai tetap di atas HL
             ok = all(cc > L1 for cc in c[L1_i + 1:n - 1])
+            # zona HH belum dipakai pada bar selesai (kalau sudah
+            # tersentuh, fase pullback pertama lewat -> tunggu HH baru)
             used = any(hh >= H1 for hh in h[L1_i + 1:n - 1]) or \
                 any(cc >= H1 for cc in c[L1_i + 1:n - 1])
             live_hi = max(px, h[-1])
-            chase = H1 + 0.5 * (H1 - L1)
-            if ok and not used and live_hi >= H1 and live_hi <= chase:
+            if ok and not used and L1 < px < H1 and live_hi < H1:
                 return ("BUY", H1, L1,
-                        "S4 touch HH %.5f (HL %.5f, body)" % (H1, L1))
+                        "S4 HL valid %.5f (HH zona %.5f, body)"
+                        % (L1, H1))
 
-    # ---------- SELL: pv[-2]=LL (zona), pv[-1]=LH (SL) ----------
+    # ------ TIPE B (BUY): HH baru -> zona HH lama jadi HL -> touch ------
+    if pv[-1][0] == "H" and pv[-2][0] == "L" and len(pv) >= 3 \
+            and pv[-3][0] == "H":
+        H1_i, H1 = pv[-3][1], pv[-3][2]
+        L1_i, L1 = pv[-2][1], pv[-2][2]
+        H2_i, H2 = pv[-1][1], pv[-1][2]
+        prior = pv[:-3]
+        hs = [q[2] for q in prior if q[0] == "H"]
+        ls = [q[2] for q in prior if q[0] == "L"]
+        if hs and ls and H1 > max(hs) and L1 > max(ls) and H2 > H1:
+            ok = all(cc > L1 for cc in c[L1_i + 1:n - 1])
+            # touch zona HH lama harus yang PERTAMA sejak HH baru
+            # (bar selesai yang sudah menyentuh -> zona dipakai -> skip)
+            used2 = any(ll <= H1 for ll in l[H2_i + 1:n - 1]) or \
+                any(cc <= H1 for cc in c[H2_i + 1:n - 1])
+            live_lo = min(px, l[-1])
+            chase = H1 - 0.5 * (H1 - L1)
+            if ok and not used2 and live_lo <= H1 and live_lo >= chase:
+                return ("BUY", H1, chase,
+                        "S4 retest HH lama %.5f (HH baru %.5f, body)"
+                        % (H1, H2))
+
+    # ------ TIPE A (SELL): LL -> LH valid terkonfirmasi -> pullback -----
     if pv[-1][0] == "H" and pv[-2][0] == "L":
         L1_i, L1 = pv[-2][1], pv[-2][2]
         H1_i, H1 = pv[-1][1], pv[-1][2]
@@ -836,14 +877,35 @@ def s4_structure(bars, k=None, live=None):
         hs = [q[2] for q in prior if q[0] == "H"]
         ls = [q[2] for q in prior if q[0] == "L"]
         if hs and ls and L1 < min(ls) and H1 < min(hs):
-            ok = all(cc < H1 for cc in c[H1_i + 1:n - 1])   # v4.44a
+            ok = all(cc < H1 for cc in c[H1_i + 1:n - 1])
             used = any(ll <= L1 for ll in l[H1_i + 1:n - 1]) or \
                 any(cc <= L1 for cc in c[H1_i + 1:n - 1])
             live_lo = min(px, l[-1])
-            chase = L1 - 0.5 * (H1 - L1)
-            if ok and not used and live_lo <= L1 and live_lo >= chase:
+            if ok and not used and L1 < px < H1 and live_lo > L1:
                 return ("SELL", L1, H1,
-                        "S4 touch LL %.5f (LH %.5f, body)" % (L1, H1))
+                        "S4 LH valid %.5f (LL zona %.5f, body)"
+                        % (H1, L1))
+
+    # ------ TIPE B (SELL): LL baru -> zona LL lama jadi LH -> touch -----
+    if pv[-1][0] == "L" and pv[-2][0] == "H" and len(pv) >= 3 \
+            and pv[-3][0] == "L":
+        L1_i, L1 = pv[-3][1], pv[-3][2]
+        H1_i, H1 = pv[-2][1], pv[-2][2]
+        L2_i, L2 = pv[-1][1], pv[-1][2]
+        prior = pv[:-3]
+        hs = [q[2] for q in prior if q[0] == "H"]
+        ls = [q[2] for q in prior if q[0] == "L"]
+        if hs and ls and L1 < min(ls) and H1 < min(hs) and L2 < L1:
+            ok = all(cc < H1 for cc in c[H1_i + 1:n - 1])
+            # touch zona LL lama harus yang PERTAMA sejak LL baru
+            used2 = any(hh >= L1 for hh in h[L2_i + 1:n - 1]) or \
+                any(cc >= L1 for cc in c[L2_i + 1:n - 1])
+            live_hi = max(px, h[-1])
+            chase = L1 + 0.5 * (H1 - L1)
+            if ok and not used2 and live_hi >= L1 and live_hi <= chase:
+                return ("SELL", L1, chase,
+                        "S4 retest LL lama %.5f (LL baru %.5f, body)"
+                        % (L1, L2))
     return None
 
 
@@ -865,8 +927,11 @@ def s4_reversal(bars, sig, k=None):
 # --------------------------- LOGIC ENTRY (user v4.44) ------------------------
 
 def evaluate(symbol, data, k=None, st=None):
-    """S4: bias EMA stack M15 + ADX>20 + filter M5 + struktur HH/HL
-    badan-candle -> entry touch zona (RR 1:1).  Tanpa sinyal = WAIT."""
+    """S4 (v4.46): bias EMA stack M15 + ADX>20 + filter M5 + pola swing
+    user -- TIPE A: HH -> HL valid terkonfirmasi -> BUY (SL=HL);
+    TIPE B: HH baru -> zona HH lama jadi zona HL -> turun menyentuh
+    titik itu -> BUY lagi (SL di bawah zona).  Mirror SELL penuh.
+    Badan-candle pivot, RR 1:1.  Tanpa sinyal = WAIT."""
     k = k or {}
     data = data or {}
     m15 = data.get("m15") or {}
