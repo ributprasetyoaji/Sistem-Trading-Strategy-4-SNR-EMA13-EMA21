@@ -813,6 +813,13 @@ def s4_structure(bars, k=None, live=None):
     terbentuk sebagian = TIDAK ada entry.  HH harus > semua high sebelum
     dan HL > semua low sebelumnya (valid); semua bar selesai setelah HL
     wajib tetap di atas HL (struktur pecah = batal).
+    VALIDASI CEPAT (user v4.48): menunggu 3 bar bisa MENGHILANGKAN
+    MOMENTUM -> validitas juga sah bila ditandai PENOLAKAN HARGA / WICK
+    candle: bar terakhir (selesai/berjalan) menyentuh ujung pullback
+    (HL/LH) lalu DITOLAK -- wick ke ujung, close jauh dari ujung
+    (setengah atas bar utk BUY, setengah bawah utk SELL) dan close
+    tidak menembus ujung -> entry MOMENTUM: harga = live, SL = ujung
+    pullback.  Jalur struktural 3 bar tetap ada (keduanya sah).
     Pivots = BADAN candle (permintaan user, bukan wick).  live = harga
     saat ini (opsional; default close bar berjalan).
     Return (sig, zone_px, sl_px, why) / None.
@@ -832,6 +839,79 @@ def s4_structure(bars, k=None, live=None):
     if len(pv) < 3:
         return None
     px = float(live) if live else c[-1]
+
+    # ------ EARLY (v4.48, user): validasi dgn PENOLAKAN HARGA / WICK ----
+    # Ujung pullback (HL utk BUY / LH utk SELL) belum perlu pivot jadi;
+    # sah bila bar terakhir MENOLAK di ujung tersebut (wick penolakan,
+    # close menjauh dari ujung, tidak menembus).  Entry momentum.
+    def _last_confirmed(kind):
+        for idx in range(len(pv) - 1, -1, -1):
+            if pv[idx][0] == kind:
+                return idx
+        return -1
+
+    hi = _last_confirmed("H")
+    if hi >= 0:                                   # BUY momentum (wick bawah)
+        Hi_i, H = pv[hi][1], pv[hi][2]
+        prior = pv[:hi]
+        hs = [q[2] for q in prior if q[0] == "H"]
+        if hs and H > max(hs) and Hi_i + 1 <= n - 1:
+            lows = l[Hi_i + 1:]
+            Lx = min(lows)
+            Lx_i = Hi_i + 1 + lows.index(Lx)
+            leg = H - Lx
+            if leg > 0:
+                used = any(hh >= H for hh in h[Hi_i + 1:n - 1]) or \
+                    any(cc >= H for cc in c[Hi_i + 1:n - 1])
+                ok = all(cc > Lx for cc in c[Lx_i + 1:n - 1])
+                rej = False
+                for kk in (n - 2, n - 1):        # bar selesai / bar berjalan
+                    if kk < 0:
+                        continue
+                    rng = h[kk] - l[kk]
+                    if rng <= 0:
+                        continue
+                    mid = (h[kk] + l[kk]) / 2.0
+                    if (l[kk] <= Lx + 0.1 * leg and
+                            c[kk] > Lx and c[kk] > mid):
+                        rej = True
+                live_hi = max(px, h[-1])
+                if (not used and ok and rej and Lx < px < H
+                        and live_hi < H):
+                    return ("BUY", H, Lx,
+                            "S4 penolakan wick di HL %.5f (zona HH %.5f)"
+                            % (Lx, H))
+    li = _last_confirmed("L")
+    if li >= 0:                                   # SELL momentum (wick atas)
+        Li_i, L = pv[li][1], pv[li][2]
+        prior = pv[:li]
+        ls = [q[2] for q in prior if q[0] == "L"]
+        if ls and L < min(ls) and Li_i + 1 <= n - 1:
+            highs = h[Li_i + 1:]
+            Hx = max(highs)
+            Hx_i = Li_i + 1 + highs.index(Hx)
+            leg = Hx - L
+            if leg > 0:
+                used = any(ll <= L for ll in l[Li_i + 1:n - 1]) or \
+                    any(cc <= L for cc in c[Li_i + 1:n - 1])
+                ok = all(cc < Hx for cc in c[Hx_i + 1:n - 1])
+                rej = False
+                for kk in (n - 2, n - 1):
+                    if kk < 0:
+                        continue
+                    rng = h[kk] - l[kk]
+                    if rng <= 0:
+                        continue
+                    mid = (h[kk] + l[kk]) / 2.0
+                    if (h[kk] >= Hx - 0.1 * leg and
+                            c[kk] < Hx and c[kk] < mid):
+                        rej = True
+                live_lo = min(px, l[-1])
+                if (not used and ok and rej and L < px < Hx
+                        and live_lo > L):
+                    return ("SELL", L, Hx,
+                            "S4 penolakan wick di LH %.5f (zona LL %.5f)"
+                            % (Hx, L))
 
     # ------ TIPE A (BUY): HH -> HL valid terkonfirmasi -> pullback ------
     if pv[-1][0] == "L" and pv[-2][0] == "H":

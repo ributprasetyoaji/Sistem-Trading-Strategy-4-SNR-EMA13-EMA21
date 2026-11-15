@@ -186,6 +186,79 @@ def test_s4_structure_sell_lh_valid():
     assert abs(r[2] - 124.2) < 0.3                  # SL = titik LH (body)
 
 
+def _wick_bars(closes, lows, highs):
+    """bars dgn wick eksplisit (utk test penolakan/wick v4.48)."""
+    n = len(closes)
+    return {"time": list(range(1000, 1000 + n)),
+            "open": [closes[i - 1] if i else closes[0]
+                     for i in range(n)],
+            "high": highs, "low": lows, "close": closes}
+
+
+def test_penolakan_wick_buy_tanpa_nunggu_3_bar():
+    """v4.48 (user): validasi HL dgn PENOLAKAN HARGA/WICK -- momentum
+    tidak hilang.  HH terkonfirmasi -> pullback 2 bar -> bar berjalan
+    HAMMER (low menyentuh ujung pullback 96.5, close 98.9 di setengah
+    atas) -> LANGSUNG BUY, SL = ujung pullback.  Jalur struktural 3 bar
+    belum mungkin (baru 2 bar selesai) -> satu-satunya jalur = wick."""
+    up = [90 + 0.5 * i for i in range(11)]
+    h0 = [95.0] * 3
+    dip = [93.2, 92.8, 93.0]
+    up2 = [94.5 + 0.55 * i for i in range(10)]
+    h1 = [100.0] * 4
+    cl = up + h0 + dip + up2 + h1 + [97.6, 97.0, 98.9]
+    lo = ([x - 0.12 for x in (up + h0 + dip + up2 + h1)] +
+          [97.3, 96.8, 96.5])
+    hi = ([x + 0.12 for x in (up + h0 + dip + up2 + h1)] +
+          [98.2, 97.8, 99.1])
+    r = S.s4_structure(_wick_bars(cl, lo, hi), K)
+    assert r is not None and r[0] == "BUY"
+    zona, sl = r[1], r[2]
+    assert abs(zona - 100.0) < 0.2                 # zona = HH
+    assert abs(sl - 96.5) < 0.2                    # SL = ujung pullback
+    assert "penolakan" in r[3]                     # penanda wick
+
+
+def test_penolakan_wick_sell_tanpa_nunggu_3_bar():
+    """v4.48 mirror SELL: LL terkonfirmasi -> pullback naik 2 bar ->
+    bar berjalan wick ATAS menyentuh ujung pullback lalu ditolak (close
+    di setengah bawah) -> LANGSUNG SELL, SL = ujung pullback (122.5)."""
+    dn = [130 - 0.5 * i for i in range(9)]
+    h0 = [126.0] * 3
+    dip = [124.8, 124.4, 124.9]
+    h1 = [125.3, 125.6]
+    dn2 = [125.2 - 0.4 * i for i in range(13)]
+    ll = [120.0] * 4
+    cl = dn + h0 + dip + h1 + dn2 + ll + [121.6, 122.4, 121.3]
+    lo = ([x - 0.12 for x in (dn + h0 + dip + h1 + dn2 + ll)] +
+          [121.2, 122.0, 120.8])
+    hi = ([x + 0.12 for x in (dn + h0 + dip + h1 + dn2 + ll)] +
+          [121.9, 122.7, 122.5])
+    r = S.s4_structure(_wick_bars(cl, lo, hi), K)
+    assert r is not None and r[0] == "SELL"
+    zona, sl = r[1], r[2]
+    assert abs(zona - 120.0) < 0.2                 # zona = LL
+    assert abs(sl - 122.7) < 0.2                   # SL = ujung pullback
+    assert "penolakan" in r[3]
+
+
+def test_tanpa_penolakan_tidak_entry_early():
+    """v4.48: bar terakhir TIDAK menolak (close di setengah bawah bar,
+    tidak menjauh dari ujung) -> jalur wick tidak entry.  Jalur
+    struktural juga belum sah -> None (tunggu konfirmasi)."""
+    up = [90 + 0.5 * i for i in range(11)]
+    h0 = [95.0] * 3
+    dip = [93.2, 92.8, 93.0]
+    up2 = [94.5 + 0.55 * i for i in range(10)]
+    h1 = [100.0] * 4
+    cl = up + h0 + dip + up2 + h1 + [97.6, 97.0, 96.7]
+    lo = ([x - 0.12 for x in (up + h0 + dip + up2 + h1)] +
+          [97.3, 96.8, 96.5])
+    hi = ([x + 0.12 for x in (up + h0 + dip + up2 + h1)] +
+          [98.2, 97.8, 97.2])
+    assert S.s4_structure(_wick_bars(cl, lo, hi), K) is None
+
+
 def test_zona_belum_terbentuk_tidak_entry():
     """v4.47 (user): zona HH/HL yang BELUM valid terbentuk -> TIDAK ada
     entry.  HL baru punya 2 bar selesai setelahnya (butuh 3) -> struktur
