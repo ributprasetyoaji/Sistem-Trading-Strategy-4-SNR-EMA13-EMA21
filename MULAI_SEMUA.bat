@@ -295,10 +295,29 @@ netsh advfirewall firewall add rule name="RBT FX STRATEGY 4 Dashboard" dir=in ac
 
 REM Browser dibuka setelah 12 dtk (dashboard S2 sudah pasti bind)
 REM (dashboard S2 bind di awal -- browser dibuka setelah 12 dtk aman)
+set "PYEXE_="
+for /f "delims=" %%P in ('%PY% -c "import sys;print(sys.executable)" 2^>nul') do set "PYEXE_=%%P"
+if not defined PYEXE_ set "PYEXE_=%PY%"
+set "PYW="
+for %%P in ("%PYEXE_%") do if exist "%%~dpPpythonw.exe" set "PYW=%%~dpPpythonw.exe"
+if not defined PYW set "PYW=%PYEXE_%"
 set "DASH=python\cc_tkdashboard.py"
 %PY% -c "import PySide6" >nul 2>&1
 if not errorlevel 1 set "DASH=python\cc_qtdashboard.py"
-start "RBT FX DASHBOARD" %PYW% %DASH% --port 8082
+start "RBT FX DASHBOARD" "%PYW%" "%DASH%" --port 8082
+echo    Dashboard dinyalakan - memeriksa dalam 8 detik...
+ping -n 9 127.0.0.1 >nul
+tasklist /FI "IMAGENAME eq pythonw.exe" 2>nul | find /I "pythonw.exe" >nul
+if not errorlevel 1 goto dash_ok
+echo    [!] Dashboard belum terdeteksi - mencoba mode console (agar error terlihat)...
+> "%~dp0DASH_DEBUG.bat" echo @echo off
+>> "%~dp0DASH_DEBUG.bat" echo cd /d "%~dp0"
+>> "%~dp0DASH_DEBUG.bat" echo "%PYEXE_%" "%DASH%" --port 8082
+>> "%~dp0DASH_DEBUG.bat" echo.
+>> "%~dp0DASH_DEBUG.bat" echo [X] Dashboard keluar tanpa jendela - FOTO LAYAR INI dan kirim.
+>> "%~dp0DASH_DEBUG.bat" echo pause
+start "RBT FX DASHBOARD" "%~dp0DASH_DEBUG.bat"
+:dash_ok
 
 Rem v-fix: engine jalan DI JENDELA INI (permintaan user: tidak ada
 rem jendela python kedua yang kosong/tak berfungsi). Log engine tampil
