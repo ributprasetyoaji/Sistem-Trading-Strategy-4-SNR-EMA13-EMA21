@@ -1096,6 +1096,11 @@ if not errorlevel 1 goto pip_ok
 %PY% -m ensurepip --upgrade >nul 2>nul
 :pip_ok
 
+rem ---- resolve python.exe ASLI (start tidak bisa memakai "py -3") ----
+set "PYEXE="
+for /f "delims=" %%P in ('%PY% -c "import sys;print(sys.executable)"') do set "PYEXE=%%P"
+if not defined PYEXE set "PYEXE=%PY%"
+
 rem ---- [3] DEPENDENCY CORE dari WHEELS REPO SENDIRI (offline) ----
 %PY% -c "import pandas" >nul 2>nul
 if not errorlevel 1 goto dep_core_ok
@@ -1233,7 +1238,7 @@ wmic process where "CommandLine like '%%cc_qtdashboard%%' or CommandLine like '%
 
 rem ---- [8] ENGINE: console minimized sendiri (stdout valid) ----
 cd /d "%APP%"
-start "RBT FX ENGINE" /MIN "%PY%" -u python\command_center.py
+start "RBT FX ENGINE" /MIN "%PYEXE%" -u python\command_center.py
 echo     Engine dinyalakan - console minimized: RBT FX ENGINE di taskbar.
 
 rem ---- [9] tunggu data engine (GUI Qt membaca dari situ) ----
@@ -1256,17 +1261,17 @@ goto eng_info
 echo [OK] Engine STRATEGY 4 berjalan (data siap).
 :eng_info
 
-rem ---- pythonw SEJAJAR python valid (>50KB, bukan stub Store) ----
+rem ---- pythonw SEJAJAR python.exe asli (folder yang sama) ----
 set "PYW="
-for /f "delims=" %%W in ('where python 2^>nul') do if not defined PYW if %%~zW GTR 50000 if exist "%%~dpWpythonw.exe" set "PYW=%%~dpWpythonw.exe"
-if not defined PYW set "PYW=%PY%"
+for %%P in ("%PYEXE%") do if exist "%%~dpPpythonw.exe" set "PYW=%%~dpPpythonw.exe"
+if not defined PYW set "PYW=%PYEXE%"
 set "GUISCR=python\cc_qtdashboard.py"
 if "%DASHGUI%"=="tk" set "GUISCR=python\cc_tkdashboard.py"
-start "RBT FX DASHBOARD" %PYW% "%GUISCR%" --port 8082
+start "RBT FX DASHBOARD" "%PYW%" "%GUISCR%" --port 8082
 echo [OK] Dashboard dibuka di layar VPS.
 rem ---- WATCHDOG: dashboard tidak hidup 8 dtk -> start mode console ----
 timeout /t 8 /nobreak >nul 2>nul
-tasklist | findstr /I "pythonw.exe" >nul 2>nul || start "RBT FX DASHBOARD" %PY% "%GUISCR%" --port 8082
+tasklist | findstr /I "pythonw.exe" >nul 2>nul || start "RBT FX DASHBOARD" "%PYEXE%" "%GUISCR%" --port 8082
 tasklist | findstr /I "pythonw.exe" >nul 2>nul || echo [!] Dashboard dipakai lewat mode console (pythonw tidak hidup).
 
 echo Engine berjalan DI LATAR BELAKANG - jendela ini BOLEH ditutup.
