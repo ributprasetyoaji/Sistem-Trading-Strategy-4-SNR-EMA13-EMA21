@@ -2177,6 +2177,13 @@ class Dash(QWidget):
         rows = s.get("scanner") or []
         st_col = {"TRADING": AMBER, "READY": GRN, "HOLD": CY, "BLOCKED": TX,
                   "WAIT": TX}
+        # v4.47 (user): JAGA POSISI SCROLL -- dulu tabel pair dibangun
+        # ulang total tiap refresh (setRowCount(0) -> insert ulang semua
+        # baris) -> scrollbar vertikal jatuh ke 0 terus, scroll ke bawah
+        # selalu kembali ke atas.  Simpan posisi sebelum rebuild,
+        # kembalikan tepat sesudahnya.
+        _vsb = self.tv.verticalScrollBar()
+        _vprev = _vsb.value()
         keep = []
         self.tv.setRowCount(0)
         i = 0
@@ -2234,7 +2241,13 @@ class Dash(QWidget):
                 self.tv.setItem(r0, c0, it)
             keep.append(r.get("symbol"))
         if self.sel_sym and self.sel_sym in keep:
-            self.tv.selectRow(keep.index(self.sel_sym))
+            want = keep.index(self.sel_sym)
+            # hanya re-select bila barisnya benar-benar pindah -- dulu
+            # selectRow dipanggil tiap tick dan menggeser scroll
+            if self.tv.currentRow() != want:
+                self.tv.selectRow(want)
+        # posisi scroll user DIJAGA (clamp ke tinggi tabel baru)
+        _vsb.setValue(min(_vprev, _vsb.maximum()))
         self._apply_lot_panel(s)
 
         # confluence + chart

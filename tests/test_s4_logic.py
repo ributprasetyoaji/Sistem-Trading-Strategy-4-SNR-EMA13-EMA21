@@ -186,6 +186,40 @@ def test_s4_structure_sell_lh_valid():
     assert abs(r[2] - 124.2) < 0.3                  # SL = titik LH (body)
 
 
+def test_zona_belum_terbentuk_tidak_entry():
+    """v4.47 (user): zona HH/HL yang BELUM valid terbentuk -> TIDAK ada
+    entry.  HL baru punya 2 bar selesai setelahnya (butuh 3) -> struktur
+    belum sah -> None."""
+    up = [90 + 0.5 * i for i in range(11)]
+    h0 = [95.0] * 3
+    dip = [93.2, 92.8, 93.0]
+    up2 = [94.5 + 0.55 * i for i in range(10)]
+    h1 = [100.0] * 4
+    pb = [98.25, 97.375, 96.5]
+    tail2 = [97.4, 97.7]              # hanya 2 bar selesai (butuh 3)
+    live = [98.0]
+    b = _bars(up + h0 + dip + up2 + h1 + pb + tail2 + live, spread=0.12)
+    assert S.s4_structure(b, K) is None
+
+
+def test_zona_hh_baru_belum_terbentuk_tidak_entry():
+    """v4.47: HH baru hanya punya 2 bar selesai setelahnya -> Tipe B
+    (retest zona HH lama) belum sah -> None."""
+    up = [90 + 0.5 * i for i in range(11)]
+    h0 = [95.0] * 3
+    dip = [93.2, 92.8, 93.0]
+    up2 = [94.5 + 0.55 * i for i in range(10)]
+    h1 = [100.0] * 4
+    pb = [98.5, 97.0, 97.2]
+    up3 = [97.6, 98.2, 98.8, 99.4, 100.2, 101.0]
+    h2s = [104.0] * 4
+    dn2 = [103.0, 102.5]              # hanya 2 bar selesai (butuh 3)
+    live = [99.8]                     # sudah menyentuh zona 100
+    b = _bars(up + h0 + dip + up2 + h1 + pb + up3 + h2s + dn2 + live,
+              spread=0.12)
+    assert S.s4_structure(b, K) is None
+
+
 def test_s4_structure_buy_retest_hh_lama():
     """TIPE B: HH baru terbentuk -> zona HH lama menjadi zona HL -> saat
     harga TURUN MENYENTUH titik itu -> BUY LAGI (SL di bawah zona)."""

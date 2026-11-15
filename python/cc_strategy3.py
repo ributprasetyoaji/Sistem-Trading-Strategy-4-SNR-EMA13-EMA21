@@ -807,6 +807,12 @@ def s4_structure(bars, k=None, live=None):
       Mirror SELL: LL baru terbentuk -> zona LL lama menjadi zona LH
       (resistance baru) -> harga NAIK menyentuh titik itu -> SELL lagi.
 
+    JAMINAN VALIDITAS (user v4.47): zona HH/HL wajib SUDAH VALID
+    TERBENTUK sebelum entry -- pivot badan hanya diakui setelah ada
+    swing_strength (3) bar SELESAI di kanannya; struktur yang masih
+    terbentuk sebagian = TIDAK ada entry.  HH harus > semua high sebelum
+    dan HL > semua low sebelumnya (valid); semua bar selesai setelah HL
+    wajib tetap di atas HL (struktur pecah = batal).
     Pivots = BADAN candle (permintaan user, bukan wick).  live = harga
     saat ini (opsional; default close bar berjalan).
     Return (sig, zone_px, sl_px, why) / None.
@@ -835,6 +841,7 @@ def s4_structure(bars, k=None, live=None):
         hs = [q[2] for q in prior if q[0] == "H"]
         ls = [q[2] for q in prior if q[0] == "L"]
         if hs and ls and H1 > max(hs) and L1 > max(ls):
+            formed = (n - 2 - L1_i >= s)   # HL valid terbentuk: s bar SELESAI
             # konfirmasi HL: semua bar selesai tetap di atas HL
             ok = all(cc > L1 for cc in c[L1_i + 1:n - 1])
             # zona HH belum dipakai pada bar selesai (kalau sudah
@@ -842,7 +849,8 @@ def s4_structure(bars, k=None, live=None):
             used = any(hh >= H1 for hh in h[L1_i + 1:n - 1]) or \
                 any(cc >= H1 for cc in c[L1_i + 1:n - 1])
             live_hi = max(px, h[-1])
-            if ok and not used and L1 < px < H1 and live_hi < H1:
+            if (ok and not used and formed and L1 < px < H1
+                    and live_hi < H1):
                 return ("BUY", H1, L1,
                         "S4 HL valid %.5f (HH zona %.5f, body)"
                         % (L1, H1))
@@ -857,6 +865,8 @@ def s4_structure(bars, k=None, live=None):
         hs = [q[2] for q in prior if q[0] == "H"]
         ls = [q[2] for q in prior if q[0] == "L"]
         if hs and ls and H1 > max(hs) and L1 > max(ls) and H2 > H1:
+            formed = (n - 2 - L1_i >= s and n - 2 - H2_i >= s and
+                      n - 2 - H1_i >= s)    # zona sudah valid terbentuk
             ok = all(cc > L1 for cc in c[L1_i + 1:n - 1])
             # touch zona HH lama harus yang PERTAMA sejak HH baru
             # (bar selesai yang sudah menyentuh -> zona dipakai -> skip)
@@ -864,7 +874,8 @@ def s4_structure(bars, k=None, live=None):
                 any(cc <= H1 for cc in c[H2_i + 1:n - 1])
             live_lo = min(px, l[-1])
             chase = H1 - 0.5 * (H1 - L1)
-            if ok and not used2 and live_lo <= H1 and live_lo >= chase:
+            if (ok and not used2 and formed and
+                    live_lo <= H1 and live_lo >= chase):
                 return ("BUY", H1, chase,
                         "S4 retest HH lama %.5f (HH baru %.5f, body)"
                         % (H1, H2))
@@ -877,11 +888,13 @@ def s4_structure(bars, k=None, live=None):
         hs = [q[2] for q in prior if q[0] == "H"]
         ls = [q[2] for q in prior if q[0] == "L"]
         if hs and ls and L1 < min(ls) and H1 < min(hs):
+            formed = (n - 2 - H1_i >= s)   # LH valid terbentuk: s bar SELESAI
             ok = all(cc < H1 for cc in c[H1_i + 1:n - 1])
             used = any(ll <= L1 for ll in l[H1_i + 1:n - 1]) or \
                 any(cc <= L1 for cc in c[H1_i + 1:n - 1])
             live_lo = min(px, l[-1])
-            if ok and not used and L1 < px < H1 and live_lo > L1:
+            if (ok and not used and formed and L1 < px < H1
+                    and live_lo > L1):
                 return ("SELL", L1, H1,
                         "S4 LH valid %.5f (LL zona %.5f, body)"
                         % (H1, L1))
@@ -896,13 +909,16 @@ def s4_structure(bars, k=None, live=None):
         hs = [q[2] for q in prior if q[0] == "H"]
         ls = [q[2] for q in prior if q[0] == "L"]
         if hs and ls and L1 < min(ls) and H1 < min(hs) and L2 < L1:
+            formed = (n - 2 - H1_i >= s and n - 2 - L2_i >= s and
+                      n - 2 - L1_i >= s)    # zona sudah valid terbentuk
             ok = all(cc < H1 for cc in c[H1_i + 1:n - 1])
             # touch zona LL lama harus yang PERTAMA sejak LL baru
             used2 = any(hh >= L1 for hh in h[L2_i + 1:n - 1]) or \
                 any(cc >= L1 for cc in c[L2_i + 1:n - 1])
             live_hi = max(px, h[-1])
             chase = L1 + 0.5 * (H1 - L1)
-            if ok and not used2 and live_hi >= L1 and live_hi <= chase:
+            if (ok and not used2 and formed and
+                    live_hi >= L1 and live_hi <= chase):
                 return ("SELL", L1, chase,
                         "S4 retest LL lama %.5f (LL baru %.5f, body)"
                         % (L1, L2))
