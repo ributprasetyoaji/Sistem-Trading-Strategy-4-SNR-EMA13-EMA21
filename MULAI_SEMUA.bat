@@ -314,7 +314,7 @@ echo    [!] Dashboard belum terdeteksi - mencoba mode console (agar error terlih
 >> "%~dp0DASH_DEBUG.bat" echo cd /d "%~dp0"
 >> "%~dp0DASH_DEBUG.bat" echo "%PYEXE_%" "%DASH%" --port 8082
 >> "%~dp0DASH_DEBUG.bat" echo.
->> "%~dp0DASH_DEBUG.bat" echo [X] Dashboard keluar tanpa jendela - FOTO LAYAR INI dan kirim.
+>> "%~dp0DASH_DEBUG.bat" echo echo [X] Dashboard keluar tanpa jendela - FOTO LAYAR INI dan kirim.
 >> "%~dp0DASH_DEBUG.bat" echo pause
 start "RBT FX DASHBOARD" "%~dp0DASH_DEBUG.bat"
 :dash_ok
