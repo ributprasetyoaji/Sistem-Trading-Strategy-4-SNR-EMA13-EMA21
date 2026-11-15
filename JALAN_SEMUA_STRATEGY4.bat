@@ -1148,22 +1148,54 @@ if errorlevel 1 goto dep_gagal
 :dep_core_ok
 echo     Dependency core (pandas/numpy/requests/websockets) OK.
 
-rem ---- [2c] PySide6 (dashboard) + MetaTrader5 ----
+rem ---- [2c] Dashboard Qt: PySide6 utk Win10/11, PySide2 utk Win7 ----
+set "QTVER=6"
+set "DASHGUI=qt"
+ver | findstr /C:"6.1" >nul 2>nul
+if not errorlevel 1 set "QTVER=5"
+ver | findstr /C:"6.2" >nul 2>nul
+if not errorlevel 1 set "QTVER=5"
+ver | findstr /C:"6.3" >nul 2>nul
+if not errorlevel 1 set "QTVER=5"
+if "%QTVER%"=="5" goto ui_py2
+echo     Memasang PySide6 (dashboard Qt) - cek dulu ...
 %PY% -c "import PySide6" >nul 2>nul
-if not errorlevel 1 goto dep_ui_ok
-echo     PySide6 belum ada - mengunduh dan memasang (diam-diam) ...
+if not errorlevel 1 goto dep_ui_qt
 %PY% -m pip install -q --disable-pip-version-check PySide6
 %PY% -c "import PySide6" >nul 2>nul
-if not errorlevel 1 goto dep_ui_ok
+if not errorlevel 1 goto dep_ui_qt
 %PY% -m pip install --disable-pip-version-check PySide6
 %PY% -c "import PySide6" >nul 2>nul
-if not errorlevel 1 goto dep_ui_ok
-%PY% -m pip install --user --disable-pip-version-check PySide6
-%PY% -c "import PySide6" >nul 2>nul
-if not errorlevel 1 goto dep_ui_ok
-echo [X] PySide6 gagal dipasang - dashboard tidak bisa dibuka.
-goto selesai_ui_gagal
-:dep_ui_ok
+if not errorlevel 1 goto dep_ui_qt
+echo     PySide6 tidak bisa jalan di Windows ini - mencoba PySide2 ...
+:ui_py2
+echo     Memasang PySide2 (Qt5, dukungan Windows 7) - mohon tunggu ...
+%PY% -m pip install -q --disable-pip-version-check PySide2
+%PY% -c "import PySide2" >nul 2>nul
+if not errorlevel 1 goto ui_jembatan
+%PY% -m pip install --disable-pip-version-check PySide2
+%PY% -c "import PySide2" >nul 2>nul
+if not errorlevel 1 goto ui_jembatan
+echo [!] PySide tidak bisa jalan di Windows ini.
+goto ui_tk
+:ui_jembatan
+rem ---- JEMBATAN: file dashboard PySide6 jalan di atas PySide2 (Qt5) ----
+mkdir "%APP%\python\PySide6" >nul 2>nul
+>"%APP%\python\PySide6\__init__.py" echo from PySide2 import QtCore, QtGui, QtWidgets
+>>"%APP%\python\PySide6\__init__.py" echo __version__ = getattr(PySide2, "__version__", "5.15.2")
+>"%APP%\python\PySide6\QtCore.py" echo from PySide2.QtCore import *
+>"%APP%\python\PySide6\QtGui.py" echo from PySide2.QtGui import *
+>"%APP%\python\PySide6\QtWidgets.py" echo from PySide2.QtWidgets import *
+%PY% -c "import sys;sys.path.insert(0,'%APP%\python');import PySide6" >nul 2>nul
+if not errorlevel 1 goto dep_ui_qt
+echo     Jembatan gagal - dashboard dipakai lewat Tk bawaan Python.
+:ui_tk
+set "DASHGUI=tk"
+echo [!] Dashboard Qt tidak tersedia - memakai dashboard Tk bawaan.
+goto dep_mt5
+:dep_ui_qt
+set "DASHGUI=qt"
+:dep_mt5
 %PY% -c "import MetaTrader5" >nul 2>nul
 if not errorlevel 1 goto dep_mt5_ok
 %PY% -m pip install -q --disable-pip-version-check MetaTrader5
@@ -1221,12 +1253,14 @@ goto eng_info
 :eng_ok
 echo [OK] Engine STRATEGY 4 berjalan (data siap).
 :eng_info
-rem ---- DASHBOARD UTAMA: jendela Qt (PySide) ----
-start "RBT FX DASHBOARD" %PYW% "python\cc_qtdashboard.py" --port 8082
-echo [OK] Dashboard Qt (PySide) dibuka di layar VPS.
+rem ---- DASHBOARD UTAMA: jendela Qt (PySide6/PySide2) atau Tk ----
+set "GUISCR=python\cc_qtdashboard.py"
+if "%DASHGUI%"=="tk" set "GUISCR=python\cc_tkdashboard.py"
+start "RBT FX DASHBOARD" %PYW% "%GUISCR%" --port 8082
+echo [OK] Dashboard dibuka di layar VPS.
 rem ---- WATCHDOG: kalau dashboard tidak hidup 8 dtk -> start mode console ----
 timeout /t 8 /nobreak >nul 2>nul
-tasklist | findstr /I "pythonw.exe" >nul 2>nul || start "RBT FX DASHBOARD" %PY% "python\cc_qtdashboard.py" --port 8082
+tasklist | findstr /I "pythonw.exe" >nul 2>nul || start "RBT FX DASHBOARD" %PY% "%GUISCR%" --port 8082
 tasklist | findstr /I "pythonw.exe" >nul 2>nul || echo [!] Dashboard dipakai lewat mode console (pythonw tidak hidup).
 echo Engine berjalan DI LATAR BELAKANG - jendela ini BOLEH ditutup.
 echo Mau matikan semua: Task Manager - akhiri python.exe dan pythonw.exe
